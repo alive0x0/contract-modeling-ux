@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario Search — v6 (Figma Reference)</title>
+
+  <!-- Nunito Sans — exact font from Figma file -->
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <!-- Material Symbols Rounded — exact icon font from Figma file -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       CIGNA CANVAS TOKENS — extracted directly from Figma
+       File: Combined Scenarios (6EYaIlOed0KHdr9MKtf9Fj)
+       Page: Reference (18:625)
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      /* Backgrounds — from node fills */
+      --bg-page:        #f8f9ff;   /* Screen Template fill */
+      --bg-header:      #fdfdff;   /* Screen Header fill */
+      --bg-white:       #ffffff;
+      --bg-nav:         #ffffff;   /* Nav fill */
+
+      /* Brand */
+      --blue:           #0033ff;   /* Interactivity.Primary-Main */
+      --blue-dk:        #110081;   /* Canvas.Primary.Dark */
+      --blue-lt:        #e6f0ff;   /* Canvas.Primary.Light */
+      --blue-mid:       #424dcf;   /* hover state seen in nodes */
+      --blue-100:       #d7e9ff;
+
+      /* Text */
+      --ink:            #353331;   /* Type.Color.Default */
+      --ink-2:          #6b6966;   /* Type.Color.Accent */
+      --ink-3:          #a3a19f;   /* Type.Color.Disabled */
+      --ink-rev:        #ffffff;
+
+      /* Semantic */
+      --green:          #007442;   /* success, seen in node fills */
+      --green-bg:       #edf3e8;
+      --red:            #c83333;   /* critical */
+      --red-dk:         #660000;
+      --red-bg:         #fdede8;
+      --amber:          #816506;
+      --amber-bg:       #f8e9b3;
+      --purple:         #424dcf;
+
+      /* Borders — from stroke colors */
+      --border:         #e0ddda;   /* Border.Emphasis */
+      --border-sub:     #f2f0ee;   /* Border.Subtle */
+      --border-strong:  #6b6966;
+      --border-table:   #dbdde9;   /* Table border */
+
+      /* Table */
+      --th-bg:          #f2f0ee;   /* table header background */
+      --th-ink:         #353331;
+      --row-hover:      #fbfaf9;
+      --row-sel:        #e6f0ff;
+
+      /* Negotiation stage */
+      --s-test-bg:  #f2f0ee; --s-test-ink:  #54524f; --s-test-brd:  #ccc9c6;
+      --s-cp-bg:    #e6f0ff; --s-cp-ink:    #110081; --s-cp-brd:    #b4d1ff;
+      --s-pp-bg:    #f5f0ff; --s-pp-ink:    #3f2c6b; --s-pp-brd:    #cfbaff;
+      --s-fin-bg:   #edf3e8; --s-fin-ink:   #004226; --s-fin-brd:   rgba(0,116,66,.3);
+
+      --purple-50:  #f5f0ff;
+      --purple-200: #cfbaff;
+      --purple-600: #8256e7;
+
+      --teal-bg:    #ddfdfb; --teal:  #002f32; --teal-brd: #13c8a4;
+      --amber-bg2:  #f8e9b3;
+
+      /* Shadows */
+      --sh-sm: 0 1px 2px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.08);
+      --sh:    0 2px 8px rgba(0,0,0,.08), 0 1px 3px rgba(0,0,0,.06);
+      --sh-nav:0 1px 0 var(--border);
+
+      /* Spacing (from node paddingLeft/Right/Top/Bottom) */
+      --sp2: 2px; --sp4: 4px; --sp8: 8px; --sp12: 12px;
+      --sp16: 16px; --sp24: 24px; --sp32: 32px; --sp48: 48px;
+
+      /* Border radius (from node cornerRadius) */
+      --r4:    4px;    /* buttons, chips, inputs */
+      --r8:    8px;    /* cards, panels */
+      --rpill: 1000px; /* avatar, dot */
+
+      /* Typography */
+      --font: 'Nunito Sans', system-ui, -apple-system, sans-serif;
+      --icon: 'Material Symbols Rounded';
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body {
+      font-family: var(--font);
+      background: var(--bg-page);
+      color: var(--ink);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── MATERIAL ICON HELPER ── */
+    .mi {
+      font-family: var(--icon);
+      font-weight: 400;
+      font-style: normal;
+      font-size: 18px;
+      line-height: 1;
+      letter-spacing: normal;
+      text-transform: none;
+      display: inline-block;
+      white-space: nowrap;
+      word-wrap: normal;
+      direction: ltr;
+      -webkit-font-feature-settings: 'liga';
+      font-feature-settings: 'liga';
+      -webkit-font-smoothing: antialiased;
+      vertical-align: middle;
+      user-select: none;
+    }
+    .mi-sm { font-size: 16px; }
+    .mi-lg { font-size: 21px; }
+    .mi-xl { font-size: 26px; }
+    .mi-blue { color: var(--blue); }
+    .mi-muted { color: var(--ink-2); }
+    .mi-white { color: #fff; }
+
+    /* ═══════════════════════
+       NAVIGATION
+       padding: 12px left, 16px right (from node)
+       nav link: 16px h-pad, 12px top, 4px bottom
+    ═══════════════════════ */
+    .nav {
+      background: var(--bg-nav);
+      border-bottom: 1px solid var(--border);
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 var(--sp16) 0 var(--sp12);
+      gap: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: var(--sp8);
+      padding: var(--sp4) var(--sp8);
+      border-radius: var(--r4);
+      margin-right: var(--sp8);
+      flex-shrink: 0;
+    }
+    .nav-logo-icon {
+      width: 24px; height: 24px;
+      background: var(--blue);
+      border-radius: var(--r4);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-logo-icon .mi { font-size: 14px; color: #fff; }
+    .nav-logo-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .nav-links {
+      display: flex;
+      align-items: stretch;
+      height: 48px;
+      padding: 0 var(--sp24);
+      gap: 0;
+    }
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--sp4);
+      padding: var(--sp12) var(--sp16) var(--sp4);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      position: relative;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      text-decoration: none;
+    }
+    .nav-link:hover { color: var(--blue); }
+    .nav-link.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+      padding-bottom: 2px;
+    }
+    .nav-link .mi { font-size: 18px; }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: var(--sp16);
+      margin-left: auto;
+    }
+    .nav-icon-btn {
+      display: flex; align-items: center;
+      padding: 0 var(--sp4);
+      cursor: pointer;
+      color: var(--ink);
+    }
+    .nav-icon-btn:hover { color: var(--blue); }
+    .nav-help {
+      display: flex; align-items: center; gap: var(--sp4);
+      font-size: 14px; font-weight: 600; color: var(--ink);
+      padding: var(--sp12) var(--sp16) var(--sp4);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .nav-help:hover { color: var(--blue); }
+    .nav-avatar {
+      width: 32px; height: 32px;
+      border-radius: var(--rpill);
+      background: var(--blue);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    /* ═══════════════════════
+       SCREEN HEADER
+       padding: 16px all (from node)
+       itemSpacing: 32px
+       bg: #fdfdff
+    ═══════════════════════ */
+    .screen-header {
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border);
+      padding: var(--sp16);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--sp32);
+    }
+    .sh-left {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp8);
+      flex-shrink: 0;
+    }
+    .sh-back {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 14px; font-weight: 600; color: var(--blue);
+      cursor: pointer; width: fit-content;
+    }
+    .sh-back .mi { font-size: 20px; }
+    .sh-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+    .sh-subtitle {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink-2);
+    }
+    /* Metadata bar under title */
+    .sh-meta {
+      display: flex;
+      gap: var(--sp32);
+      align-items: flex-start;
+    }
+    .sh-meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .sh-meta-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .sh-meta-lbl {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink-2);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    /* Stepper — right side of header */
+    .stepper {
+      display: flex;
+      align-items: flex-start;
+      padding: var(--sp12) var(--sp48);
+      gap: var(--sp8);
+      flex-shrink: 0;
+      margin-left: auto;
+    }
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp4);
+      position: relative;
+    }
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 13px;
+      left: calc(50% + 14px);
+      width: calc(100% - 4px);
+      height: 1px;
+      background: var(--border);
+    }
+    .step-circle {
+      width: 26px; height: 26px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+      border: 1.5px solid var(--border);
+      background: var(--bg-white);
+      color: var(--ink-3);
+      position: relative;
+      z-index: 1;
+    }
+    .step.done .step-circle {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+    }
+    .step.done .step-circle .mi { font-size: 14px; }
+    .step.active .step-circle {
+      background: var(--blue);
+      border-color: var(--blue);
+      color: #fff;
+      border-width: 2px;
+    }
+    .step-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-3);
+      white-space: nowrap;
+      text-align: center;
+    }
+    .step.done .step-label,
+    .step.active .step-label { color: var(--blue); }
+
+    /* ═══════════════════════
+       LAYOUT — left rail + main
+    ═══════════════════════ */
+    .layout {
+      display: flex;
+      min-height: calc(100vh - 104px);
+    }
+
+    /* LEFT RAIL
+       Link: Left Rail Navigation/Link
+       Width: ~200px, padding 16px h
+    */
+    .left-rail {
+      width: 200px;
+      flex-shrink: 0;
+      background: var(--bg-white);
+      border-right: 1px solid var(--border);
+      padding: var(--sp8) 0;
+    }
+    .rail-link {
+      display: flex;
+      align-items: center;
+      gap: var(--sp8);
+      padding: var(--sp8) var(--sp16);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      position: relative;
+    }
+    .rail-link:hover { background: var(--row-hover); color: var(--blue); }
+    .rail-link.active {
+      color: var(--blue);
+      border-left-color: var(--blue);
+      background: var(--row-sel);
+    }
+    .rail-link .mi { font-size: 18px; color: inherit; }
+    .rail-section {
+      padding: var(--sp8) var(--sp16) var(--sp4);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--ink-3);
+      margin-top: var(--sp8);
+    }
+
+    /* MAIN CONTENT */
+    .main {
+      flex: 1;
+      padding: var(--sp16) var(--sp24);
+      min-width: 0;
+      overflow-x: auto;
+    }
+
+    /* ═══════════════════════
+       PAGE-LEVEL TABS
+       Tabs/Page-Level component
+       16px/w600, count badge
+    ═══════════════════════ */
+    .page-tabs {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 2px solid var(--border);
+      margin-bottom: var(--sp16);
+      gap: 0;
+    }
+    .page-tab {
+      display: flex;
+      align-items: center;
+      gap: var(--sp8);
+      padding: var(--sp8) var(--sp16) 9px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink-2);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      white-space: nowrap;
+    }
+    .page-tab:hover { color: var(--ink); }
+    .page-tab.active {
+      color: var(--blue);
+      border-bottom-color: var(--blue);
+    }
+    .tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: var(--rpill);
+      font-size: 11px;
+      font-weight: 700;
+      background: var(--border-sub);
+      color: var(--ink-2);
+    }
+    .page-tab.active .tab-badge {
+      background: var(--blue);
+      color: #fff;
+    }
+
+    /* ═══════════════════════
+       TEAM ACTIVITY PANEL
+    ═══════════════════════ */
+    .team-panel {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--r8);
+      margin-bottom: var(--sp12);
+      overflow: hidden;
+    }
+    .tp-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--sp8) var(--sp16);
+      border-bottom: 1px solid var(--border-sub);
+    }
+    .tp-hdr-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .tp-hdr-right {
+      display: flex;
+      align-items: center;
+      gap: var(--sp8);
+    }
+    .tp-period {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 13px; font-weight: 600; color: var(--ink-2);
+      padding: 3px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--r4);
+      cursor: pointer;
+      background: var(--bg-white);
+    }
+    .tp-period:hover { border-color: var(--blue); color: var(--blue); }
+    .tp-period .mi { font-size: 16px; }
+    .tp-hint { font-size: 12px; color: var(--ink-3); }
+
+    .tp-members {
+      display: flex;
+      align-items: stretch;
+      overflow-x: auto;
+    }
+    .mc {
+      flex: 1;
+      min-width: 190px;
+      padding: var(--sp12) var(--sp16);
+      border-right: 1px solid var(--border-sub);
+      cursor: pointer;
+      transition: background .06s;
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp8);
+    }
+    .mc:last-child { border-right: none; }
+    .mc:hover { background: var(--row-hover); }
+    .mc.active {
+      background: var(--row-sel);
+      border-top: 2px solid var(--blue);
+      margin-top: -1px;
+    }
+    .mc-top { display: flex; align-items: center; gap: var(--sp8); }
+    .mc-av {
+      width: 30px; height: 30px;
+      border-radius: var(--rpill);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .av-a { background: #3879db; }
+    .av-b { background: #007442; }
+    .av-c { background: #8256e7; }
+    .av-d { background: #009083; }
+    .av-e { background: #816506; }
+    .mc-name { font-size: 13px; font-weight: 700; color: var(--ink); line-height: 1.3; }
+    .mc-role { font-size: 11px; color: var(--ink-3); }
+    .mc-stats { display: flex; gap: var(--sp16); }
+    .mc-stat-val { font-size: 20px; font-weight: 800; color: var(--ink); line-height: 1; }
+    .mc-stat-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-3); }
+    .mc-note {
+      font-size: 11px; color: var(--ink-2); line-height: 1.5;
+      background: var(--bg-page);
+      border-left: 2px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 0 var(--r4) var(--r4) 0;
+    }
+    .mc-note strong { color: var(--ink); }
+    .mc-note-ts { font-size: 10px; color: var(--ink-3); display: block; margin-top: 2px; }
+
+    /* ═══════════════════════
+       FILTER BAR — Canvas style
+    ═══════════════════════ */
+    .fbar {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--r8);
+      padding: var(--sp12) var(--sp16);
+      margin-bottom: var(--sp12);
+    }
+    .fbar-row1 { display: flex; gap: var(--sp8); align-items: center; margin-bottom: var(--sp8); }
+
+    /* Search input — Canvas Field style */
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap .mi {
+      position: absolute; left: 10px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ink-2); font-size: 18px; pointer-events: none;
+    }
+    .search-inp {
+      width: 100%; height: 36px;
+      padding: 0 12px 0 38px;
+      border: 1px solid var(--border);
+      border-radius: var(--r4);
+      font-size: 14px; font-family: var(--font);
+      color: var(--ink); background: var(--bg-white);
+      outline: none;
+    }
+    .search-inp:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .search-inp::placeholder { color: var(--ink-3); }
+
+    /* Button — matches Canvas Button/Default
+       cornerRadius: 4px, paddingLeft/Right: 9px, itemSpacing: 8px */
+    .btn {
+      display: inline-flex; align-items: center; gap: var(--sp8);
+      height: 36px; padding: 0 12px;
+      border-radius: var(--r4);
+      font-size: 14px; font-weight: 600;
+      font-family: var(--font);
+      cursor: pointer;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      transition: background .08s, border-color .08s;
+    }
+    .btn .mi { font-size: 18px; }
+    .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-outline {
+      background: var(--bg-white); color: var(--blue);
+      border-color: var(--blue);
+    }
+    .btn-outline:hover { background: var(--row-sel); }
+    .btn-ghost {
+      background: transparent; color: var(--ink-2);
+      border-color: transparent;
+    }
+    .btn-ghost:hover { background: var(--border-sub); color: var(--ink); }
+    .btn-text {
+      background: transparent; color: var(--blue);
+      border-color: transparent; padding: 0 var(--sp4);
+    }
+    .btn-text:hover { text-decoration: underline; }
+
+    /* Filters trigger — shows count when active */
+    .filter-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      height: 36px; padding: 0 12px;
+      border-radius: var(--r4);
+      font-size: 14px; font-weight: 600; font-family: var(--font);
+      cursor: pointer; white-space: nowrap;
+      border: 1px solid var(--border);
+      background: var(--bg-white); color: var(--ink);
+    }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-btn.on { border-color: var(--blue); background: var(--row-sel); color: var(--blue); }
+    .filter-btn .mi { font-size: 18px; }
+    .filter-count {
+      background: var(--blue); color: #fff;
+      border-radius: var(--rpill);
+      font-size: 10px; font-weight: 700;
+      padding: 1px 6px; min-width: 18px; text-align: center;
+    }
+
+    /* Save View */
+    .save-btn {
+      display: inline-flex; align-items: center; gap: var(--sp8);
+      height: 36px; padding: 0 12px;
+      border-radius: var(--r4);
+      font-size: 14px; font-weight: 600; font-family: var(--font);
+      cursor: pointer; white-space: nowrap;
+      border: 1px dashed var(--ink-3);
+      background: transparent; color: var(--ink-2);
+    }
+    .save-btn:hover { border-color: var(--blue); border-style: solid; color: var(--blue); background: var(--row-sel); }
+    .save-btn .mi { font-size: 18px; }
+
+    /* Quick filter row */
+    .fbar-row2 { display: flex; gap: var(--sp8); align-items: center; flex-wrap: wrap; }
+
+    /* Canvas select — matches Dropdown component */
+    .fsel {
+      height: 32px;
+      padding: 0 28px 0 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--r4);
+      font-size: 13px; font-weight: 600;
+      font-family: var(--font); color: var(--ink);
+      background: var(--bg-white)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23353331' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+        no-repeat right 8px center;
+      appearance: none; cursor: pointer; outline: none;
+    }
+    .fsel:focus { border-color: var(--blue); }
+    .fsel.on {
+      border-color: var(--blue);
+      background-color: var(--row-sel);
+      color: var(--blue-dk);
+    }
+
+    /* Member quick-select — purple tint */
+    .fsel-member {
+      border-color: var(--purple-200);
+      background-color: var(--purple-50);
+      color: var(--purple-600);
+    }
+    .fsel-member:focus { border-color: var(--purple-600); }
+
+    /* Filter divider */
+    .fdiv { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+    /* Combined toggle pill */
+    .combo-pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 32px; padding: 0 12px;
+      border-radius: var(--rpill);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--purple-200);
+      background: var(--purple-50); color: var(--purple-600);
+    }
+    .combo-pill.on { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
+    .combo-pill:hover { background: var(--purple-200); }
+    .combo-pill.on:hover { background: #6b42c8; }
+
+    /* ═══════════════════════
+       ADVANCED FILTERS PANEL
+    ═══════════════════════ */
+    .adv-panel {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--blue);
+      border-radius: 0 0 var(--r8) var(--r8);
+      padding: var(--sp16);
+      margin-top: -13px;
+      margin-bottom: var(--sp12);
+      display: none;
+    }
+    .adv-panel.open { display: block; }
+    .adv-hdr {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--sp12);
+    }
+    .adv-hdr h4 {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em; color: var(--ink-2);
+    }
+    .adv-close {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 13px; font-weight: 600; color: var(--ink-3);
+      cursor: pointer; padding: 3px 8px; border-radius: var(--r4);
+    }
+    .adv-close:hover { background: var(--border-sub); color: var(--ink); }
+    .adv-close .mi { font-size: 16px; }
+    .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--sp12) var(--sp16); }
+    .adv-f label {
+      display: block; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .05em;
+      color: var(--ink-2); margin-bottom: 4px;
+    }
+    .adv-f select,
+    .adv-f input[type="text"],
+    .adv-f input[type="date"] {
+      width: 100%; height: 32px; padding: 0 8px;
+      border: 1px solid var(--border); border-radius: var(--r4);
+      font-size: 13px; font-family: var(--font); color: var(--ink);
+      background: var(--bg-white); outline: none;
+    }
+    .adv-f select {
+      padding-right: 24px; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23353331' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 7px center;
+    }
+    .adv-f select:focus, .adv-f input:focus { border-color: var(--blue); }
+    .dr { display: flex; gap: var(--sp4); align-items: center; }
+    .dr span { font-size: 11px; color: var(--ink-3); flex-shrink: 0; }
+
+    /* Multi-select — Contract Office */
+    .msf {
+      border: 1px solid var(--border); border-radius: var(--r4);
+      padding: 3px 6px; min-height: 32px;
+      display: flex; flex-wrap: wrap; gap: 3px; align-items: center;
+      background: var(--bg-white);
+    }
+    .msf:focus-within { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .ms-chip {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 1px 6px 1px 8px; border-radius: var(--rpill);
+      font-size: 11px; font-weight: 600;
+      background: var(--row-sel); color: var(--blue-dk);
+      border: 1px solid var(--blue-mid);
+    }
+    .ms-chip .rm { font-size: 10px; opacity: .5; cursor: pointer; }
+    .ms-chip .rm:hover { opacity: 1; }
+    .ms-inp {
+      border: none; outline: none;
+      font-size: 12px; font-family: var(--font);
+      color: var(--ink); background: transparent; min-width: 70px;
+    }
+    .ms-inp::placeholder { color: var(--ink-3); }
+    .ms-wrap { position: relative; }
+    .ms-dd {
+      display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--r8); box-shadow: var(--sh); z-index: 200; overflow: hidden;
+    }
+    .ms-dd-item {
+      padding: 8px 12px; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: var(--sp8);
+      color: var(--ink);
+    }
+    .ms-dd-item:hover { background: var(--row-sel); color: var(--blue); }
+    .ms-dd-item.sel { color: var(--blue); }
+    .ms-dd-item .mi { font-size: 16px; }
+
+    .adv-foot {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: var(--sp12); padding-top: var(--sp12);
+      border-top: 1px solid var(--border-sub);
+    }
+    .adv-hint { font-size: 11px; color: var(--ink-3); font-style: italic; }
+    .adv-acts { display: flex; gap: var(--sp8); }
+
+    /* ═══════════════════════
+       RESULTS TOOLBAR
+    ═══════════════════════ */
+    .rtbar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: var(--sp8);
+    }
+    .rc { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .rc strong { color: var(--ink); }
+    .col-bar { display: flex; align-items: center; gap: var(--sp4); flex-wrap: wrap; }
+    .ctog {
+      font-size: 12px; font-weight: 600;
+      padding: 2px 8px;
+      border: 1px solid var(--border); border-radius: var(--r4);
+      background: var(--bg-white); cursor: pointer; color: var(--ink-2);
+      font-family: var(--font);
+    }
+    .ctog.on { background: var(--row-sel); border-color: var(--blue-mid); color: var(--blue-dk); }
+
+    /* ═══════════════════════
+       TABLE — Canvas Table
+       Header: 14px/w600, bg #f2f0ee
+       Cell: 14px/w400
+       Row height ~44px
+       Filter Indicator (3 lines icon)
+    ═══════════════════════ */
+    .tw {
+      background: var(--bg-white);
+      border: 1px solid var(--border-table);
+      border-radius: var(--r8);
+      overflow: hidden;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+
+    thead th {
+      background: var(--th-bg);
+      color: var(--th-ink);
+      font-size: 13px; font-weight: 700;
+      font-family: var(--font);
+      padding: 9px 12px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    thead th:hover { background: var(--border-sub); }
+    .th-inner {
+      display: flex; align-items: center; gap: 4px;
+    }
+    /* Sort / filter indicator — matches 'Sort Indicator' and 'Filter Indicator' components */
+    .th-sort { color: var(--ink-3); font-size: 14px; }
+    .th-sort.active { color: var(--blue); }
+
+    .thchk {
+      width: 40px; padding: 9px 0 9px 14px !important;
+      cursor: default !important;
+    }
+    .thchk:hover { background: var(--th-bg) !important; }
+
+    tbody tr { border-bottom: 1px solid var(--border-sub); transition: background .05s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--row-hover); }
+    tbody tr.sel { background: var(--row-sel); }
+    tbody td { padding: 10px 12px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Name cell */
+    .nc { display: flex; flex-direction: column; gap: 3px; }
+    .nc-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .sname {
+      font-size: 14px; font-weight: 700; color: var(--blue);
+      cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .sname:hover { text-decoration: underline; }
+    .nc-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .nc-id { font-size: 12px; font-weight: 600; color: var(--ink-3); font-family: 'SF Mono','Consolas',monospace; }
+    .creator {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 600; color: var(--ink-2);
+    }
+    .cr-dot {
+      width: 16px; height: 16px; border-radius: var(--rpill);
+      font-size: 8px; font-weight: 700; color: #fff;
+      display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .nc-note {
+      font-size: 12px; color: var(--ink-2); line-height: 1.5;
+      background: var(--bg-page);
+      border-left: 2px solid var(--border);
+      padding: 3px 8px; border-radius: 0 var(--r4) var(--r4) 0;
+      margin-top: 2px; max-width: 440px;
+    }
+    .nc-note strong { color: var(--ink); font-weight: 700; }
+    .nc-note .nt { font-size: 10px; color: var(--ink-3); margin-left: 6px; }
+
+    /* Latest version tag */
+    .tag-latest {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 1px 7px; border-radius: var(--rpill);
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .04em;
+      background: #edf3e8; color: #004226;
+      border: 1px solid rgba(0,116,66,.3); white-space: nowrap;
+    }
+    .tag-older {
+      display: inline-flex; align-items: center;
+      padding: 1px 7px; border-radius: var(--rpill);
+      font-size: 10px; font-weight: 600;
+      background: var(--border-sub); color: var(--ink-3);
+      border: 1px solid var(--border); white-space: nowrap;
+    }
+
+    /* ── CANVAS BADGES ── */
+    /* Matches _Table/Bases/Badge and Badge component */
+    .badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 2px 8px; border-radius: var(--rpill);
+      font-size: 12px; font-weight: 700;
+      white-space: nowrap; border: 1px solid transparent;
+    }
+    .badge .mi { font-size: 12px; }
+
+    /* Negotiation status */
+    .b-test { background: var(--s-test-bg); color: var(--s-test-ink); border-color: var(--s-test-brd); }
+    .b-cp   { background: var(--s-cp-bg);   color: var(--s-cp-ink);   border-color: var(--s-cp-brd); }
+    .b-pp   { background: var(--s-pp-bg);   color: var(--s-pp-ink);   border-color: var(--s-pp-brd); }
+    .b-fin  { background: var(--s-fin-bg);  color: var(--s-fin-ink);  border-color: var(--s-fin-brd); }
+    /* Combined */
+    .b-comb { background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-200); }
+    /* RSH */
+    .b-yes  { background: #edf3e8; color: #007442; border-color: rgba(0,116,66,.3); }
+    .b-no   { background: var(--border-sub); color: var(--ink-3); border-color: var(--border); }
+
+    /* Claim type — square corners to distinguish from round badges */
+    .ct {
+      display: inline-flex; align-items: center;
+      padding: 2px 6px; border-radius: var(--r4);
+      font-size: 12px; font-weight: 700;
+      white-space: nowrap; border: 1px solid transparent;
+    }
+    .ct-fac  { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-brd); }
+    .ct-prof { background: var(--purple-50); color: #3f2c6b; border-color: var(--purple-200); }
+    .ct-asc  { background: var(--amber-bg2); color: var(--amber); border-color: rgba(129,101,6,.35); }
+
+    /* Custom tags */
+    .ctag {
+      display: inline-flex; align-items: center;
+      padding: 1px 7px; border-radius: var(--rpill);
+      font-size: 12px; font-weight: 600;
+      background: var(--bg-page); color: var(--ink-2);
+      border: 1px solid var(--border); white-space: nowrap;
+    }
+    .ctag.blue  { background: var(--row-sel);  color: var(--blue-dk);  border-color: var(--blue-mid); }
+    .ctag.green { background: #edf3e8; color: #004226; border-color: rgba(0,116,66,.3); }
+    .ctag.amber { background: var(--amber-bg); color: var(--amber); border-color: rgba(129,101,6,.3); }
+
+    .tr { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+
+    /* Date cell */
+    .dc { font-size: 13px; color: var(--ink-2); white-space: nowrap; }
+    .dc-ts { font-size: 11px; color: var(--ink-3); display: block; margin-top: 1px; }
+
+    /* Office/Region stacked */
+    .oc { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .rc-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+
+    /* System */
+    .sys { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* ── ACTION ICONS — matches Action Icon component */
+    .act-btn {
+      width: 32px; height: 32px;
+      display: inline-flex; align-items: center; justify-content: center;
+      border-radius: var(--r4);
+      cursor: pointer; color: var(--ink-2);
+      border: 1px solid transparent;
+    }
+    .act-btn:hover { background: var(--border-sub); color: var(--blue); border-color: var(--border); }
+    .act-btn .mi { font-size: 18px; }
+
+    /* ── BULK ACTION BAR ── */
+    .bulk {
+      background: var(--ink); /* #353331 — System bg */
+      color: #fff;
+      padding: 10px var(--sp16);
+      display: flex; align-items: center; gap: var(--sp12);
+    }
+    .bulk .sc { font-size: 14px; font-weight: 700; }
+    .bdiv { width: 1px; height: 20px; background: rgba(255,255,255,.2); }
+    .bulk .btn-primary { font-size: 14px; }
+    .bgh {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 13px; font-weight: 600; color: rgba(255,255,255,.7);
+      cursor: pointer; padding: 5px 8px; border-radius: var(--r4);
+    }
+    .bgh:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .bgh .mi { font-size: 16px; }
+    .bdis { margin-left: auto; font-size: 13px; font-weight: 600; opacity: .5; cursor: pointer; }
+    .bdis:hover { opacity: 1; }
+
+    /* ── PAGINATION ── */
+    .pag {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px var(--sp16);
+      border-top: 1px solid var(--border-sub);
+      font-size: 13px; font-weight: 600; color: var(--ink-2);
+    }
+    .pbtns { display: flex; gap: 3px; }
+    .pb {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border); border-radius: var(--r4);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 600; cursor: pointer; color: var(--ink);
+    }
+    .pb:hover { background: var(--border-sub); }
+    .pb.a { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 700; }
+    .pb .mi { font-size: 16px; }
+
+    /* ── FILTER CHIPS — matches Canvas filter chip pattern ── */
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      height: 28px; padding: 0 10px;
+      border-radius: var(--rpill);
+      font-size: 12px; font-weight: 600; font-family: var(--font);
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--bg-white); color: var(--ink-2);
+    }
+    .filter-chip:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-chip .mi { font-size: 14px; }
+    .filter-chip .chip-count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 16px; height: 16px; padding: 0 4px;
+      border-radius: var(--rpill);
+      font-size: 10px; font-weight: 700;
+      background: var(--border-sub); color: var(--ink-2);
+    }
+
+    input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAVIGATION
+     Matches: Navigation component exactly
+     white bg, 48px h, Nunito Sans 14/700
+══════════════════════════════════════ -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-icon">
+      <span class="mi" style="font-size:13px;font-variation-settings:'FILL' 1">grid_view</span>
+    </div>
+    <span class="nav-logo-name">Contract Modeling</span>
+  </div>
+
+  <div class="nav-links">
+    <a class="nav-link" href="#">Scenario <span class="mi mi-muted">arrow_drop_down</span></a>
+    <a class="nav-link active" href="#">Ratesheet History <span class="mi mi-blue">arrow_drop_down</span></a>
+    <a class="nav-link" href="#">Ratesheet Maintenance</a>
+    <a class="nav-link" href="#">Modeling Query Hub</a>
+    <a class="nav-link" href="#">Admin Access</a>
+  </div>
+
+  <div class="nav-right">
+    <div class="nav-icon-btn"><span class="mi">search</span></div>
+    <div class="nav-help">Help</div>
+    <div class="nav-icon-btn"><span class="mi">notifications</span></div>
+    <div class="nav-avatar">GX</div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     SCREEN HEADER
+     Matches: Screen Header/Default
+     padding: 16px, bg #fdfdff
+     28px/700 title, stepper right
+══════════════════════════════════════ -->
+<div class="screen-header">
+  <div class="sh-left">
+    <div class="sh-back">
+      <span class="mi">chevron_left</span>
+      Back
+    </div>
+    <div class="sh-title">Scenario Search</div>
+    <div class="sh-subtitle">My Team's Scenarios — Market Lead View</div>
+  </div>
+
+  <div class="sh-meta">
+    <div class="sh-meta-item">
+      <div class="sh-meta-val">47</div>
+      <div class="sh-meta-lbl">Team Scenarios</div>
+    </div>
+    <div class="sh-meta-item">
+      <div class="sh-meta-val" style="color:var(--purple-600)">6</div>
+      <div class="sh-meta-lbl">Combined</div>
+    </div>
+    <div class="sh-meta-item">
+      <div class="sh-meta-val" style="color:var(--blue)">9</div>
+      <div class="sh-meta-lbl">Proposals</div>
+    </div>
+    <div class="sh-meta-item">
+      <div class="sh-meta-val" style="color:var(--green)">3</div>
+      <div class="sh-meta-lbl">Final</div>
+    </div>
+  </div>
+
+  <!-- Stepper — matches Progress Indicator/Stepper/Default -->
+  <div class="stepper">
+    <div class="step done">
+      <div class="step-circle"><span class="mi" style="font-size:14px;font-variation-settings:'FILL' 1">check</span></div>
+      <div class="step-label">Search</div>
+    </div>
+    <div class="step active">
+      <div class="step-circle">2</div>
+      <div class="step-label">Select</div>
+    </div>
+    <div class="step">
+      <div class="step-circle">3</div>
+      <div class="step-label">Combine</div>
+    </div>
+    <div class="step">
+      <div class="step-circle">4</div>
+      <div class="step-label">Configure</div>
+    </div>
+    <div class="step">
+      <div class="step-circle">5</div>
+      <div class="step-label">Review</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LAYOUT — left rail + main
+══════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- LEFT RAIL — Matches Left Rail Navigation/Link component -->
+  <aside class="left-rail">
+    <div class="rail-section">Team</div>
+    <div class="rail-link active">
+      <span class="mi">group</span>
+      All Members
+    </div>
+    <div class="rail-link">
+      <span class="mi">person</span>
+      Skander B.
+    </div>
+    <div class="rail-link">
+      <span class="mi">person</span>
+      Priya N.
+    </div>
+    <div class="rail-link">
+      <span class="mi">person</span>
+      Marcus C.
+    </div>
+    <div class="rail-link">
+      <span class="mi">person</span>
+      Aisha T.
+    </div>
+    <div class="rail-link">
+      <span class="mi">person</span>
+      Derek W.
+    </div>
+
+    <div class="rail-section">Status</div>
+    <div class="rail-link">
+      <span class="mi" style="color:var(--ink-3)">radio_button_unchecked</span>
+      Test
+    </div>
+    <div class="rail-link">
+      <span class="mi" style="color:var(--blue)">send</span>
+      Cigna Proposal
+    </div>
+    <div class="rail-link">
+      <span class="mi" style="color:var(--purple-600)">reply_all</span>
+      Provider Proposal
+    </div>
+    <div class="rail-link">
+      <span class="mi" style="color:var(--green)">task_alt</span>
+      Final
+    </div>
+
+    <div class="rail-section">Views</div>
+    <div class="rail-link">
+      <span class="mi">bookmark</span>
+      Saved Views
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- PAGE-LEVEL TABS — Tabs/Page-Level component -->
+    <div class="page-tabs">
+      <div class="page-tab active">
+        My Team's Scenarios
+        <span class="tab-badge">47</span>
+      </div>
+      <div class="page-tab">
+        All Scenarios
+        <span class="tab-badge">312</span>
+      </div>
+    </div>
+
+    <!-- TEAM ACTIVITY PANEL -->
+    <div class="team-panel">
+      <div class="tp-hdr">
+        <span class="tp-hdr-title">Team Activity</span>
+        <div class="tp-hdr-right">
+          <span class="tp-hint">Click member to filter</span>
+          <div class="tp-period">
+            <span class="mi">calendar_month</span>
+            May 2026
+            <span class="mi">arrow_drop_down</span>
+          </div>
+        </div>
+      </div>
+      <div class="tp-members">
+
+        <div class="mc active">
+          <div class="mc-top">
+            <div class="mc-av av-a">SB</div>
+            <div>
+              <div class="mc-name">Skander Belghith</div>
+              <div class="mc-role">Analyst · TX Region</div>
+            </div>
+          </div>
+          <div class="mc-stats">
+            <div>
+              <div class="mc-stat-val">8</div>
+              <div class="mc-stat-lbl">This month</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--purple-600)">3</div>
+              <div class="mc-stat-lbl">Combined</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--blue)">2</div>
+              <div class="mc-stat-lbl">Proposal</div>
+            </div>
+          </div>
+          <div class="mc-note">
+            <strong>TX-Austin ASC 2026 v3</strong> — updated rate assumptions, removed outlier providers
+            <span class="mc-note-ts">May 14 · 2:30 PM</span>
+          </div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-b">PN</div>
+            <div>
+              <div class="mc-name">Priya Nair</div>
+              <div class="mc-role">Analyst · WA Region</div>
+            </div>
+          </div>
+          <div class="mc-stats">
+            <div>
+              <div class="mc-stat-val">6</div>
+              <div class="mc-stat-lbl">This month</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--purple-600)">2</div>
+              <div class="mc-stat-lbl">Combined</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--green)">1</div>
+              <div class="mc-stat-lbl">Final</div>
+            </div>
+          </div>
+          <div class="mc-note">
+            <strong>WA-Seattle Prof+Fac v2</strong> — finalized after provider counter, signed off
+            <span class="mc-note-ts">May 14 · 9:20 AM</span>
+          </div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-c">MC</div>
+            <div>
+              <div class="mc-name">Marcus Chen</div>
+              <div class="mc-role">Sr. Analyst · GA Region</div>
+            </div>
+          </div>
+          <div class="mc-stats">
+            <div>
+              <div class="mc-stat-val">11</div>
+              <div class="mc-stat-lbl">This month</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--purple-600)">1</div>
+              <div class="mc-stat-lbl">Combined</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--blue)">4</div>
+              <div class="mc-stat-lbl">Proposal</div>
+            </div>
+          </div>
+          <div class="mc-note">
+            <strong>GA-Atlanta Facility v4</strong> — revised LOB split after compliance review
+            <span class="mc-note-ts">May 13 · 11:05 AM</span>
+          </div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-d">AT</div>
+            <div>
+              <div class="mc-name">Aisha Torres</div>
+              <div class="mc-role">Analyst · NY Region</div>
+            </div>
+          </div>
+          <div class="mc-stats">
+            <div>
+              <div class="mc-stat-val">5</div>
+              <div class="mc-stat-lbl">This month</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--ink-3)">0</div>
+              <div class="mc-stat-lbl">Combined</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--s-test-ink)">5</div>
+              <div class="mc-stat-lbl">Test</div>
+            </div>
+          </div>
+          <div class="mc-note">
+            <strong>NY-Albany Commercial v2</strong> — waiting on updated network data
+            <span class="mc-note-ts">May 12 · 4:45 PM</span>
+          </div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-e">DW</div>
+            <div>
+              <div class="mc-name">Derek Wu</div>
+              <div class="mc-role">Analyst · GP Region</div>
+            </div>
+          </div>
+          <div class="mc-stats">
+            <div>
+              <div class="mc-stat-val">4</div>
+              <div class="mc-stat-lbl">This month</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--purple-600)">1</div>
+              <div class="mc-stat-lbl">Combined</div>
+            </div>
+            <div>
+              <div class="mc-stat-val" style="color:var(--blue)">1</div>
+              <div class="mc-stat-lbl">Proposal</div>
+            </div>
+          </div>
+          <div class="mc-note">
+            <strong>ND-Fargo ASC v1</strong> — first run, rate assumptions conservative
+            <span class="mc-note-ts">May 10 · 10:18 AM</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="fbar">
+      <div class="fbar-row1">
+        <div class="search-wrap">
+          <span class="mi">search</span>
+          <input type="text" class="search-inp" placeholder="Search by name, ID, system, region, office, tag, or version…">
+        </div>
+        <button class="filter-btn on" onclick="toggleAdv()">
+          <span class="mi">tune</span>
+          Filters
+          <span class="filter-count">3</span>
+        </button>
+        <button class="save-btn">
+          <span class="mi">bookmark_add</span>
+          Save View
+        </button>
+      </div>
+
+      <div class="fbar-row2">
+        <!-- Created By — first, most used by market lead -->
+        <select class="fsel fsel-member">
+          <option selected>Created by: Skander B.</option>
+          <option>All team members</option>
+          <option>Skander Belghith</option>
+          <option>Priya Nair</option>
+          <option>Marcus Chen</option>
+          <option>Aisha Torres</option>
+          <option>Derek Wu</option>
+        </select>
+
+        <select class="fsel on">
+          <option>Claim Type</option>
+          <option selected>ASC</option>
+          <option>Facility</option>
+          <option>Professional</option>
+          <option>Mixed</option>
+        </select>
+
+        <select class="fsel">
+          <option selected>Scenario Status</option>
+          <option>Test</option>
+          <option>Cigna Proposal</option>
+          <option>Provider Proposal</option>
+          <option>Final</option>
+        </select>
+
+        <select class="fsel">
+          <option selected>RSH Pushed</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+
+        <div class="fdiv"></div>
+        <span class="combo-pill on"><span class="mi" style="font-size:14px">link</span> Combined only</span>
+      </div>
+    </div>
+
+    <!-- ADVANCED FILTERS PANEL -->
+    <div class="adv-panel open" id="adv-panel">
+      <div class="adv-hdr">
+        <h4>Advanced Filters</h4>
+        <span class="adv-close" onclick="toggleAdv()">
+          <span class="mi">close</span>
+          Close
+        </span>
+      </div>
+      <div class="adv-grid">
+
+        <div class="adv-f">
+          <label>Region</label>
+          <select>
+            <option>All Regions</option>
+            <option selected>South Central</option>
+            <option>Pacific Northwest</option>
+            <option>Mid-Atlantic</option>
+            <option>Great Plains</option>
+            <option>Northeast</option>
+          </select>
+        </div>
+
+        <div class="adv-f">
+          <label>Contract Office (multi)</label>
+          <div class="ms-wrap">
+            <div class="msf">
+              <span class="ms-chip">TX — Austin <span class="rm">✕</span></span>
+              <input type="text" class="ms-inp" id="ms-inp" placeholder="+ Add office…">
+            </div>
+            <div class="ms-dd" id="ms-dd">
+              <div class="ms-dd-item sel"><span class="mi">check</span> TX — Austin</div>
+              <div class="ms-dd-item">TX — Dallas</div>
+              <div class="ms-dd-item">TX — Houston</div>
+              <div class="ms-dd-item">WA — Seattle</div>
+              <div class="ms-dd-item">GA — Atlanta</div>
+              <div class="ms-dd-item">NY — Albany</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="adv-f">
+          <label>System Name</label>
+          <select>
+            <option>All Systems</option>
+            <option>Medicare Advantage</option>
+            <option>Commercial PPO</option>
+            <option>Medicaid</option>
+            <option>ASC Network</option>
+            <option>Evernorth PBM</option>
+          </select>
+        </div>
+
+        <div class="adv-f">
+          <label>CRP Type</label>
+          <select>
+            <option>All CRP Types</option>
+            <option>A — Amendment</option>
+            <option>B — Base</option>
+            <option>D — Draft</option>
+            <option>O — Other</option>
+          </select>
+        </div>
+
+        <div class="adv-f">
+          <label>Line of Business</label>
+          <select>
+            <option>All LOBs</option>
+            <option>OAP</option>
+            <option>New Business</option>
+            <option>Renewal</option>
+          </select>
+        </div>
+
+        <div class="adv-f">
+          <label>Date Created</label>
+          <div class="dr">
+            <input type="date" style="flex:1">
+            <span>–</span>
+            <input type="date" style="flex:1">
+          </div>
+        </div>
+
+        <div class="adv-f">
+          <label>Last Run</label>
+          <div class="dr">
+            <input type="date" style="flex:1">
+            <span>–</span>
+            <input type="date" style="flex:1">
+          </div>
+        </div>
+
+        <div class="adv-f">
+          <label>Tag</label>
+          <input type="text" placeholder="e.g. Q1-Final, TX-Neg-4, v3">
+        </div>
+
+      </div>
+      <div class="adv-foot">
+        <span class="adv-hint">Region, Office (multi-select), System, CRP, LOB, date ranges, tag</span>
+        <div class="adv-acts">
+          <button class="btn btn-ghost">Reset all</button>
+          <button class="btn btn-primary">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS TOOLBAR -->
+    <div class="rtbar">
+      <span class="rc">
+        Showing <strong>4</strong> of <strong>8</strong> by Skander B. &nbsp;·&nbsp; 47 team &nbsp;·&nbsp; 312 org-wide
+      </span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;color:var(--ink-3);font-weight:600;">Columns:</span>
+        <div class="col-bar">
+          <span class="ctog on">Status</span>
+          <span class="ctog on">Claim Type</span>
+          <span class="ctog on">System</span>
+          <span class="ctog on">Office · Region</span>
+          <span class="ctog on">RSH</span>
+          <span class="ctog on">Last Run</span>
+          <span class="ctog">Date Created</span>
+          <span class="ctog">LOB</span>
+          <span class="ctog">CRP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE — Canvas Table component -->
+    <div class="tw">
+      <table>
+        <colgroup>
+          <col style="width:40px">
+          <col style="min-width:320px">    <!-- Name — primary -->
+          <col style="width:148px">        <!-- Status -->
+          <col style="width:128px">        <!-- Claim Type -->
+          <col style="width:160px">        <!-- System -->
+          <col style="width:130px">        <!-- Office/Region -->
+          <col style="width:72px">         <!-- RSH -->
+          <col style="width:128px">        <!-- Last Run -->
+          <col style="width:80px">         <!-- Actions -->
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="thchk"><input type="checkbox"></th>
+            <th>
+              <div class="th-inner">
+                Scenario Name
+                <span class="mi th-sort active" style="font-size:16px">unfold_more</span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">
+                Status
+                <span class="mi th-sort" style="font-size:16px">unfold_more</span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">
+                Claim Type
+                <span class="mi th-sort" style="font-size:16px">unfold_more</span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">
+                System
+                <span class="mi th-sort" style="font-size:16px">unfold_more</span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">
+                Office · Region
+                <span class="mi th-sort" style="font-size:16px">unfold_more</span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">
+                RSH
+                <span class="mi th-sort" style="font-size:16px">unfold_more</span>
+              </div>
+            </th>
+            <th>
+              <div class="th-inner">
+                Last Run
+                <span class="mi th-sort" style="font-size:16px">arrow_downward</span>
+              </div>
+            </th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- ROW 1 — Latest, Combined ASC+Fac, Provider Proposal, selected -->
+          <tr class="sel">
+            <td style="padding-left:14px;"><input type="checkbox" checked></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">TX-Austin ASC+Fac Combined 2026 v3</span>
+                  <span class="tag-latest">● Latest</span>
+                  <span class="badge b-comb"><span class="mi" style="font-size:12px">link</span> Combined</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-40291</span>
+                  <span class="creator">
+                    <span class="cr-dot av-a">SB</span>
+                    Skander B.
+                  </span>
+                  <span class="ctag blue">TX-Neg-4</span>
+                  <span class="ctag amber">Due May 19</span>
+                </div>
+                <div class="nc-note">
+                  <strong>v3:</strong> Updated rate assumptions, removed outlier providers from Q4 cohort
+                  <span class="nt">May 14 · 2:30 PM</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge b-pp">Provider Proposal</span></td>
+            <td><div class="tr"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
+            <td class="sys">ASC Network</td>
+            <td>
+              <div class="oc">TX — Austin</div>
+              <div class="rc-sub">South Central</div>
+            </td>
+            <td><span class="badge b-yes"><span class="mi" style="font-size:12px">check_circle</span> Yes</span></td>
+            <td>
+              <div class="dc">May 14, 2026</div>
+              <div class="dc-ts">2:30 PM</div>
+            </td>
+            <td>
+              <div style="display:flex;gap:2px;">
+                <div class="act-btn"><span class="mi">play_arrow</span></div>
+                <div class="act-btn"><span class="mi">more_vert</span></div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- ROW 2 — Older version, same scenario -->
+          <tr>
+            <td style="padding-left:14px;"><input type="checkbox"></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname" style="color:var(--ink-2);font-weight:600;">TX-Austin ASC+Fac Combined 2026 v2</span>
+                  <span class="tag-older">Older</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-40187</span>
+                  <span class="creator"><span class="cr-dot av-a">SB</span> Skander B.</span>
+                  <span class="ctag blue">TX-Neg-4</span>
+                </div>
+                <div class="nc-note" style="border-color:var(--ink-3);">
+                  <strong>v2:</strong> Base version before outlier removal — kept for comparison
+                  <span class="nt">May 5 · 10:32 AM</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge b-cp">Cigna Proposal</span></td>
+            <td><div class="tr"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
+            <td class="sys">ASC Network</td>
+            <td>
+              <div class="oc">TX — Austin</div>
+              <div class="rc-sub">South Central</div>
+            </td>
+            <td><span class="badge b-yes"><span class="mi" style="font-size:12px">check_circle</span> Yes</span></td>
+            <td>
+              <div class="dc">May 5, 2026</div>
+              <div class="dc-ts">10:32 AM</div>
+            </td>
+            <td>
+              <div style="display:flex;gap:2px;">
+                <div class="act-btn"><span class="mi">play_arrow</span></div>
+                <div class="act-btn"><span class="mi">more_vert</span></div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- ROW 3 — Priya's WA combined, Final -->
+          <tr>
+            <td style="padding-left:14px;"><input type="checkbox"></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">WA-Seattle Prof+Fac Combined v2</span>
+                  <span class="tag-latest">● Latest</span>
+                  <span class="badge b-comb"><span class="mi" style="font-size:12px">link</span> Combined</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-38902</span>
+                  <span class="creator"><span class="cr-dot av-b">PN</span> Priya N.</span>
+                  <span class="ctag blue">WA-Neg-2</span>
+                  <span class="ctag green">Signed</span>
+                </div>
+                <div class="nc-note">
+                  <strong>v2:</strong> Finalized after provider counter-proposal — all terms agreed
+                  <span class="nt">May 14 · 9:20 AM</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge b-fin"><span class="mi" style="font-size:12px">task_alt</span> Final</span></td>
+            <td><div class="tr"><span class="ct ct-prof">Professional</span><span class="ct ct-fac">Facility</span></div></td>
+            <td class="sys">Commercial PPO</td>
+            <td>
+              <div class="oc">WA — Seattle</div>
+              <div class="rc-sub">Pacific NW</div>
+            </td>
+            <td><span class="badge b-yes"><span class="mi" style="font-size:12px">check_circle</span> Yes</span></td>
+            <td>
+              <div class="dc">May 14, 2026</div>
+              <div class="dc-ts">9:20 AM</div>
+            </td>
+            <td>
+              <div style="display:flex;gap:2px;">
+                <div class="act-btn"><span class="mi">play_arrow</span></div>
+                <div class="act-btn"><span class="mi">more_vert</span></div>
+              </div>
+            </td>
+          </tr>
+
+          <!-- ROW 4 — Aisha's draft, Test -->
+          <tr>
+            <td style="padding-left:14px;"><input type="checkbox"></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">NY-Albany Commercial Facility v2</span>
+                  <span class="tag-latest">● Latest</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-39714</span>
+                  <span class="creator"><span class="cr-dot av-d">AT</span> Aisha T.</span>
+                  <span class="ctag amber">Awaiting data</span>
+                </div>
+                <div class="nc-note">
+                  <strong>v2:</strong> Waiting on updated network data before submitting as Cigna Proposal
+                  <span class="nt">May 12 · 4:45 PM</span>
+                </div>
+              </div>
+            </td>
+            <td><span class="badge b-test">Test</span></td>
+            <td><div class="tr"><span class="ct ct-fac">Facility</span></div></td>
+            <td class="sys">Medicare Advantage</td>
+            <td>
+              <div class="oc">NY — Albany</div>
+              <div class="rc-sub">Mid-Atlantic</div>
+            </td>
+            <td><span class="badge b-no">No</span></td>
+            <td>
+              <div class="dc">May 12, 2026</div>
+              <div class="dc-ts">4:45 PM</div>
+            </td>
+            <td>
+              <div style="display:flex;gap:2px;">
+                <div class="act-btn"><span class="mi">play_arrow</span></div>
+                <div class="act-btn"><span class="mi">more_vert</span></div>
+              </div>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- BULK ACTION BAR -->
+      <div class="bulk">
+        <span class="sc">1 selected</span>
+        <div class="bdiv"></div>
+        <button class="btn btn-primary">
+          <span class="mi">link</span>
+          Combine Selected
+        </button>
+        <span class="bgh"><span class="mi">label</span> Batch Tag</span>
+        <span class="bgh"><span class="mi">download</span> Export</span>
+        <span class="bdis">✕ Clear</span>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pag">
+        <span>
+          Rows per page:
+          <select style="border:none;font-size:13px;font-weight:600;color:var(--ink);background:transparent;cursor:pointer;font-family:var(--font);outline:none;">
+            <option>25</option><option>50</option><option>100</option>
+          </select>
+        </span>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <span>1–4 of 8 by Skander B. &nbsp;·&nbsp; 47 team &nbsp;·&nbsp; 312 org</span>
+          <div class="pbtns">
+            <div class="pb"><span class="mi">chevron_left</span></div>
+            <div class="pb a">1</div>
+            <div class="pb">2</div>
+            <div class="pb"><span class="mi">chevron_right</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .tw -->
+
+  </main>
+</div><!-- end .layout -->
+
+<script>
+  function toggleAdv() {
+    const p = document.getElementById('adv-panel');
+    const btn = document.querySelector('.filter-btn');
+    p.classList.toggle('open');
+    btn.classList.toggle('on', p.classList.contains('open'));
+  }
+  // Multi-select office dropdown
+  const msInp = document.getElementById('ms-inp');
+  const msDd  = document.getElementById('ms-dd');
+  if (msInp) {
+    msInp.addEventListener('focus', () => { msDd.style.display = 'block'; });
+    msInp.addEventListener('blur',  () => { setTimeout(() => { msDd.style.display = 'none'; }, 160); });
+  }
+</script>
+</body>
+</html>
