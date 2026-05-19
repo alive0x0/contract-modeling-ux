@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario Search — Redesign Phase 1</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CIGNA CANVAS DESIGN TOKENS — Light Mode
+       Source: contract-modeling-ux/design-system/
+    ============================================================ */
+    :root {
+      /* Background */
+      --bg-screen:        #F8F9FF;
+      --bg-screen-light:  #FDFDFF;
+      --bg-screen-low:    #F1F3FC;
+      --bg-screen-lowest: #DBDDE9;
+      --bg-white:         #FFFFFF;
+      --bg-system:        #353331;
+      --bg-info:          #E6F0FF;
+      --bg-success:       #EDF3E8;
+      --bg-warning:       #F8E9B3;
+      --bg-critical:      #FDEDE8;
+
+      /* Type */
+      --type-default:     #353331;
+      --type-accent:      #6B6966;
+      --type-disabled:    #A3A19F;
+      --type-reversed:    #FFFFFF;
+
+      /* Border */
+      --border-default:   #6B6966;
+      --border-emphasis:  #E0DDDA;
+      --border-subtle:    #F2F0EE;
+      --border-accent:    #A3A19F;
+      --table-divider:    #C1C4D4;
+      --table-border:     #DBDDE9;
+
+      /* Table */
+      --table-header:     #F1F3FC;
+      --table-header-active: #EEEBE8;
+      --table-cell-hover: #FBFAF9;
+      --table-cell-selected: #D7E9FF;
+      --table-cell-in-elem: #F8F9FF;
+      --table-cell-disabled: #F2F0EE;
+
+      /* Interactivity */
+      --interactive-primary: #0033FF;
+      --interactive-primary-dark: #110081;
+      --interactive-hover-light: #D7E9FF;
+      --interactive-disabled: #E0DDDA;
+
+      /* Semantic */
+      --success:          #00874D;
+      --success-bg:       #EDF3E8;
+      --success-dark:     #004226;
+      --warning:          #EAB80B;
+      --warning-bg:       #F8E9B3;
+      --warning-dark:     #816506;
+      --critical:         #A90000;
+      --critical-bg:      #FDEDE8;
+      --critical-mid:     #F5867F;
+      --info:             #3879DB;
+      --info-bg:          #E6F0FF;
+      --info-dark:        #110081;
+
+      /* Dataviz semantic */
+      --status-success:   #00874D;
+      --status-success-bg:#B0F9DB;
+      --status-inprog:    #3879DB;
+      --status-inprog-bg: #B4D1FF;
+      --status-warn:      #EAB80B;
+      --status-warn-bg:   #F8E9B3;
+      --status-crit:      #A90000;
+      --status-crit-bg:   #FAB7B2;
+      --status-neutral:   #6B6966;
+      --status-neutral-bg:#EEEBE8;
+
+      /* Blue palette */
+      --blue-50:  #F8F9FF;
+      --blue-75:  #E6F0FF;
+      --blue-100: #D7E9FF;
+      --blue-200: #B4D1FF;
+      --blue-300: #90B9FF;
+      --blue-500: #3879DB;
+      --blue-600: #0033FF;
+      --blue-900: #110081;
+
+      /* Neutral */
+      --neutral-50:  #FDFDFC;
+      --neutral-60:  #FBFAF9;
+      --neutral-80:  #F6F5F3;
+      --neutral-90:  #F2F0EE;
+      --neutral-100: #EEEBE8;
+      --neutral-200: #E0DDDA;
+      --neutral-300: #CCC9C6;
+      --neutral-400: #B7B5B3;
+      --neutral-500: #A3A19F;
+      --neutral-600: #8B8986;
+      --neutral-700: #6B6966;
+      --neutral-800: #54524F;
+      --neutral-900: #353331;
+
+      /* Purple/badge */
+      --purple-50:  #F5F0FF;
+      --purple-200: #CFBAFF;
+      --purple-500: #9668FF;
+      --purple-600: #8256E7;
+      --purple-900: #3F2C6B;
+
+      /* Shadow */
+      --shadow-sm: 0 1px 3px rgba(52,42,118,0.10), 0 1px 2px rgba(52,42,118,0.06);
+      --shadow:    0 4px 12px rgba(52,42,118,0.12), 0 2px 4px rgba(52,42,118,0.06);
+      --shadow-lg: 0 10px 30px rgba(52,42,118,0.14), 0 4px 8px rgba(52,42,118,0.06);
+
+      /* Typography */
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --r2: 2px; --r4: 4px; --r6: 6px; --r8: 8px; --r12: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-screen);
+      color: var(--type-default);
+      font-size: 14px;
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       PAGE FRAME — nav + breadcrumb (simulated)
+    ============================================================ */
+    .global-nav {
+      background: var(--bg-system);
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 32px;
+    }
+    .global-nav .logo {
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.2px;
+    }
+    .global-nav nav {
+      display: flex;
+      gap: 24px;
+    }
+    .global-nav nav a {
+      font-size: 13px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.72);
+      text-decoration: none;
+    }
+    .global-nav nav a.active {
+      color: #fff;
+      font-weight: 600;
+      border-bottom: 2px solid var(--blue-600);
+      padding-bottom: 2px;
+    }
+
+    .breadcrumb-bar {
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border-emphasis);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--type-accent);
+    }
+    .breadcrumb-bar span.sep { color: var(--neutral-400); }
+    .breadcrumb-bar span.current { color: var(--type-default); font-weight: 500; }
+
+    /* ============================================================
+       MAIN LAYOUT
+    ============================================================ */
+    .page-body {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 24px 24px 48px;
+    }
+
+    /* ============================================================
+       PAGE HEADER
+    ============================================================ */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .page-header-left h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--type-default);
+      letter-spacing: -0.3px;
+      margin-bottom: 2px;
+    }
+    .page-header-left p {
+      font-size: 13px;
+      color: var(--type-accent);
+    }
+    .page-header-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ============================================================
+       BUTTONS
+    ============================================================ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--r4);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+    .btn-primary {
+      background: var(--interactive-primary);
+      color: #fff;
+      border-color: var(--interactive-primary);
+    }
+    .btn-primary:hover { background: var(--interactive-primary-dark); }
+    .btn-secondary {
+      background: var(--bg-white);
+      color: var(--type-default);
+      border-color: var(--border-default);
+    }
+    .btn-secondary:hover { background: var(--table-cell-hover); }
+    .btn-ghost {
+      background: transparent;
+      color: var(--type-accent);
+      border-color: transparent;
+    }
+    .btn-ghost:hover { background: var(--neutral-90); }
+
+    /* ============================================================
+       SEARCH + FILTER BAR
+    ============================================================ */
+    .search-filter-bar {
+      background: var(--bg-white);
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r8);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .search-input-wrap {
+      position: relative;
+      flex: 1;
+    }
+    .search-input-wrap .icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--neutral-500);
+      font-size: 14px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 34px;
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r4);
+      font-size: 13px;
+      color: var(--type-default);
+      background: var(--bg-white);
+      outline: none;
+      transition: border-color 0.12s;
+    }
+    .search-input:focus { border-color: var(--interactive-primary); }
+    .search-input::placeholder { color: var(--neutral-500); }
+
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--type-accent);
+      margin-right: 4px;
+    }
+
+    .filter-select {
+      padding: 5px 28px 5px 10px;
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r4);
+      font-size: 12px;
+      color: var(--type-default);
+      background: var(--bg-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238B8986' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 8px center;
+      appearance: none;
+      cursor: pointer;
+      outline: none;
+      font-family: var(--font);
+    }
+    .filter-select:focus { border-color: var(--interactive-primary); }
+
+    .filter-tag-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid var(--border-emphasis);
+      background: var(--bg-white);
+      color: var(--type-accent);
+      transition: all 0.1s;
+    }
+    .filter-tag-pill.active {
+      background: var(--blue-75);
+      border-color: var(--blue-200);
+      color: var(--info-dark);
+      font-weight: 600;
+    }
+    .filter-tag-pill:hover { background: var(--neutral-90); }
+
+    .clear-filters {
+      font-size: 12px;
+      color: var(--info);
+      cursor: pointer;
+      text-decoration: underline;
+      margin-left: auto;
+    }
+
+    /* ============================================================
+       ACTIVE FILTER SUMMARY
+    ============================================================ */
+    .active-filter-strip {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 0 0;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border-subtle);
+      margin-top: 10px;
+    }
+    .af-label {
+      font-size: 11px;
+      color: var(--type-accent);
+      font-weight: 500;
+    }
+    .af-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px 2px 8px;
+      border-radius: 100px;
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--blue-75);
+      color: var(--info-dark);
+      border: 1px solid var(--blue-200);
+    }
+    .af-chip .x {
+      font-size: 10px;
+      cursor: pointer;
+      opacity: 0.6;
+      margin-left: 2px;
+    }
+    .af-chip .x:hover { opacity: 1; }
+
+    /* ============================================================
+       RESULTS META ROW
+    ============================================================ */
+    .results-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .results-count {
+      font-size: 13px;
+      color: var(--type-accent);
+    }
+    .results-count strong { color: var(--type-default); }
+    .results-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ============================================================
+       CUSTOM TAG ROW — NEW FEATURE CALLOUT BANNER
+    ============================================================ */
+    .feature-notice {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--info-bg);
+      border: 1px solid var(--blue-200);
+      border-radius: var(--r6);
+      margin-bottom: 14px;
+      font-size: 12px;
+      color: var(--info-dark);
+    }
+    .feature-notice .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--info);
+      flex-shrink: 0;
+    }
+
+    /* ============================================================
+       TABLE
+    ============================================================ */
+    .table-wrap {
+      background: var(--bg-white);
+      border: 1px solid var(--table-border);
+      border-radius: var(--r8);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead th {
+      background: var(--table-header);
+      color: var(--type-default);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--table-divider);
+      text-align: left;
+      white-space: nowrap;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      cursor: pointer;
+      user-select: none;
+    }
+    thead th:hover { background: var(--table-header-active); }
+    thead th .sort-icon { opacity: 0.4; margin-left: 4px; font-size: 10px; }
+    thead th.sorted .sort-icon { opacity: 1; color: var(--interactive-primary); }
+
+    /* Column checkbox */
+    .col-check { width: 36px; padding: 10px 0 10px 14px !important; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.08s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--table-cell-hover); }
+    tbody tr.selected { background: var(--table-cell-selected); }
+
+    tbody td {
+      padding: 10px 12px;
+      color: var(--type-default);
+      vertical-align: middle;
+    }
+
+    /* Scenario name cell */
+    .scenario-name {
+      font-weight: 500;
+      color: var(--interactive-primary);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .scenario-name:hover { text-decoration: underline; }
+
+    /* ============================================================
+       BADGES
+    ============================================================ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    /* Run status */
+    .badge-success  { background: var(--status-success-bg); color: var(--success); border-color: rgba(0,135,77,0.25); }
+    .badge-inprog   { background: var(--status-inprog-bg);  color: var(--info-dark); border-color: rgba(56,121,219,0.3); }
+    .badge-warn     { background: var(--status-warn-bg);    color: var(--warning-dark); border-color: rgba(234,184,11,0.4); }
+    .badge-error    { background: var(--status-crit-bg);    color: var(--critical); border-color: rgba(169,0,0,0.25); }
+    .badge-neutral  { background: var(--neutral-90);        color: var(--type-accent); border-color: var(--neutral-200); }
+    /* Combined badge */
+    .badge-combined { background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-200); }
+    /* RSH stale badge */
+    .badge-stale    { background: var(--warning-bg); color: var(--warning-dark); border-color: rgba(234,184,11,0.4); }
+    .badge-rsh-ok   { background: var(--success-bg); color: var(--success); border-color: rgba(0,135,77,0.25); }
+
+    /* Claim type tags — NEW */
+    .claim-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: var(--r4);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      border: 1px solid transparent;
+    }
+    .claim-facility    { background: #DDFDFB; color: #002F32; border-color: #13C8A4; }
+    .claim-professional{ background: var(--purple-50); color: var(--purple-900); border-color: var(--purple-200); }
+    .claim-asc         { background: var(--bg-warning); color: var(--warning-dark); border-color: rgba(234,184,11,0.5); }
+    .claim-custom      { background: var(--neutral-90); color: var(--type-accent); border-color: var(--neutral-300); }
+
+    /* Custom scenario tag — user-defined */
+    .custom-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 500;
+      background: var(--blue-50);
+      color: var(--info);
+      border: 1px solid var(--blue-200);
+      white-space: nowrap;
+    }
+    .custom-tag.green {
+      background: var(--success-bg);
+      color: var(--success-dark);
+      border-color: rgba(0,135,77,0.3);
+    }
+    .custom-tag.orange {
+      background: var(--warning-bg);
+      color: var(--warning-dark);
+      border-color: rgba(234,184,11,0.4);
+    }
+
+    /* Tag cluster */
+    .tag-cluster {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    /* RSH sync indicator */
+    .rsh-dot {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+    }
+    .rsh-dot .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .rsh-dot .dot.ok    { background: var(--success); }
+    .rsh-dot .dot.stale { background: var(--warning); }
+    .rsh-dot .dot.unknown { background: var(--neutral-400); }
+    .rsh-dot .label { font-size: 11px; }
+
+    /* ============================================================
+       COLUMN — STATUS FRONT (columns 1-3 priority reordered)
+    ============================================================ */
+
+    /* ============================================================
+       SELECTION BULK ACTION BAR — appears when rows are checked
+    ============================================================ */
+    .bulk-action-bar {
+      position: sticky;
+      bottom: 0;
+      left: 0; right: 0;
+      background: var(--bg-system);
+      color: #fff;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-radius: var(--r8) var(--r8) 0 0;
+      box-shadow: var(--shadow-lg);
+      transition: transform 0.2s;
+    }
+    .bulk-action-bar .sel-count {
+      font-size: 13px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+    .bulk-action-bar .divider { width: 1px; height: 20px; background: rgba(255,255,255,0.2); }
+    .btn-combine {
+      background: var(--interactive-primary);
+      color: #fff;
+      border: none;
+      padding: 7px 16px;
+      border-radius: var(--r4);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-combine:hover { background: #0026d1; }
+    .bulk-dismiss {
+      margin-left: auto;
+      font-size: 12px;
+      opacity: 0.6;
+      cursor: pointer;
+    }
+    .bulk-dismiss:hover { opacity: 1; }
+
+    /* ============================================================
+       PAGINATION
+    ============================================================ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px;
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--type-accent);
+      background: var(--bg-white);
+    }
+    .page-btns {
+      display: flex;
+      gap: 4px;
+    }
+    .page-btn {
+      width: 28px; height: 28px;
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r4);
+      background: var(--bg-white);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+      cursor: pointer;
+      color: var(--type-default);
+    }
+    .page-btn:hover { background: var(--neutral-90); }
+    .page-btn.active { background: var(--interactive-primary); color: #fff; border-color: var(--interactive-primary); font-weight: 600; }
+
+    /* ============================================================
+       ANNOTATION LEGEND PANEL
+    ============================================================ */
+    .annotation-panel {
+      background: var(--bg-white);
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r8);
+      padding: 16px;
+      margin-top: 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .annotation-panel h3 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--type-accent);
+      margin-bottom: 12px;
+    }
+    .legend-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+    }
+    .legend-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .legend-item .legend-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--type-default);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .legend-item .legend-desc {
+      font-size: 11px;
+      color: var(--type-accent);
+      line-height: 1.5;
+    }
+    .new-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 6px;
+      background: var(--purple-50);
+      color: var(--purple-600);
+      border-radius: 100px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid var(--purple-200);
+    }
+    .enhanced-pill {
+      display: inline-flex;
+      align-items: center;
+      padding: 1px 6px;
+      background: var(--success-bg);
+      color: var(--success-dark);
+      border-radius: 100px;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      border: 1px solid rgba(0,135,77,0.3);
+    }
+
+    /* ============================================================
+       CHECKBOXES
+    ============================================================ */
+    input[type="checkbox"] {
+      width: 14px; height: 14px;
+      accent-color: var(--interactive-primary);
+      cursor: pointer;
+    }
+
+    /* ============================================================
+       TOOLTIP (hover explain)
+    ============================================================ */
+    .tooltip-wrap { position: relative; display: inline-flex; }
+    .tooltip-wrap .tip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--bg-system);
+      color: #fff;
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: var(--r4);
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      z-index: 10;
+    }
+    .tooltip-wrap:hover .tip { opacity: 1; }
+
+    /* ============================================================
+       OPEN QUESTION CALLOUTS (wireflow style)
+    ============================================================ */
+    .oq-banner {
+      background: var(--warning-bg);
+      border: 1px solid rgba(234,184,11,0.5);
+      border-left: 3px solid var(--warning);
+      border-radius: var(--r6);
+      padding: 10px 14px;
+      font-size: 11px;
+      color: var(--warning-dark);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .oq-banner .oq-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+    /* ============================================================
+       COLUMN VISIBILITY CONTROLS
+    ============================================================ */
+    .col-control-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .col-toggle {
+      font-size: 11px;
+      padding: 3px 8px;
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r4);
+      background: var(--bg-white);
+      cursor: pointer;
+      color: var(--type-accent);
+    }
+    .col-toggle.on {
+      background: var(--blue-75);
+      border-color: var(--blue-200);
+      color: var(--info-dark);
+      font-weight: 500;
+    }
+
+    /* Icon helper */
+    .icon { font-style: normal; }
+  </style>
+</head>
+<body>
+
+<!-- GLOBAL NAV (simulated) -->
+<div class="global-nav">
+  <div class="logo">Contract Modeling</div>
+  <nav>
+    <a href="#">Dashboard</a>
+    <a href="#" class="active">Scenarios</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+  </nav>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb-bar">
+  <span>Scenarios</span>
+  <span class="sep">›</span>
+  <span class="current">Search</span>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page-body">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <h1>Scenario Search</h1>
+      <p>Find, filter, and launch individual or combined scenarios across contract offices</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="btn btn-secondary">⚙ Manage Tags</button>
+      <button class="btn btn-secondary">↗ Export</button>
+      <button class="btn btn-primary">＋ New Scenario</button>
+    </div>
+  </div>
+
+  <!-- OPEN QUESTION BANNERS (wireflow annotation style) -->
+  <div class="oq-banner">
+    <span class="oq-icon">❓</span>
+    <span><strong>Open Q — Custom Tags:</strong> Users need to tag scenarios by claim type (Facility, Professional, ASC) and by negotiation group. Should tags be user-created freeform, or from a controlled vocabulary? This mockup shows a hybrid: system claim-type tags (Facility/Prof/ASC) + user custom tags (freeform).</span>
+  </div>
+  <div class="oq-banner">
+    <span class="oq-icon">❓</span>
+    <span><strong>Open Q — RSH Sync Status:</strong> Users track in Excel whether a scenario has been updated in RSH. Should this be a live feed (API integration) or a manual flag? This mockup shows a dot indicator with "Synced / Stale / Unknown" states. Needs backend signal to be real.</span>
+  </div>
+
+  <!-- SEARCH + FILTER BAR -->
+  <div class="search-filter-bar">
+    <div class="search-row">
+      <!-- GLOBAL SEARCH — NEW -->
+      <div class="search-input-wrap">
+        <span class="icon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search by name, ID, contract office, or tag…" value="">
+      </div>
+      <button class="btn btn-secondary" style="white-space:nowrap">🔽 Advanced Filters</button>
+    </div>
+
+    <!-- FILTER ROW -->
+    <div class="filter-chips">
+      <span class="filter-label">Filters:</span>
+
+      <!-- Claim Type — NEW -->
+      <select class="filter-select">
+        <option>Claim Type: All</option>
+        <option selected>Claim Type: ASC</option>
+        <option>Facility</option>
+        <option>Professional</option>
+        <option>Mixed / Combined</option>
+      </select>
+
+      <!-- Run Status — moved earlier -->
+      <select class="filter-select">
+        <option>Run Status: All</option>
+        <option>Completed</option>
+        <option>Running</option>
+        <option>Failed</option>
+        <option>Test</option>
+      </select>
+
+      <!-- CRP Type -->
+      <select class="filter-select">
+        <option>CRP Type: All</option>
+        <option>A — Amendment</option>
+        <option>B — Base</option>
+        <option>D — Draft</option>
+        <option>O — Other</option>
+      </select>
+
+      <!-- Scenario type quick pills — NEW -->
+      <div style="display:flex;gap:4px;margin-left:4px;">
+        <span class="filter-tag-pill">All</span>
+        <span class="filter-tag-pill active">Combined ⛓</span>
+        <span class="filter-tag-pill">Individual</span>
+      </div>
+
+      <!-- RSH Status — NEW -->
+      <select class="filter-select">
+        <option>RSH Status: All</option>
+        <option>RSH: Synced</option>
+        <option>RSH: Stale</option>
+        <option>RSH: Unknown</option>
+      </select>
+
+      <span class="clear-filters">Clear all</span>
+    </div>
+
+    <!-- ACTIVE FILTER STRIP -->
+    <div class="active-filter-strip">
+      <span class="af-label">Active:</span>
+      <span class="af-chip">Claim Type: ASC <span class="x">✕</span></span>
+      <span class="af-chip">Type: Combined <span class="x">✕</span></span>
+      <span class="af-chip">Office: TX-Austin <span class="x">✕</span></span>
+    </div>
+  </div>
+
+  <!-- RESULTS META ROW -->
+  <div class="results-meta">
+    <span class="results-count">Showing <strong>4</strong> of 312 scenarios</span>
+    <div class="results-actions">
+      <div class="col-control-bar">
+        <span style="font-size:11px;color:var(--type-accent);margin-right:2px;">Columns:</span>
+        <span class="col-toggle on">Status</span>
+        <span class="col-toggle on">Claim Type</span>
+        <span class="col-toggle on">RSH</span>
+        <span class="col-toggle on">Tags</span>
+        <span class="col-toggle">LOB</span>
+        <span class="col-toggle">Last Run</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-check"><input type="checkbox"></th>
+          <!-- ★ STATUS MOVED TO FRONT — key UX change -->
+          <th>Run Status <span class="sort-icon sorted">↑</span></th>
+          <th>Scenario Name <span class="sort-icon">↕</span></th>
+          <th>ID <span class="sort-icon">↕</span></th>
+          <!-- ★ NEW COLUMNS -->
+          <th>Claim Type <span class="sort-icon">↕</span></th>
+          <th>Tags <span class="sort-icon">↕</span></th>
+          <th>RSH Sync <span class="sort-icon">↕</span></th>
+          <!-- EXISTING columns -->
+          <th>CRP Type <span class="sort-icon">↕</span></th>
+          <th>Contract Office <span class="sort-icon">↕</span></th>
+          <th>Last Run <span class="sort-icon">↕</span></th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ROW 1 — Combined scenario, ASC + Facility, Stale RSH -->
+        <tr class="selected">
+          <td class="col-check"><input type="checkbox" checked></td>
+          <td><span class="badge badge-success">● Completed</span></td>
+          <td>
+            <div class="tag-cluster">
+              <span class="scenario-name">TX-Austin 2026 ASC+Fac Combined</span>
+              <span class="badge badge-combined">⛓ Combined</span>
+            </div>
+          </td>
+          <td style="font-family:monospace;font-size:11px;color:var(--type-accent)">SCN-40291</td>
+          <td>
+            <div class="tag-cluster">
+              <span class="claim-tag claim-asc">ASC</span>
+              <span class="claim-tag claim-facility">Facility</span>
+            </div>
+          </td>
+          <td>
+            <div class="tag-cluster">
+              <span class="custom-tag">TX-Neg-Group-4</span>
+              <span class="custom-tag green">Q1 Final</span>
+            </div>
+          </td>
+          <td>
+            <div class="rsh-dot tooltip-wrap">
+              <div class="dot stale"></div>
+              <span class="label" style="color:var(--warning-dark);font-size:11px;">Stale · 14d</span>
+              <span class="tip">Last synced to RSH 14 days ago. Source scenario updated since then.</span>
+            </div>
+          </td>
+          <td><span class="badge badge-neutral">B</span></td>
+          <td style="font-size:12px">TX — Austin</td>
+          <td style="font-size:11px;color:var(--type-accent)">May 5, 2026</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">▶ Run</button>
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 2 — Individual ASC, RSH Synced -->
+        <tr class="selected">
+          <td class="col-check"><input type="checkbox" checked></td>
+          <td><span class="badge badge-success">● Completed</span></td>
+          <td>
+            <div class="tag-cluster">
+              <span class="scenario-name">TX-Austin 2026 ASC Base</span>
+            </div>
+          </td>
+          <td style="font-family:monospace;font-size:11px;color:var(--type-accent)">SCN-40187</td>
+          <td>
+            <div class="tag-cluster">
+              <span class="claim-tag claim-asc">ASC</span>
+            </div>
+          </td>
+          <td>
+            <div class="tag-cluster">
+              <span class="custom-tag green">Q1 Final</span>
+              <span class="custom-tag orange">Pending Review</span>
+            </div>
+          </td>
+          <td>
+            <div class="rsh-dot tooltip-wrap">
+              <div class="dot ok"></div>
+              <span class="label" style="color:var(--success);font-size:11px;">Synced</span>
+              <span class="tip">Scenario is up-to-date with RSH. Last pushed May 12, 2026.</span>
+            </div>
+          </td>
+          <td><span class="badge badge-neutral">A</span></td>
+          <td style="font-size:12px">TX — Austin</td>
+          <td style="font-size:11px;color:var(--type-accent)">May 12, 2026</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">▶ Run</button>
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 3 — Professional + Facility combined, Running -->
+        <tr>
+          <td class="col-check"><input type="checkbox"></td>
+          <td><span class="badge badge-inprog">◌ Running</span></td>
+          <td>
+            <div class="tag-cluster">
+              <span class="scenario-name">WA-Seattle Prof+Fac Combined</span>
+              <span class="badge badge-combined">⛓ Combined</span>
+            </div>
+          </td>
+          <td style="font-family:monospace;font-size:11px;color:var(--type-accent)">SCN-38902</td>
+          <td>
+            <div class="tag-cluster">
+              <span class="claim-tag claim-professional">Professional</span>
+              <span class="claim-tag claim-facility">Facility</span>
+            </div>
+          </td>
+          <td>
+            <div class="tag-cluster">
+              <span class="custom-tag">WA-Neg-2</span>
+            </div>
+          </td>
+          <td>
+            <div class="rsh-dot">
+              <div class="dot unknown"></div>
+              <span class="label" style="color:var(--type-accent);font-size:11px;">Unknown</span>
+            </div>
+          </td>
+          <td><span class="badge badge-neutral">D</span></td>
+          <td style="font-size:12px">WA — Seattle</td>
+          <td style="font-size:11px;color:var(--type-accent)">Running…</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">⏹ Stop</button>
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 4 — Individual facility, failed -->
+        <tr>
+          <td class="col-check"><input type="checkbox"></td>
+          <td><span class="badge badge-error">✕ Failed</span></td>
+          <td>
+            <div class="tag-cluster">
+              <span class="scenario-name">[COPY] TX-Austin Facility Draft</span>
+            </div>
+          </td>
+          <td style="font-family:monospace;font-size:11px;color:var(--type-accent)">SCN-39714</td>
+          <td>
+            <div class="tag-cluster">
+              <span class="claim-tag claim-facility">Facility</span>
+            </div>
+          </td>
+          <td>
+            <div class="tag-cluster">
+              <span class="custom-tag orange">Draft</span>
+            </div>
+          </td>
+          <td>
+            <div class="rsh-dot">
+              <div class="dot unknown"></div>
+              <span class="label" style="color:var(--type-accent);font-size:11px;">Not synced</span>
+            </div>
+          </td>
+          <td><span class="badge badge-neutral">D</span></td>
+          <td style="font-size:12px">TX — Austin</td>
+          <td style="font-size:11px;color:var(--type-accent)">May 1, 2026</td>
+          <td>
+            <div style="display:flex;gap:4px;">
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">▶ Retry</button>
+              <button class="btn btn-ghost" style="padding:4px 8px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <span>Rows per page: <select style="border:none;font-size:12px;color:var(--type-default);background:transparent;cursor:pointer;"><option>25</option><option>50</option><option>100</option></select></span>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span>1–4 of 312</span>
+        <div class="page-btns">
+          <div class="page-btn">‹</div>
+          <div class="page-btn active">1</div>
+          <div class="page-btn">2</div>
+          <div class="page-btn">3</div>
+          <div class="page-btn">…</div>
+          <div class="page-btn">13</div>
+          <div class="page-btn">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK ACTION BAR (2 rows selected) -->
+  <div class="bulk-action-bar">
+    <span class="sel-count">2 scenarios selected</span>
+    <div class="divider"></div>
+    <button class="btn-combine">⛓ Combine Selected</button>
+    <button class="btn btn-ghost" style="color:rgba(255,255,255,0.8);font-size:12px;padding:6px 10px;">🏷 Batch Tag</button>
+    <button class="btn btn-ghost" style="color:rgba(255,255,255,0.8);font-size:12px;padding:6px 10px;">↗ Export</button>
+    <span class="bulk-dismiss">✕ Clear selection</span>
+  </div>
+
+  <!-- ANNOTATION LEGEND -->
+  <div class="annotation-panel">
+    <h3>Phase 1 — What's New in This Redesign</h3>
+    <div class="legend-grid">
+
+      <div class="legend-item">
+        <div class="legend-label">
+          🔍 Global Search Bar
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="legend-desc">Single search bar replaces 13 column-level filters. Searches across name, ID, contract office, and tags simultaneously. Eliminates the need to know which column to filter.</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          ● Run Status — Column 1
+          <span class="enhanced-pill">ENHANCED</span>
+        </div>
+        <div class="legend-desc">Status moved from column 10–11 to column 1 (right after checkbox). Color-coded dots — no more scanning to the far right to answer "did my scenario finish?"</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          <span class="claim-tag claim-asc" style="font-size:10px;">ASC</span>
+          <span class="claim-tag claim-facility" style="font-size:10px;">Facility</span>
+          Claim Type Tags
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="legend-desc">System-generated tags for Facility, Professional, and ASC claim types. Addresses Skander's blind spot — no column currently distinguishes ASC from Facility scenarios.</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          <span class="custom-tag">TX-Neg-Group-4</span>
+          User Custom Tags
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="legend-desc">Freeform tags users can apply to any scenario. Replaces the naming conventions ([COPY], manual prefixes) and Excel workarounds for grouping by negotiation group or project phase.</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          RSH Sync Status
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="legend-desc">Visible indicator showing whether a scenario has been pushed to RSH and if the RSH copy is still current. States: Synced ✓, Stale (source updated since last push), Unknown. Eliminates Excel tracking.</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          <span class="badge badge-combined">⛓ Combined</span>
+          Combined Badge
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="legend-desc">Visual identifier in the name column distinguishes combined scenarios from individual ones. Prevents confusion when scanning the list — no longer requires opening each row to check its type.</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          ⛓ Combine Selected — Bulk Action
+          <span class="new-pill">NEW</span>
+        </div>
+        <div class="legend-desc">Multi-select rows with checkboxes, then hit "Combine Selected" to initiate a combined scenario from the search page. Eliminates leaving the page, navigating to the Combined Scenario page, and manually typing IDs.</div>
+      </div>
+
+      <div class="legend-item">
+        <div class="legend-label">
+          Column Visibility Controls
+          <span class="enhanced-pill">ENHANCED</span>
+        </div>
+        <div class="legend-desc">Toggle which columns are visible. Status, Claim Type, RSH, and Tags are on by default. LOB and Last Run are off by default (most users don't need them immediately). Saves horizontal scroll.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end page-body -->
+
+</body>
+</html>
