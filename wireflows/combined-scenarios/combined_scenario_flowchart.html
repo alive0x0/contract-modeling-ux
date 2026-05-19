@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combined Scenario — Business Flow</title>
+<style>
+  /* ── CANVAS DESIGN SYSTEM TOKENS ── */
+  :root {
+    /* Brand */
+    --primary:        #0033FF;
+    --primary-dark:   #110081;
+    --primary-light:  #E6F0FF;
+    --primary-mid:    #B4D1FF;
+
+    /* Backgrounds */
+    --bg-screen:      #F8F9FF;
+    --bg-low:         #F1F3FC;
+    --bg-lowest:      #DBDDE9;
+    --bg-white:       #FFFFFF;
+
+    /* Text */
+    --ink:            #353331;
+    --ink-muted:      #6B6966;
+    --ink-disabled:   #A3A19F;
+
+    /* Borders */
+    --border-subtle:  #F2F0EE;
+    --border-default: #E0DDDA;
+    --border-strong:  #C1C4D4;
+    --border-ink:     #6B6966;
+
+    /* Semantic */
+    --success:        #488319;
+    --success-bg:     #EDF3E8;
+    --success-mid:    #C6D9B8;
+    --error:          #BA0000;
+    --error-bg:       #FDEDE8;
+    --error-mid:      #FAB7B2;
+    --warning:        #EAB80B;
+    --warning-bg:     #F8E9B3;
+    --warning-mid:    #F4D141;
+
+    /* Table */
+    --table-hover:    #FBFAF9;
+    --table-selected: #E6F0FF;
+    --table-header:   #EEEBE8;
+    --table-divider:  #C1C4D4;
+
+    /* Nav */
+    --nav-bg:         #110081;
+
+    /* Spacing */
+    --s0: 0px; --s2: 2px; --s4: 4px; --s8: 8px;
+    --s12: 12px; --s16: 16px; --s24: 24px; --s32: 32px;
+
+    /* Radius */
+    --r: 4px;
+    --r8: 8px;
+    --r-pill: 1000px;
+
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: var(--font);
+    background: var(--bg-screen);
+    color: var(--ink);
+    font-size: 13px;
+    min-height: 100vh;
+  }
+
+  /* ── TOP NAV ── */
+  .topnav {
+    background: var(--nav-bg);
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 var(--s24);
+    gap: var(--s16);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .topnav .logo { color: #fff; font-weight: 700; font-size: 13px; letter-spacing: .02em; }
+  .topnav .nav-items { display: flex; gap: 2px; flex: 1; }
+  .topnav .nav-item { color: rgba(255,255,255,.6); font-size: 12px; padding: 5px 10px; border-radius: var(--r); cursor: pointer; }
+  .topnav .nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+  .topnav .nav-item.active { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-default);
+    padding: var(--s16) var(--s24);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s16);
+  }
+  .page-title { font-size: 18px; font-weight: 700; color: var(--ink); }
+  .page-sub { font-size: 12px; color: var(--ink-muted); margin-top: 2px; }
+
+  .view-toggle {
+    display: flex;
+    background: var(--bg-low);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r8);
+    padding: 3px;
+    gap: 2px;
+  }
+  .view-btn {
+    padding: 5px 12px;
+    border-radius: var(--r);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--ink-muted);
+    transition: all .15s;
+  }
+  .view-btn.active { background: var(--bg-white); color: var(--ink); box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+
+  /* ── CANVAS ── */
+  .canvas-wrap {
+    padding: var(--s24);
+    overflow-x: auto;
+  }
+
+  .flow-canvas {
+    min-width: 1100px;
+    position: relative;
+  }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex;
+    gap: var(--s16);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--s24);
+    background: var(--bg-white);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r8);
+    padding: var(--s12) var(--s16);
+  }
+  .legend-title { font-size: 11px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; margin-right: var(--s8); }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-muted); }
+  .legend-swatch {
+    width: 20px; height: 14px; border-radius: var(--r);
+    flex-shrink: 0;
+  }
+  .legend-diamond {
+    width: 16px; height: 16px;
+    background: var(--warning-bg);
+    border: 1.5px solid var(--warning);
+    transform: rotate(45deg);
+    flex-shrink: 0;
+  }
+  .legend-sep { width: 1px; height: 20px; background: var(--border-default); margin: 0 4px; }
+
+  /* ── FLOW SECTIONS ── */
+  .flow-section {
+    margin-bottom: var(--s32);
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--ink-disabled);
+    margin-bottom: var(--s12);
+    display: flex;
+    align-items: center;
+    gap: var(--s8);
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border-default);
+  }
+
+  /* ── FLOW ROW ── */
+  .flow-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    position: relative;
+  }
+
+  /* ── NODES ── */
+  .node {
+    flex-shrink: 0;
+    border-radius: var(--r8);
+    padding: var(--s12) var(--s16);
+    min-width: 180px;
+    max-width: 220px;
+    position: relative;
+    border: 1.5px solid transparent;
+  }
+  .node-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+  .node-desc {
+    font-size: 11px;
+    color: var(--ink-muted);
+    line-height: 1.45;
+  }
+  .node-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 6px;
+    padding: 2px 7px;
+    border-radius: var(--r-pill);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .02em;
+  }
+
+  /* Node variants */
+  .node-start {
+    background: var(--nav-bg);
+    border-color: var(--nav-bg);
+    border-radius: var(--r-pill);
+    min-width: 120px;
+    max-width: 140px;
+    text-align: center;
+  }
+  .node-start .node-title { color: #fff; margin: 0; font-size: 13px; }
+
+  .node-action {
+    background: var(--bg-white);
+    border-color: var(--border-strong);
+  }
+  .node-action:hover { border-color: var(--primary); }
+
+  .node-new {
+    background: var(--primary-light);
+    border-color: var(--primary-mid);
+  }
+  .node-new .node-title { color: var(--primary-dark); }
+  .node-new .node-desc { color: #3457a0; }
+
+  .node-system {
+    background: var(--bg-low);
+    border-color: var(--border-strong);
+    border-style: dashed;
+  }
+  .node-system .node-title { color: var(--ink-muted); }
+
+  .node-success {
+    background: var(--success-bg);
+    border-color: var(--success-mid);
+  }
+  .node-success .node-title { color: var(--success); }
+
+  .node-error {
+    background: var(--error-bg);
+    border-color: var(--error-mid);
+  }
+  .node-error .node-title { color: var(--error); }
+
+  .node-end {
+    background: var(--ink);
+    border-color: var(--ink);
+    border-radius: var(--r-pill);
+    min-width: 120px;
+    max-width: 140px;
+    text-align: center;
+  }
+  .node-end .node-title { color: #fff; margin: 0; font-size: 13px; }
+
+  /* Decision diamond */
+  .decision-wrap {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    position: relative;
+    min-width: 140px;
+  }
+  .diamond {
+    width: 100px;
+    height: 100px;
+    background: var(--warning-bg);
+    border: 2px solid var(--warning);
+    transform: rotate(45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: var(--r);
+  }
+  .diamond-inner {
+    transform: rotate(-45deg);
+    text-align: center;
+    padding: 4px;
+  }
+  .diamond-inner .d-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+  }
+
+  /* Arrows */
+  .arrow {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    padding: 0 4px;
+    margin-top: 32px;
+  }
+  .arrow-line {
+    height: 1.5px;
+    background: var(--border-ink);
+    min-width: 24px;
+    flex: 1;
+    position: relative;
+  }
+  .arrow-line::after {
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-left: 7px solid var(--border-ink);
+    border-right: none;
+  }
+  .arrow-label {
+    position: absolute;
+    top: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--ink-muted);
+    white-space: nowrap;
+    background: var(--bg-screen);
+    padding: 1px 4px;
+    border-radius: 3px;
+  }
+
+  /* Down arrow connector */
+  .down-arrow {
+    width: 1.5px;
+    background: var(--border-ink);
+    min-height: 24px;
+    margin: 0 auto;
+    position: relative;
+  }
+  .down-arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top: 7px solid var(--border-ink);
+    border-bottom: none;
+  }
+
+  /* Branch labels */
+  .branch-yes {
+    font-size: 10px; font-weight: 700; color: var(--success);
+    text-align: center; margin: 4px 0;
+  }
+  .branch-no {
+    font-size: 10px; font-weight: 700; color: var(--error);
+    text-align: center; margin: 4px 0;
+  }
+
+  /* ── GATE BLOCK ── */
+  .gate {
+    background: var(--warning-bg);
+    border: 1.5px solid var(--warning);
+    border-radius: var(--r8);
+    padding: var(--s12) var(--s16);
+    min-width: 200px;
+    max-width: 240px;
+  }
+  .gate-title { font-size: 11px; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .gate-rule {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    font-size: 10.5px;
+    color: var(--ink-muted);
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .gate-rule svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ── PHASE LABELS ── */
+  .phase-track {
+    display: flex;
+    gap: 0;
+    margin-bottom: var(--s8);
+    padding-left: 0;
+  }
+  .phase-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: var(--r-pill);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-right: var(--s8);
+  }
+  .phase-1 { background: var(--primary-light); color: var(--primary-dark); border: 1px solid var(--primary-mid); }
+  .phase-2 { background: var(--warning-bg); color: #7a5200; border: 1px solid var(--warning-mid); }
+  .phase-3 { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-mid); }
+  .phase-4 { background: var(--bg-low); color: var(--ink-muted); border: 1px solid var(--border-strong); }
+
+  /* ── FULL FLOW GRID ── */
+  .full-flow {
+    display: grid;
+    grid-template-columns: auto;
+    gap: 0;
+  }
+
+  .flow-lane {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* ── HORIZONTAL FLOW ── */
+  .h-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    flex-wrap: nowrap;
+  }
+  .h-flow .node { flex-shrink: 0; }
+
+  /* ── BRANCH BLOCK ── */
+  .branch-block {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  /* ── HAPPY PATH vs ERROR PATH ── */
+  .two-paths {
+    display: grid;
+    grid-template-columns: 1fr 1px 1fr;
+    gap: var(--s24);
+    margin-top: var(--s16);
+  }
+  .path-divider {
+    background: var(--border-default);
+    align-self: stretch;
+  }
+  .path-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    margin-bottom: var(--s12);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .path-label.happy { color: var(--success); }
+  .path-label.error { color: var(--error); }
+
+  /* ── SWIMLANE ── */
+  .swimlane-grid {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 0;
+    border: 1px solid var(--border-default);
+    border-radius: var(--r8);
+    overflow: hidden;
+    background: var(--bg-white);
+  }
+  .lane-label {
+    background: var(--table-header);
+    border-right: 1px solid var(--border-default);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--s16) var(--s8);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--ink-muted);
+    writing-mode: vertical-rl;
+    text-orientation: mixed;
+    transform: rotate(180deg);
+  }
+  .lane-content {
+    padding: var(--s16);
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .lane-content:last-of-type { border-bottom: none; }
+
+  /* ── STEP NODES (numbered) ── */
+  .step-node {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--s12);
+    padding: var(--s12);
+    background: var(--bg-white);
+    border: 1.5px solid var(--border-default);
+    border-radius: var(--r8);
+    transition: border-color .15s;
+    cursor: default;
+  }
+  .step-node:hover { border-color: var(--primary); }
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: var(--r-pill);
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .step-num.new { background: var(--primary); }
+  .step-num.existing { background: var(--ink-muted); }
+  .step-body { flex: 1; }
+  .step-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .step-desc { font-size: 11px; color: var(--ink-muted); line-height: 1.4; }
+
+  .new-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: var(--primary-light); color: var(--primary);
+    border: 1px solid var(--primary-mid);
+    font-size: 9px; font-weight: 700;
+    padding: 1px 6px; border-radius: var(--r-pill);
+    margin-left: 6px; letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .enhanced-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    background: #F0FDF4; color: var(--success);
+    border: 1px solid var(--success-mid);
+    font-size: 9px; font-weight: 700;
+    padding: 1px 6px; border-radius: var(--r-pill);
+    margin-left: 6px; letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+
+  /* Connector lines between steps */
+  .step-connector {
+    width: 1.5px;
+    min-height: 20px;
+    background: var(--border-strong);
+    margin: 4px 0 4px 23px;
+  }
+
+  /* ── DECISION BOX ── */
+  .decision-box {
+    background: var(--warning-bg);
+    border: 2px solid var(--warning);
+    border-radius: var(--r8);
+    padding: var(--s12) var(--s16);
+    text-align: center;
+  }
+  .decision-box .d-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: #7a5200;
+    margin-bottom: 4px;
+  }
+  .decision-box .d-question {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* Branch outcomes */
+  .branch-outcomes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--s12);
+    margin-top: var(--s8);
+  }
+  .outcome {
+    border-radius: var(--r8);
+    padding: var(--s8) var(--s12);
+    font-size: 11px;
+  }
+  .outcome-yes { background: var(--success-bg); border: 1.5px solid var(--success-mid); }
+  .outcome-yes .o-label { color: var(--success); font-weight: 700; font-size: 10px; margin-bottom: 3px; }
+  .outcome-no { background: var(--error-bg); border: 1.5px solid var(--error-mid); }
+  .outcome-no .o-label { color: var(--error); font-weight: 700; font-size: 10px; margin-bottom: 3px; }
+
+  /* ── OPEN QUESTIONS ── */
+  .open-q {
+    background: #F5F0FF;
+    border: 1.5px solid #D8B4FE;
+    border-radius: var(--r8);
+    padding: var(--s12) var(--s16);
+    margin-top: var(--s32);
+  }
+  .open-q-title { font-size: 11px; font-weight: 700; color: #5B21B6; text-transform: uppercase; letter-spacing: .05em; margin-bottom: var(--s12); }
+  .open-q-item {
+    display: flex;
+    gap: var(--s8);
+    font-size: 11.5px;
+    color: var(--ink-muted);
+    margin-bottom: var(--s8);
+    line-height: 1.45;
+  }
+  .q-num {
+    width: 18px; height: 18px; border-radius: var(--r-pill);
+    background: #7C3AED; color: #fff;
+    font-size: 9px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* ── VIEW PANELS ── */
+  .view-panel { display: none; }
+  .view-panel.active { display: block; }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+  .divider-h { height: 1px; background: var(--border-default); margin: var(--s24) 0; }
+
+  .callout {
+    display: flex; gap: var(--s12);
+    padding: var(--s12) var(--s16);
+    border-radius: var(--r8);
+    font-size: 12px;
+    margin-bottom: var(--s16);
+    align-items: flex-start;
+  }
+  .callout-info { background: var(--primary-light); border: 1px solid var(--primary-mid); color: var(--primary-dark); }
+  .callout svg { flex-shrink: 0; margin-top: 1px; }
+
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s16); }
+  .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--s16); }
+
+  .card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-default);
+    border-radius: var(--r8);
+    padding: var(--s16);
+  }
+  .card-title { font-size: 11px; font-weight: 700; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: var(--s8); }
+
+  .pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 9px; border-radius: var(--r-pill);
+    font-size: 10px; font-weight: 700;
+  }
+  .pill-blue { background: var(--primary-light); color: var(--primary-dark); border: 1px solid var(--primary-mid); }
+  .pill-green { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-mid); }
+  .pill-red { background: var(--error-bg); color: var(--error); border: 1px solid var(--error-mid); }
+  .pill-grey { background: var(--bg-low); color: var(--ink-muted); border: 1px solid var(--border-strong); }
+  .pill-orange { background: var(--warning-bg); color: #7a5200; border: 1px solid var(--warning-mid); }
+  .pill-purple { background: #F5F0FF; color: #5B21B6; border: 1px solid #D8B4FE; }
+
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <span class="logo">Contract Modeling</span>
+  <div class="nav-items">
+    <div class="nav-item">Home</div>
+    <div class="nav-item active">Scenarios</div>
+    <div class="nav-item">Patcher</div>
+    <div class="nav-item">Ratesheet History</div>
+    <div class="nav-item">Ratesheet Maintenance</div>
+  </div>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div>
+    <div class="page-title">Combined Scenario — Business Flow</div>
+    <div class="page-sub">End-to-end experience map · Entry points, decision gates, happy path, error states, open questions</div>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="view-toggle">
+      <button class="view-btn active" onclick="showView('flow')">Flow View</button>
+      <button class="view-btn" onclick="showView('business')">Business Logic</button>
+      <button class="view-btn" onclick="showView('questions')">Open Questions</button>
+    </div>
+  </div>
+</div>
+
+<div class="canvas-wrap">
+
+<!-- ══════════════════════════════════════
+     VIEW 1 — FLOW VIEW
+══════════════════════════════════════ -->
+<div class="view-panel active" id="view-flow">
+
+  <!-- LEGEND -->
+  <div class="legend">
+    <span class="legend-title">Legend</span>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--nav-bg)"></div>
+      Start / End
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--bg-white);border:1.5px solid var(--border-strong)"></div>
+      Existing step
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--primary-light);border:1.5px solid var(--primary-mid)"></div>
+      New / Enhanced
+    </div>
+    <div class="legend-item">
+      <div class="legend-diamond"></div>
+      Decision gate
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--success-bg);border:1.5px solid var(--success-mid)"></div>
+      Happy path outcome
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--error-bg);border:1.5px solid var(--error-mid)"></div>
+      Error / blocked path
+    </div>
+    <div class="legend-item">
+      <div class="legend-swatch" style="background:var(--bg-low);border:1.5px dashed var(--border-strong)"></div>
+      System action (auto)
+    </div>
+    <div class="legend-sep"></div>
+    <div class="legend-item"><span class="new-badge">New</span> Net-new capability</div>
+    <div class="legend-item"><span class="enhanced-badge">Enhanced</span> Improvement on existing</div>
+  </div>
+
+  <!-- PHASE TRACK -->
+  <div class="phase-track">
+    <span class="phase-pill phase-1">① Discovery</span>
+    <span class="phase-pill phase-2">② Assembly</span>
+    <span class="phase-pill phase-3">③ Execution</span>
+    <span class="phase-pill phase-4">④ Post-Run Management</span>
+  </div>
+
+  <!-- MAIN FLOW GRID -->
+  <div style="display:grid;grid-template-columns:1fr;gap:12px">
+
+    <!-- ── PHASE 1: DISCOVERY ── -->
+    <div class="card">
+      <div class="card-title" style="color:var(--primary-dark);margin-bottom:16px">
+        Phase 1 — Discovery: How does an analyst know they need to combine?
+      </div>
+
+      <div class="three-col">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Entry Point A</div>
+          <div class="step-node">
+            <div class="step-num existing" style="font-size:9px">A</div>
+            <div class="step-body">
+              <div class="step-title">Planned national negotiation</div>
+              <div class="step-desc">Analyst is assigned a multi-market contract (e.g. Tenant). Knows from the start they'll need regional rollups. Models by contract office intentionally.</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;padding:8px 12px;background:var(--primary-light);border-radius:4px;font-size:11px;color:var(--primary-dark)">
+            <strong>Workflow:</strong> Model → Combine → Roll up by region → Repeat
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Entry Point B</div>
+          <div class="step-node">
+            <div class="step-num existing" style="font-size:9px">B</div>
+            <div class="step-body">
+              <div class="step-title">Post-hoc rollup need</div>
+              <div class="step-desc">Analyst modeled ASCs and hospitals separately. Stakeholder asks for a combined view. Analyst realizes existing individual scenarios can be merged.</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;padding:8px 12px;background:var(--primary-light);border-radius:4px;font-size:11px;color:var(--primary-dark)">
+            <strong>Workflow:</strong> Existing scenarios → Discover combine option → Merge
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Entry Point C <span class="new-badge">New</span></div>
+          <div class="step-node node-new" style="border-color:var(--primary-mid)">
+            <div class="step-num" style="font-size:9px">C</div>
+            <div class="step-body">
+              <div class="step-title" style="color:var(--primary-dark)">Bulk selection from search page</div>
+              <div class="step-desc" style="color:#3457a0">Analyst filters the scenario list by system/region, selects multiple rows, hits "Combine Selected." Discovery and assembly happen in one action.</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;padding:8px 12px;background:var(--primary-light);border-radius:4px;font-size:11px;color:var(--primary-dark)">
+            <strong>Workflow:</strong> Filter → Select → Combine (no ID hunting)
+          </div>
+        </div>
+      </div>
+
+      <!-- Open business question -->
+      <div style="margin-top:16px;padding:10px 14px;background:var(--warning-bg);border:1px solid var(--warning-mid);border-radius:var(--r8);font-size:11px;color:#7a5200">
+        <strong>⚠ Business question:</strong> Should analysts be able to create a "negotiation group" or "project" to pre-organize scenarios before combining? This would solve Entry Points A and B upstream — scenarios know they belong together before the combine step.
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 0">
+      <div style="flex:1;height:1.5px;background:var(--border-strong);max-width:400px"></div>
+      <div style="padding:4px 12px;background:var(--bg-low);border:1px solid var(--border-strong);border-radius:var(--r-pill);font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em">Phase 2 — Assembly</div>
+      <div style="flex:1;height:1.5px;background:var(--border-strong);max-width:400px"></div>
+    </div>
+
+    <!-- ── PHASE 2: ASSEMBLY ── -->
+    <div class="card">
+      <div class="card-title" style="color:#7a5200;margin-bottom:16px">Phase 2 — Assembly: Selecting and validating scenarios to combine</div>
+
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start">
+
+        <!-- LEFT: Selection -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 2a — Scenario Selection</div>
+          <div class="step-node node-new">
+            <div class="step-num">1</div>
+            <div class="step-body">
+              <div class="step-title" style="color:var(--primary-dark)">Multi-select from search <span class="new-badge">New</span></div>
+              <div class="step-desc" style="color:#3457a0">Filter by type, system, or region tag. Check rows. Bulk bar shows count. "Combine Selected" opens assembly view pre-populated.</div>
+            </div>
+          </div>
+          <div style="margin:6px 0 6px 23px;width:1.5px;height:16px;background:var(--border-strong)"></div>
+          <div class="step-node" style="border-style:dashed">
+            <div class="step-num existing">or</div>
+            <div class="step-body">
+              <div class="step-title">Manual ID entry (existing)</div>
+              <div class="step-desc">Current flow — analyst types/pastes scenario IDs directly into the combine page. Still supported as fallback.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MIDDLE: Gate -->
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:32px">
+          <div style="width:32px;height:1.5px;background:var(--border-strong)"></div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted)">then</div>
+          <div style="width:32px;height:1.5px;background:var(--border-strong)"></div>
+        </div>
+
+        <!-- RIGHT: Pre-flight -->
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 2b — Compatibility Check <span class="new-badge">New</span></div>
+          <div class="decision-box">
+            <div class="d-label">Decision Gate</div>
+            <div class="d-question">Do all selected scenarios share required properties?</div>
+          </div>
+          <div style="margin-top:8px">
+            <div style="font-size:10px;font-weight:700;color:var(--ink-muted);margin-bottom:6px">Validates 6 rules:</div>
+            <div style="display:flex;flex-direction:column;gap:3px">
+              <div style="font-size:10.5px;color:var(--ink-muted);display:flex;gap:6px;align-items:center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Effective Date
+              </div>
+              <div style="font-size:10.5px;color:var(--ink-muted);display:flex;gap:6px;align-items:center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Proposed Effective Date
+              </div>
+              <div style="font-size:10.5px;color:var(--ink-muted);display:flex;gap:6px;align-items:center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Claim Date Range
+              </div>
+              <div style="font-size:10.5px;color:var(--ink-muted);display:flex;gap:6px;align-items:center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Claim Version
+              </div>
+              <div style="font-size:10.5px;color:var(--ink-muted);display:flex;gap:6px;align-items:center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Lines of Business
+              </div>
+              <div style="font-size:10.5px;color:var(--ink-muted);display:flex;gap:6px;align-items:center">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Future Value Setting
+              </div>
+            </div>
+          </div>
+
+          <!-- Branch outcomes -->
+          <div class="branch-outcomes" style="margin-top:10px">
+            <div class="outcome outcome-yes">
+              <div class="o-label">✓ All pass</div>
+              <div style="font-size:10.5px;color:var(--ink-muted)">Name scenario, set region tag, proceed to run</div>
+            </div>
+            <div class="outcome outcome-no">
+              <div class="o-label">✗ Conflict found</div>
+              <div style="font-size:10.5px;color:var(--ink-muted)">Show which scenarios conflict and which rule fails. Analyst removes or fixes before re-checking.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:16px;padding:10px 14px;background:var(--warning-bg);border:1px solid var(--warning-mid);border-radius:var(--r8);font-size:11px;color:#7a5200">
+        <strong>⚠ Business question:</strong> What happens when an analyst wants to combine scenarios with matching dates but different LOBs (e.g. OAP + New Business)? Currently blocked. Is this a real need worth enabling, or an edge case to document as a known limitation?
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 0">
+      <div style="flex:1;height:1.5px;background:var(--border-strong);max-width:400px"></div>
+      <div style="padding:4px 12px;background:var(--success-bg);border:1px solid var(--success-mid);border-radius:var(--r-pill);font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:.05em">Phase 3 — Execution</div>
+      <div style="flex:1;height:1.5px;background:var(--border-strong);max-width:400px"></div>
+    </div>
+
+    <!-- ── PHASE 3: EXECUTION ── -->
+    <div class="card">
+      <div class="card-title" style="color:var(--success);margin-bottom:16px">Phase 3 — Execution: Running the combined scenario and viewing results</div>
+
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:start">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 3a — Run</div>
+          <div class="step-node" style="background:var(--bg-low);border-style:dashed">
+            <div class="step-num existing">Sys</div>
+            <div class="step-body">
+              <div class="step-title">System runs combined model</div>
+              <div class="step-desc">Existing compute. Output is identical to building the scenario from scratch with all facilities. No change to this step.</div>
+            </div>
+          </div>
+          <div style="margin:6px 0 6px 23px;width:1.5px;height:16px;background:var(--border-strong)"></div>
+          <div class="step-node" style="background:var(--bg-low);border-style:dashed">
+            <div class="step-num existing">Sys</div>
+            <div class="step-body">
+              <div class="step-title">System stores source IDs</div>
+              <div class="step-desc" style="color:var(--success)">NEW: At run time, system permanently records which scenario IDs were combined to build this result.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:32px">
+          <div style="width:32px;height:1.5px;background:var(--border-strong)"></div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted)">then</div>
+          <div style="width:32px;height:1.5px;background:var(--border-strong)"></div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Step 3b — Results <span class="enhanced-badge">Enhanced</span></div>
+          <div class="step-node node-new">
+            <div class="step-num">R</div>
+            <div class="step-body">
+              <div class="step-title" style="color:var(--primary-dark)">Combined report + provenance card</div>
+              <div class="step-desc" style="color:#3457a0">Full report (trends, transfer metrics, facility breakdown, timeline). PLUS: permanent provenance card showing source scenario IDs as clickable links.</div>
+            </div>
+          </div>
+          <div style="margin-top:8px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
+            <div style="padding:7px 10px;background:var(--bg-low);border:1px solid var(--border-default);border-radius:var(--r);font-size:10.5px;color:var(--ink-muted)">
+              <strong style="color:var(--ink)">Existing tabs</strong><br>Modeling Summary, Claims, Timeline, Uncertainty
+            </div>
+            <div style="padding:7px 10px;background:var(--primary-light);border:1px solid var(--primary-mid);border-radius:var(--r);font-size:10.5px;color:var(--primary-dark)">
+              <strong>New: Provenance</strong><br>Source IDs, run date, negotiation group tag
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONNECTOR -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;padding:4px 0">
+      <div style="flex:1;height:1.5px;background:var(--border-strong);max-width:400px"></div>
+      <div style="padding:4px 12px;background:var(--bg-low);border:1px solid var(--border-strong);border-radius:var(--r-pill);font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em">Phase 4 — Post-Run Management</div>
+      <div style="flex:1;height:1.5px;background:var(--border-strong);max-width:400px"></div>
+    </div>
+
+    <!-- ── PHASE 4: POST-RUN ── -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:16px">Phase 4 — Post-Run: What can an analyst do after a combined scenario exists?</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Edit &amp; Re-run <span class="pill pill-grey" style="font-size:9px">Existing</span></div>
+          <div class="step-node">
+            <div class="step-num existing">E</div>
+            <div class="step-body">
+              <div class="step-title">Modify timeline</div>
+              <div class="step-desc">Go into combined scenario timeline, change rates/terms for any facility, re-run. Already works. No change needed.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Add Source <span class="new-badge">New</span></div>
+          <div class="step-node node-new">
+            <div class="step-num">+</div>
+            <div class="step-body">
+              <div class="step-title" style="color:var(--primary-dark)">Manage Sources in-place</div>
+              <div class="step-desc" style="color:#3457a0">Add or remove a source scenario without leaving the page. Pre-filtered to compatible only. Re-runs automatically on save.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Navigate to Source <span class="enhanced-badge">Enhanced</span></div>
+          <div class="step-node node-new">
+            <div class="step-num">↗</div>
+            <div class="step-body">
+              <div class="step-title" style="color:var(--primary-dark)">Jump to source scenario</div>
+              <div class="step-desc" style="color:#3457a0">Click any source ID in the provenance card → opens that individual scenario in a new tab. No need to search for it.</div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Nested Combine <span class="pill pill-orange" style="font-size:9px">Edge case</span></div>
+          <div class="step-node" style="border-color:var(--warning);background:var(--warning-bg)">
+            <div class="step-num" style="background:var(--warning);color:#fff">?</div>
+            <div class="step-body">
+              <div class="step-title">Combine a combined scenario</div>
+              <div class="step-desc" style="color:#7a5200">Currently: take combined ID, add to new combine. Works but clunky. Should the tool understand this is a tree, not a flat list?</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:16px;padding:10px 14px;background:var(--warning-bg);border:1px solid var(--warning-mid);border-radius:var(--r8);font-size:11px;color:#7a5200">
+        <strong>⚠ Business question:</strong> When a source scenario is modified after a combined scenario was run — does the combined scenario show a "stale" indicator? Should analysts be notified when a source they used has changed?
+      </div>
+    </div>
+
+  </div><!-- end main flow grid -->
+</div><!-- end view-flow -->
+
+
+<!-- ══════════════════════════════════════
+     VIEW 2 — BUSINESS LOGIC
+══════════════════════════════════════ -->
+<div class="view-panel" id="view-business">
+
+  <div class="callout callout-info">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>This view maps the business rules, constraints, and data relationships that govern the combined scenario feature. Use this to align engineering scope and surface edge cases before design handoff.</span>
+  </div>
+
+  <div class="two-col" style="margin-bottom:16px">
+
+    <div class="card">
+      <div class="card-title">Compatibility Rules (Hard Gates)</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-low);border-radius:var(--r);font-size:11px">
+          <span>Effective Date</span>
+          <span class="pill pill-red">Must match</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-low);border-radius:var(--r);font-size:11px">
+          <span>Proposed Effective Date</span>
+          <span class="pill pill-red">Must match</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-low);border-radius:var(--r);font-size:11px">
+          <span>Claim Date Range</span>
+          <span class="pill pill-red">Must match</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-low);border-radius:var(--r);font-size:11px">
+          <span>Claim Version</span>
+          <span class="pill pill-red">Must match</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-low);border-radius:var(--r);font-size:11px">
+          <span>Lines of Business</span>
+          <span class="pill pill-orange">Must match (debated)</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:var(--bg-low);border-radius:var(--r);font-size:11px">
+          <span>Future Value Setting</span>
+          <span class="pill pill-red">Must match</span>
+        </div>
+        <div style="margin-top:4px;font-size:11px;color:var(--ink-muted);padding:8px;background:var(--warning-bg);border-radius:var(--r);border:1px solid var(--warning-mid)">
+          <strong style="color:#7a5200">Rationale:</strong> Rules exist because you cannot build a single scenario from scratch with mismatched dates/versions. The combine must be mathematically equivalent to building from scratch.
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Data Model — What Gets Stored</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="padding:10px 12px;background:var(--bg-low);border-radius:var(--r);border-left:3px solid var(--primary)">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px">Today</div>
+          <div style="font-size:11px;color:var(--ink-muted)">Combined scenario stored as a regular scenario. No link back to source IDs. Name convention is the only signal.</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--primary-light);border-radius:var(--r);border-left:3px solid var(--primary)">
+          <div style="font-size:11px;font-weight:700;color:var(--primary-dark);margin-bottom:4px">Proposed — Provenance record</div>
+          <div style="font-size:11px;color:#3457a0">Store: source_scenario_ids[ ], combined_on_date, negotiation_group, is_combined: true. Displayed in report. Enables in-place management.</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--warning-bg);border-radius:var(--r);border-left:3px solid var(--warning)">
+          <div style="font-size:11px;font-weight:700;color:#7a5200;margin-bottom:4px">Open question — Staleness</div>
+          <div style="font-size:11px;color:#7a5200">If source scenario A is modified after combined scenario C was built from [A, B] — should C be flagged as stale? Does the system need to track source version at combine time?</div>
+        </div>
+        <div style="padding:10px 12px;background:var(--bg-low);border-radius:var(--r);border-left:3px solid var(--border-ink)">
+          <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:4px">Nested combine</div>
+          <div style="font-size:11px;color:var(--ink-muted)">Can a combined scenario be a source in another combine? Currently yes (combine C then use C's ID in a new combine). Should the system resolve the full source tree or treat combined IDs as opaque?</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">User Types &amp; Access Patterns</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+        <div style="display:flex;gap:10px;padding:10px;background:var(--bg-low);border-radius:var(--r)">
+          <div style="width:36px;height:36px;border-radius:var(--r-pill);background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">SA</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--ink)">Senior Analyst (Skander)</div>
+            <div style="font-size:11px;color:var(--ink-muted)">Power user. Manages national negotiations. Combines 5–10 scenarios at a time. Maintains Excel tracker today. Needs provenance + in-place management most.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;padding:10px;background:var(--bg-low);border-radius:var(--r)">
+          <div style="width:36px;height:36px;border-radius:var(--r-pill);background:var(--ink-muted);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">MA</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--ink)">Mid-level Analyst</div>
+            <div style="font-size:11px;color:var(--ink-muted)">Combines ASCs + hospitals for a single market. Lower frequency. Most at risk of being blocked by compatibility errors they don't understand. Needs pre-flight clarity most.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;padding:10px;background:var(--bg-low);border-radius:var(--r)">
+          <div style="width:36px;height:36px;border-radius:var(--r-pill);background:var(--border-strong);color:var(--ink);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">M</div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--ink)">Manager / Stakeholder</div>
+            <div style="font-size:11px;color:var(--ink-muted)">Reads combined reports. Wants to know: which facilities, which markets, what trend. Doesn't combine — consumes outputs. Benefits from provenance card and region summary.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Feature Scope — What's In vs Out</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+        <div style="font-size:10px;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">In scope (this cycle)</div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5" style="margin-top:1px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+          Multi-select + Combine Selected on search page
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5" style="margin-top:1px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+          Pre-flight compatibility check with clear error messages
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5" style="margin-top:1px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+          Provenance card on combined scenario report
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5" style="margin-top:1px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+          In-place source management (add/remove, re-run)
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#488319" stroke-width="2.5" style="margin-top:1px;flex-shrink:0"><polyline points="20 6 9 17 4 12"/></svg>
+          Combined badge on scenario list rows
+        </div>
+
+        <div style="font-size:10px;font-weight:700;color:var(--error);text-transform:uppercase;letter-spacing:.05em;margin:10px 0 2px">Out of scope (deferred)</div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#BA0000" stroke-width="2" style="margin-top:1px;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          LOB cross-combine (OAP + New Business) — low demand
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#BA0000" stroke-width="2" style="margin-top:1px;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Negotiation group / project folders — larger scope
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#BA0000" stroke-width="2" style="margin-top:1px;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Staleness / change notification from source scenarios
+        </div>
+        <div style="display:flex;gap:6px;align-items:flex-start;font-size:11px;color:var(--ink-muted)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#BA0000" stroke-width="2" style="margin-top:1px;flex-shrink:0"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Tree-aware nested combine resolution
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end view-business -->
+
+
+<!-- ══════════════════════════════════════
+     VIEW 3 — OPEN QUESTIONS
+══════════════════════════════════════ -->
+<div class="view-panel" id="view-questions">
+
+  <div class="callout callout-info" style="margin-bottom:20px">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>These are the unresolved business questions that should be answered before finalizing the design or handing off to engineering. Each one has a recommended owner and decision approach.</span>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px">
+
+    <div style="background:var(--bg-white);border:1.5px solid var(--warning);border-radius:var(--r8);overflow:hidden">
+      <div style="background:var(--warning-bg);padding:10px 16px;display:flex;gap:10px;align-items:center">
+        <div style="width:22px;height:22px;border-radius:var(--r-pill);background:var(--warning);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">1</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">Should we introduce a "Negotiation Group" or "Project" concept upstream?</div>
+        <span class="pill pill-orange" style="margin-left:auto">Strategic</span>
+      </div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Context</div>
+          <div style="font-size:11.5px;color:var(--ink-muted)">Skander uses Excel to track which scenarios belong to which negotiation. The tool has no concept of grouping. Without it, analysts will always need an external tracker even after the combine enhancements ship.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Options</div>
+          <div style="font-size:11px;color:var(--ink-muted);display:flex;flex-direction:column;gap:4px">
+            <div>A. Add a "Negotiation Group" tag to scenarios (lightweight, low effort)</div>
+            <div>B. Build a project/folder hierarchy — scenarios belong to a project (larger scope)</div>
+            <div>C. Don't build it — multi-select on search page is enough for now</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Recommendation</div>
+          <div style="font-size:11.5px;color:var(--ink)"><strong>Start with Option A</strong> — a simple tag/label field on scenario creation. Low effort, eliminates the Excel tracker, doesn't require a new data model. Can evolve into Option B later.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-white);border:1.5px solid var(--warning);border-radius:var(--r8);overflow:hidden">
+      <div style="background:var(--warning-bg);padding:10px 16px;display:flex;gap:10px;align-items:center">
+        <div style="width:22px;height:22px;border-radius:var(--r-pill);background:var(--warning);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">2</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">What happens when a source scenario is modified after a combine was run?</div>
+        <span class="pill pill-orange" style="margin-left:auto">Data integrity</span>
+      </div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Context</div>
+          <div style="font-size:11.5px;color:var(--ink-muted)">Combined scenario C was built from [A, B]. An analyst later modifies scenario A's timeline. C is now stale — it reflects the old version of A. Currently there is no indication of this.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Options</div>
+          <div style="font-size:11px;color:var(--ink-muted);display:flex;flex-direction:column;gap:4px">
+            <div>A. Show a "stale" warning on the combined scenario report when any source was modified after last run</div>
+            <div>B. Store source scenario version/hash at combine time, detect drift automatically</div>
+            <div>C. No system tracking — analyst is responsible for re-running when needed</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Recommendation</div>
+          <div style="font-size:11.5px;color:var(--ink)"><strong>Option A as MVP</strong> — compare source scenario "date modified" to the combined scenario's last run date. Show a simple "Source updated — consider re-running" banner. No version hashing needed initially.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-white);border:1.5px solid var(--warning);border-radius:var(--r8);overflow:hidden">
+      <div style="background:var(--warning-bg);padding:10px 16px;display:flex;gap:10px;align-items:center">
+        <div style="width:22px;height:22px;border-radius:var(--r-pill);background:var(--warning);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">3</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">Should LOB cross-combine (OAP + New Business) be enabled?</div>
+        <span class="pill pill-grey" style="margin-left:auto">Edge case</span>
+      </div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Context</div>
+          <div style="font-size:11.5px;color:var(--ink-muted)">A facility models OAP and New Business in separate scenarios with different LOBs. Today you cannot combine them. Skander said this is not a priority — but acknowledged it as a real limitation.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Risk</div>
+          <div style="font-size:11px;color:var(--ink-muted)">Enabling this breaks the mathematical equivalence guarantee — the combined output would no longer be identical to building from scratch with both LOBs, because the base assumptions differ.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Recommendation</div>
+          <div style="font-size:11.5px;color:var(--ink)"><strong>Keep blocked.</strong> Document as a known limitation in the UI with a clear explanation. Investigate usage data — if more than 5% of failed combines are LOB conflicts, revisit.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-white);border:1.5px solid var(--warning);border-radius:var(--r8);overflow:hidden">
+      <div style="background:var(--warning-bg);padding:10px 16px;display:flex;gap:10px;align-items:center">
+        <div style="width:22px;height:22px;border-radius:var(--r-pill);background:var(--warning);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">4</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">How should nested combines be handled — flat or tree-aware?</div>
+        <span class="pill pill-purple" style="margin-left:auto">Architecture</span>
+      </div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Context</div>
+          <div style="font-size:11.5px;color:var(--ink-muted)">Skander combines [A, B] → C, then combines [C, D] → E. Today the system treats C as an opaque scenario ID. The provenance of E won't show A and B — only C and D.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Options</div>
+          <div style="font-size:11px;color:var(--ink-muted);display:flex;flex-direction:column;gap:4px">
+            <div>A. Flat — provenance shows immediate sources only (C, D). User must navigate to C to see A, B.</div>
+            <div>B. Tree — provenance expands fully: E → [C → [A, B], D]. Shows full lineage.</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Recommendation</div>
+          <div style="font-size:11.5px;color:var(--ink)"><strong>Start with Option A (flat)</strong> with clickable links. Analyst can navigate the chain. Full tree display is a nice-to-have — adds complexity without clear demand. Revisit if analysts complain about lineage depth.</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg-white);border:1.5px solid var(--warning);border-radius:var(--r8);overflow:hidden">
+      <div style="background:var(--warning-bg);padding:10px 16px;display:flex;gap:10px;align-items:center">
+        <div style="width:22px;height:22px;border-radius:var(--r-pill);background:var(--warning);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">5</div>
+        <div style="font-size:13px;font-weight:700;color:var(--ink)">Who else needs to be interviewed before design handoff?</div>
+        <span class="pill pill-blue" style="margin-left:auto">Research</span>
+      </div>
+      <div style="padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Context</div>
+          <div style="font-size:11.5px;color:var(--ink-muted)">Skander is a technically advanced power user. He has normalized workarounds. We do not know if his workflow represents the median analyst using or trying to use this feature.</div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Gaps to fill</div>
+          <div style="font-size:11px;color:var(--ink-muted);display:flex;flex-direction:column;gap:4px">
+            <div>• Mid-level analyst who tried and failed to use combine</div>
+            <div>• Manager who reads combined reports (not the builder)</div>
+            <div>• Analyst at a different contract office — is the Excel tracker universal?</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px">Recommendation</div>
+          <div style="font-size:11.5px;color:var(--ink)"><strong>1–2 more interviews</strong> before finalizing the search page redesign. The combine flow enhancements can proceed — those are clearly validated. The search page changes need broader signal.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div><!-- end view-questions -->
+
+</div><!-- end canvas-wrap -->
+
+<script>
+function showView(name) {
+  document.querySelectorAll('.view-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  event.target.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>
