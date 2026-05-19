@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario Search — v4</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ── CIGNA CANVAS TOKENS — Light Mode ── */
+    :root {
+      --bg-screen:   #F8F9FF;
+      --bg-white:    #FFFFFF;
+      --bg-low:      #F1F3FC;
+      --bg-system:   #353331;
+
+      --ink:         #353331;
+      --ink-2:       #6B6966;
+      --ink-3:       #A3A19F;
+
+      --border:      #E0DDDA;
+      --border-str:  #6B6966;
+      --border-sub:  #F2F0EE;
+      --table-div:   #C1C4D4;
+      --table-brd:   #DBDDE9;
+
+      --th-bg:       #F1F3FC;
+      --th-act:      #EEEBE8;
+      --row-hov:     #FBFAF9;
+      --row-sel:     #D7E9FF;
+
+      --blue:        #0033FF;
+      --blue-dk:     #110081;
+      --blue-lt:     #E6F0FF;
+      --blue-100:    #D7E9FF;
+      --blue-200:    #B4D1FF;
+
+      --n90:  #F2F0EE; --n100: #EEEBE8; --n200: #E0DDDA;
+      --n300: #CCC9C6; --n400: #B7B5B3; --n500: #A3A19F;
+      --n600: #8B8986; --n700: #6B6966; --n900: #353331;
+
+      --green:    #00874D; --green-bg: #EDF3E8; --green-dk: #004226; --green-mid: #B0F9DB;
+      --amber:    #EAB80B; --amber-bg: #F8E9B3; --amber-dk: #816506;
+      --red:      #A90000; --red-bg:   #FDEDE8;
+      --teal-bg:  #DDFDFB; --teal:     #002F32; --teal-brd: #13C8A4;
+
+      --purple-50:  #F5F0FF;
+      --purple-100: #E6DEF7;
+      --purple-200: #CFBAFF;
+      --purple-500: #9668FF;
+      --purple-600: #8256E7;
+      --purple-900: #3F2C6B;
+
+      /* Negotiation stage palette — sequential, intentional */
+      --stage-test-bg:   #F2F0EE;   /* neutral — not yet in negotiation */
+      --stage-test-ink:  #54524F;
+      --stage-test-brd:  #CCC9C6;
+
+      --stage-cp-bg:     #E6F0FF;   /* blue — Cigna internal */
+      --stage-cp-ink:    #110081;
+      --stage-cp-brd:    #B4D1FF;
+
+      --stage-pp-bg:     #F5F0FF;   /* purple — provider-facing */
+      --stage-pp-ink:    #3F2C6B;
+      --stage-pp-brd:    #CFBAFF;
+
+      --stage-fin-bg:    #EDF3E8;   /* green — negotiation closed */
+      --stage-fin-ink:   #004226;
+      --stage-fin-brd:   rgba(0,135,77,.3);
+
+      --sh-sm: 0 1px 3px rgba(52,42,118,.07), 0 1px 2px rgba(52,42,118,.04);
+      --sh:    0 4px 12px rgba(52,42,118,.09), 0 2px 4px rgba(52,42,118,.04);
+      --sh-lg: 0 10px 28px rgba(52,42,118,.13), 0 4px 8px rgba(52,42,118,.05);
+
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --r4: 4px; --r6: 6px; --r8: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg-screen); color: var(--ink); font-size: 13px; line-height: 1.5; }
+
+    /* NAV */
+    .gnav { background: var(--bg-system); height: 48px; display: flex; align-items: center; padding: 0 24px; gap: 32px; }
+    .gnav .logo { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
+    .gnav nav { display: flex; gap: 24px; }
+    .gnav nav a { font-size: 13px; color: rgba(255,255,255,.6); text-decoration: none; }
+    .gnav nav a.on { color: #fff; font-weight: 600; border-bottom: 2px solid var(--blue); padding-bottom: 2px; }
+
+    .bc { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 8px 24px; font-size: 12px; color: var(--ink-2); display: flex; gap: 5px; align-items: center; }
+    .bc .sep { color: var(--n400); }
+    .bc .cur { color: var(--ink); font-weight: 500; }
+
+    .wrap { max-width: 1560px; margin: 0 auto; padding: 20px 24px 48px; }
+
+    /* PAGE HEADER */
+    .ph { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .ph h1 { font-size: 20px; font-weight: 600; letter-spacing: -.3px; margin-bottom: 1px; }
+    .ph p { font-size: 12px; color: var(--ink-2); }
+    .ph-acts { display: flex; gap: 8px; align-items: center; }
+
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: var(--r4); font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: background .1s; white-space: nowrap; font-family: var(--font); }
+    .btn-primary   { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-secondary { background: var(--bg-white); color: var(--ink); border-color: var(--border-str); }
+    .btn-secondary:hover { background: var(--n90); }
+    .btn-ghost     { background: transparent; color: var(--ink-2); }
+    .btn-ghost:hover { background: var(--n90); }
+
+    /* MY / ALL TABS */
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 14px; }
+    .tab  { padding: 8px 18px 9px; font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; display: flex; align-items: center; gap: 6px; }
+    .tab:hover { color: var(--ink); }
+    .tab.on { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+    .tab .cp { min-width: 20px; height: 18px; padding: 0 6px; border-radius: 100px; font-size: 10px; font-weight: 700; background: var(--blue-lt); color: var(--blue-dk); display: inline-flex; align-items: center; justify-content: center; }
+    .tab.on .cp { background: var(--blue); color: #fff; }
+
+    /* ══════════════════════════════════════════
+       LEADERSHIP INSIGHT PANEL
+       Replaces the old pulse bar with a
+       negotiation pipeline funnel + signal cards
+    ══════════════════════════════════════════ */
+    .insight-panel {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--r8);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--sh-sm);
+    }
+
+    /* Top: funnel stages — the core leadership view */
+    .funnel {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 1px solid var(--border);
+    }
+    .funnel-stage {
+      flex: 1;
+      padding: 14px 16px 12px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      cursor: default;
+    }
+    .funnel-stage:last-child { border-right: none; }
+
+    /* Stage arrow connector */
+    .funnel-stage:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -9px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 8px solid transparent;
+      border-bottom: 8px solid transparent;
+      border-left: 8px solid var(--border);
+      z-index: 2;
+    }
+    .funnel-stage:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      right: -8px; top: 50%; transform: translateY(-50%);
+      width: 0; height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 7px solid var(--bg-white);
+      z-index: 3;
+    }
+
+    .stage-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+    .stage-count {
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -.6px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .stage-sub {
+      font-size: 10px;
+      color: var(--ink-3);
+      line-height: 1.4;
+    }
+    .stage-sub strong { color: var(--ink-2); font-weight: 600; }
+
+    /* Stage-specific coloring */
+    .stage-test  { border-top: 3px solid var(--n300); }
+    .stage-test  .stage-label { color: var(--stage-test-ink); }
+    .stage-test  .stage-count { color: var(--n700); }
+
+    .stage-cp    { border-top: 3px solid var(--blue-200); }
+    .stage-cp    .stage-label { color: var(--stage-cp-ink); }
+    .stage-cp    .stage-count { color: var(--blue); }
+
+    .stage-pp    { border-top: 3px solid var(--purple-200); }
+    .stage-pp    .stage-label { color: var(--purple-600); }
+    .stage-pp    .stage-count { color: var(--purple-600); }
+
+    .stage-final { border-top: 3px solid var(--green-mid); }
+    .stage-final .stage-label { color: var(--green); }
+    .stage-final .stage-count { color: var(--green); }
+
+    /* Bottom: signal row — 4 leadership signals */
+    .signals {
+      display: flex;
+      align-items: stretch;
+    }
+    .signal {
+      flex: 1;
+      padding: 10px 16px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .signal:last-child { border-right: none; }
+    .signal-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .signal-body {}
+    .signal-val {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -.3px;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+    .signal-lbl {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: var(--ink-2);
+      margin-bottom: 1px;
+    }
+    .signal-desc { font-size: 10px; color: var(--ink-3); line-height: 1.4; }
+    .signal-desc strong { color: var(--ink-2); }
+
+    /* Signal semantic colors */
+    .sig-ok   .signal-val { color: var(--green); }
+    .sig-warn .signal-val { color: var(--amber-dk); }
+    .sig-crit .signal-val { color: var(--red); }
+    .sig-info .signal-val { color: var(--blue); }
+    .sig-purple .signal-val { color: var(--purple-600); }
+
+    /* Attention ring on a signal card */
+    .signal.attention {
+      background: var(--red-bg);
+      border-top: 2px solid var(--red);
+      margin-top: -1px;
+    }
+
+    /* ── FILTER BAR ── */
+    .fbar { background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--r8); padding: 11px 14px; margin-bottom: 12px; box-shadow: var(--sh-sm); }
+    .fbar-row1 { display: flex; gap: 8px; align-items: center; }
+    .sw { position: relative; flex: 1; }
+    .sw .si { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--n500); font-size: 13px; pointer-events: none; }
+    .sinp { width: 100%; padding: 7px 10px 7px 32px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 12px; color: var(--ink); background: var(--bg-white); outline: none; font-family: var(--font); transition: border-color .1s; }
+    .sinp:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .sinp::placeholder { color: var(--n500); }
+
+    .adv-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: var(--r4); font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-str); background: var(--bg-white); color: var(--ink); font-family: var(--font); white-space: nowrap; }
+    .adv-btn:hover { background: var(--n90); }
+    .adv-btn.on { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+    .adv-btn .fc { background: var(--blue); color: #fff; border-radius: 100px; font-size: 9px; font-weight: 700; padding: 1px 5px; }
+
+    .save-btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 11px; border-radius: var(--r4); font-size: 12px; font-weight: 500; cursor: pointer; border: 1px dashed var(--n400); background: transparent; color: var(--ink-2); font-family: var(--font); white-space: nowrap; }
+    .save-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); border-style: solid; }
+
+    .fbar-row2 { display: flex; gap: 6px; align-items: center; margin-top: 9px; flex-wrap: wrap; }
+
+    .fsel { padding: 4px 22px 4px 8px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 11px; color: var(--ink); background: var(--bg-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%238B8986' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 7px center; appearance: none; cursor: pointer; outline: none; font-family: var(--font); }
+    .fsel:focus { border-color: var(--blue); }
+    .fsel.on { border-color: var(--blue); background-color: var(--blue-lt); color: var(--blue-dk); font-weight: 600; }
+
+    .fsep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+    .ctog-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 100px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid var(--purple-200); background: var(--purple-50); color: var(--purple-600); }
+    .ctog-pill:hover { background: var(--purple-100); }
+    .ctog-pill.on { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
+
+    /* ADVANCED PANEL */
+    .adv-panel { background: var(--bg-white); border: 1px solid var(--border); border-top: 2px solid var(--blue); border-radius: 0 0 var(--r8) var(--r8); padding: 16px 16px 14px; margin-top: -13px; margin-bottom: 12px; box-shadow: var(--sh); display: none; }
+    .adv-panel.open { display: block; }
+    .adv-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .adv-hdr h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+    .adv-x { font-size: 11px; color: var(--ink-3); cursor: pointer; padding: 2px 6px; border-radius: var(--r4); }
+    .adv-x:hover { background: var(--n90); color: var(--ink); }
+    .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 16px; }
+    .adv-f label { display: block; font-size: 10px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+    .adv-f select, .adv-f input[type="text"], .adv-f input[type="date"] { width: 100%; padding: 5px 8px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 11px; color: var(--ink); background: var(--bg-white); outline: none; font-family: var(--font); }
+    .adv-f select { padding-right: 24px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%238B8986' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; }
+    .adv-f select:focus, .adv-f input:focus { border-color: var(--blue); }
+    .dr { display: flex; gap: 4px; align-items: center; }
+    .dr span { font-size: 10px; color: var(--ink-2); flex-shrink: 0; }
+
+    /* multi-select office */
+    .msf { border: 1px solid var(--border); border-radius: var(--r4); padding: 4px 6px; min-height: 30px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; background: var(--bg-white); }
+    .msf:focus-within { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .mst { display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px 1px 7px; border-radius: 100px; font-size: 10px; font-weight: 500; background: var(--blue-lt); color: var(--blue-dk); border: 1px solid var(--blue-200); }
+    .mst .rm { font-size: 9px; opacity: .5; cursor: pointer; }
+    .mst .rm:hover { opacity: 1; }
+    .msi { border: none; outline: none; font-size: 11px; font-family: var(--font); color: var(--ink); background: transparent; min-width: 80px; }
+    .msi::placeholder { color: var(--n500); }
+    .ms-wrap { position: relative; }
+    .ms-dd { display: none; position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--r6); box-shadow: var(--sh); z-index: 100; }
+    .ms-dd-item { padding: 7px 10px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .ms-dd-item:hover { background: var(--blue-lt); }
+    .ms-dd-item.sel { color: var(--blue); font-weight: 500; }
+
+    .adv-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; border-top: 1px solid var(--border-sub); padding-top: 12px; }
+    .adv-hint { font-size: 10px; color: var(--ink-3); font-style: italic; }
+    .adv-acts { display: flex; gap: 8px; }
+
+    /* RESULTS TOOLBAR */
+    .rtbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .rc { font-size: 12px; color: var(--ink-2); }
+    .rc strong { color: var(--ink); }
+    .col-bar { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .ctog { font-size: 10px; padding: 2px 7px; border: 1px solid var(--border); border-radius: var(--r4); background: var(--bg-white); cursor: pointer; color: var(--ink-2); font-family: var(--font); }
+    .ctog.on { background: var(--blue-lt); border-color: var(--blue-200); color: var(--blue-dk); font-weight: 600; }
+
+    /* TABLE */
+    .tw { background: var(--bg-white); border: 1px solid var(--table-brd); border-radius: var(--r8); overflow: hidden; box-shadow: var(--sh-sm); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+
+    thead th { background: var(--th-bg); color: var(--ink); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: .04em; padding: 9px 10px; border-bottom: 1px solid var(--table-div); text-align: left; white-space: nowrap; cursor: pointer; user-select: none; overflow: hidden; text-overflow: ellipsis; }
+    thead th:hover { background: var(--th-act); }
+    thead th .si { opacity: .25; margin-left: 3px; font-size: 8px; }
+    thead th.srt .si { opacity: 1; color: var(--blue); }
+    .thchk { cursor: default !important; padding: 9px 0 9px 12px !important; width: 36px; }
+    .thchk:hover { background: var(--th-bg) !important; }
+
+    tbody tr { border-bottom: 1px solid var(--border-sub); transition: background .06s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--row-hov); }
+    tbody tr.sel { background: var(--row-sel); }
+    tbody td { padding: 9px 10px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
+
+    .nc { display: flex; flex-direction: column; gap: 2px; }
+    .nc-top { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .sname { font-weight: 500; color: var(--blue); cursor: pointer; }
+    .sname:hover { text-decoration: underline; }
+    .mono { font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 10px; color: var(--n500); }
+
+    /* ── BADGES ── */
+    .b { display: inline-flex; align-items: center; gap: 2px; padding: 2px 7px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; border: 1px solid transparent; }
+
+    /* Scenario Status — negotiation lifecycle */
+    .b-test { background: var(--stage-test-bg); color: var(--stage-test-ink); border-color: var(--stage-test-brd); }
+    .b-cp   { background: var(--stage-cp-bg);   color: var(--stage-cp-ink);   border-color: var(--stage-cp-brd); }
+    .b-pp   { background: var(--stage-pp-bg);   color: var(--stage-pp-ink);   border-color: var(--stage-pp-brd); }
+    .b-fin  { background: var(--stage-fin-bg);  color: var(--stage-fin-ink);  border-color: var(--stage-fin-brd); }
+
+    /* Combined */
+    .b-comb { background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-200); }
+    /* RSH */
+    .b-yes  { background: var(--green-bg); color: var(--green); border-color: rgba(0,135,77,.3); }
+    .b-no   { background: var(--n90); color: var(--ink-2); border-color: var(--n200); }
+
+    /* Claim type */
+    .ct { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: var(--r4); font-size: 10px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+    .ct-fac  { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-brd); }
+    .ct-prof { background: var(--purple-50); color: var(--purple-900); border-color: var(--purple-200); }
+    .ct-asc  { background: var(--amber-bg); color: var(--amber-dk); border-color: rgba(234,184,11,.5); }
+
+    /* Custom tags */
+    .ctag { display: inline-flex; padding: 1px 6px; border-radius: 100px; font-size: 10px; font-weight: 500; background: var(--bg-low); color: var(--ink-2); border: 1px solid var(--border); white-space: nowrap; }
+    .ctag.blue { background: var(--blue-lt); color: var(--blue-dk); border-color: var(--blue-200); }
+    .ctag.green{ background: var(--green-bg); color: var(--green-dk); border-color: rgba(0,135,77,.3); }
+    .ctag.amber{ background: var(--amber-bg); color: var(--amber-dk); border-color: rgba(234,184,11,.4); }
+
+    .tr { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+    .dc { font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+    .dc .ts { font-size: 10px; color: var(--ink-3); display: block; margin-top: 1px; }
+    .off-cell { font-size: 11px; color: var(--ink-2); }
+    .reg-cell { font-size: 10px; color: var(--ink-3); margin-top: 1px; }
+
+    /* BULK BAR */
+    .bulk { background: var(--bg-system); color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .bulk .sc { font-size: 12px; font-weight: 600; }
+    .bdiv { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
+    .bcomb { background: var(--blue); color: #fff; border: none; padding: 5px 13px; border-radius: var(--r4); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 5px; }
+    .bcomb:hover { background: #0026d1; }
+    .bgh { font-size: 11px; color: rgba(255,255,255,.7); cursor: pointer; padding: 4px 8px; border-radius: var(--r4); display: flex; align-items: center; gap: 4px; }
+    .bgh:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .bdis { margin-left: auto; font-size: 11px; opacity: .5; cursor: pointer; }
+    .bdis:hover { opacity: 1; }
+
+    /* PAGINATION */
+    .pag { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-top: 1px solid var(--border-sub); font-size: 11px; color: var(--ink-2); }
+    .pbtns { display: flex; gap: 3px; }
+    .pb { width: 26px; height: 26px; border: 1px solid var(--border); border-radius: var(--r4); background: var(--bg-white); display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; color: var(--ink); }
+    .pb:hover { background: var(--n90); }
+    .pb.a { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 700; }
+
+    input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--blue); cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<div class="gnav">
+  <div class="logo">Contract Modeling</div>
+  <nav>
+    <a href="#">Dashboard</a>
+    <a href="#" class="on">Scenarios</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+  </nav>
+</div>
+<div class="bc">
+  <span>Scenarios</span><span class="sep"> › </span><span class="cur">Search</span>
+</div>
+
+<div class="wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="ph">
+    <div>
+      <h1>Scenario Search</h1>
+      <p>Track negotiation progress and manage scenarios across systems and contract offices</p>
+    </div>
+    <div class="ph-acts">
+      <button class="btn btn-secondary">⚙ Manage Tags</button>
+      <button class="btn btn-secondary">↗ Export</button>
+      <button class="btn btn-primary">＋ New Scenario</button>
+    </div>
+  </div>
+
+  <!-- MY / ALL TABS -->
+  <div class="tabs">
+    <div class="tab on">My Scenarios <span class="cp">24</span></div>
+    <div class="tab">All Scenarios <span class="cp">312</span></div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       LEADERSHIP INSIGHT PANEL
+       Top: negotiation pipeline funnel
+       Bottom: 4 signal cards for leadership
+  ══════════════════════════════════════ -->
+  <div class="insight-panel">
+
+    <!-- NEGOTIATION PIPELINE FUNNEL -->
+    <div class="funnel">
+
+      <div class="funnel-stage stage-test">
+        <div class="stage-label">Test</div>
+        <div class="stage-count">8</div>
+        <div class="stage-sub">Internal modeling only<br><strong>4 RSH-ready</strong></div>
+      </div>
+
+      <div class="funnel-stage stage-cp">
+        <div class="stage-label">Cigna Proposal</div>
+        <div class="stage-count">7</div>
+        <div class="stage-sub">Submitted to provider<br><strong>Avg 12 days pending</strong></div>
+      </div>
+
+      <div class="funnel-stage stage-pp">
+        <div class="stage-label">Provider Proposal</div>
+        <div class="stage-count">6</div>
+        <div class="stage-sub">Provider counter-proposal in<br><strong>3 expiring in 7 days</strong></div>
+      </div>
+
+      <div class="funnel-stage stage-final">
+        <div class="stage-label">Final</div>
+        <div class="stage-count">3</div>
+        <div class="stage-sub">Negotiation closed<br><strong>All in RSH</strong></div>
+      </div>
+
+    </div>
+
+    <!-- LEADERSHIP SIGNALS -->
+    <div class="signals">
+
+      <div class="signal sig-warn attention">
+        <div class="signal-icon">⚠️</div>
+        <div class="signal-body">
+          <div class="signal-lbl">Expiring Soon</div>
+          <div class="signal-val">3</div>
+          <div class="signal-desc">Provider proposals due within <strong>7 days</strong> — SC region</div>
+        </div>
+      </div>
+
+      <div class="signal sig-info">
+        <div class="signal-icon">📤</div>
+        <div class="signal-body">
+          <div class="signal-lbl">Pending RSH Push</div>
+          <div class="signal-val">9</div>
+          <div class="signal-desc"><strong>6 Cigna Proposal</strong>, 3 Final not yet in RSH</div>
+        </div>
+      </div>
+
+      <div class="signal sig-purple">
+        <div class="signal-icon">⛓</div>
+        <div class="signal-body">
+          <div class="signal-lbl">Combined Scenarios</div>
+          <div class="signal-val">6 of 24</div>
+          <div class="signal-desc"><strong>4 Facility+ASC</strong>, 2 Prof+Facility — 2 regions</div>
+        </div>
+      </div>
+
+      <div class="signal sig-ok">
+        <div class="signal-icon">✅</div>
+        <div class="signal-body">
+          <div class="signal-lbl">Finalized This Quarter</div>
+          <div class="signal-val">3</div>
+          <div class="signal-desc">Up from 1 last quarter · <strong>4 regions</strong> active</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="fbar">
+    <div class="fbar-row1">
+      <div class="sw">
+        <span class="si">🔍</span>
+        <input type="text" class="sinp" placeholder="Search by name, ID, system, region, office, or tag…">
+      </div>
+      <button class="adv-btn on" id="adv-trigger" onclick="toggleAdv()">
+        ⧉ Filters <span class="fc">3</span>
+      </button>
+      <button class="save-btn">⊕ Save View</button>
+    </div>
+
+    <div class="fbar-row2">
+      <!-- Claim Type -->
+      <select class="fsel on">
+        <option>Claim Type</option>
+        <option selected>ASC</option>
+        <option>Facility</option>
+        <option>Professional</option>
+        <option>Mixed</option>
+      </select>
+
+      <!-- Scenario Status — negotiation lifecycle -->
+      <select class="fsel">
+        <option>Scenario Status</option>
+        <option>Test</option>
+        <option>Cigna Proposal</option>
+        <option>Provider Proposal</option>
+        <option>Final</option>
+      </select>
+
+      <!-- RSH Pushed -->
+      <select class="fsel">
+        <option>RSH Pushed</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+
+      <div class="fsep"></div>
+
+      <span class="ctog-pill on">⛓ Combined only</span>
+    </div>
+  </div>
+
+  <!-- ADVANCED FILTERS -->
+  <div class="adv-panel open" id="adv-panel">
+    <div class="adv-hdr">
+      <h4>Advanced Filters</h4>
+      <span class="adv-x" onclick="toggleAdv()">✕ Close</span>
+    </div>
+    <div class="adv-grid">
+
+      <div class="adv-f">
+        <label>Region</label>
+        <select>
+          <option>All Regions</option>
+          <option selected>South Central</option>
+          <option>Pacific Northwest</option>
+          <option>Mid-Atlantic</option>
+          <option>Great Plains</option>
+          <option>Northeast</option>
+        </select>
+      </div>
+
+      <div class="adv-f">
+        <label>Contract Office</label>
+        <div class="ms-wrap">
+          <div class="msf">
+            <span class="mst">TX — Austin <span class="rm">✕</span></span>
+            <span class="mst">TX — Dallas <span class="rm">✕</span></span>
+            <input type="text" class="msi" id="ms-inp" placeholder="+ Add office…">
+          </div>
+          <div class="ms-dd" id="ms-dd">
+            <div class="ms-dd-item sel">✓ TX — Austin</div>
+            <div class="ms-dd-item sel">✓ TX — Dallas</div>
+            <div class="ms-dd-item">TX — Houston</div>
+            <div class="ms-dd-item">WA — Seattle</div>
+            <div class="ms-dd-item">NY — Albany</div>
+            <div class="ms-dd-item">GA — Atlanta</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="adv-f">
+        <label>System Name</label>
+        <select>
+          <option>All Systems</option>
+          <option>Medicare Advantage</option>
+          <option>Commercial PPO</option>
+          <option>Medicaid</option>
+          <option>ASC Network</option>
+          <option>Evernorth PBM</option>
+        </select>
+      </div>
+
+      <div class="adv-f">
+        <label>CRP Type</label>
+        <select>
+          <option>All CRP Types</option>
+          <option>A — Amendment</option>
+          <option>B — Base</option>
+          <option>D — Draft</option>
+          <option>O — Other</option>
+        </select>
+      </div>
+
+      <div class="adv-f">
+        <label>Line of Business</label>
+        <select>
+          <option>All LOBs</option>
+          <option>OAP</option>
+          <option>New Business</option>
+          <option>Renewal</option>
+        </select>
+      </div>
+
+      <div class="adv-f">
+        <label>Created By</label>
+        <input type="text" placeholder="Name or user ID">
+      </div>
+
+      <div class="adv-f">
+        <label>Date Created</label>
+        <div class="dr">
+          <input type="date" style="flex:1">
+          <span>–</span>
+          <input type="date" style="flex:1">
+        </div>
+      </div>
+
+      <div class="adv-f">
+        <label>Last Run</label>
+        <div class="dr">
+          <input type="date" style="flex:1">
+          <span>–</span>
+          <input type="date" style="flex:1">
+        </div>
+      </div>
+
+      <div class="adv-f">
+        <label>Tag</label>
+        <input type="text" placeholder="e.g. Q1-Final, TX-Neg-4">
+      </div>
+
+    </div>
+    <div class="adv-foot">
+      <span class="adv-hint">Region, Office (multi-select), System, CRP, LOB, Created By, date ranges, tag</span>
+      <div class="adv-acts">
+        <button class="btn btn-ghost">Reset all</button>
+        <button class="btn btn-primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS TOOLBAR -->
+  <div class="rtbar">
+    <span class="rc">Showing <strong>4</strong> of <strong>24</strong> my scenarios &nbsp;·&nbsp; 312 org-wide</span>
+    <div class="col-bar">
+      <span style="font-size:10px;color:var(--ink-2);margin-right:2px;">Columns:</span>
+      <span class="ctog on">Status</span>
+      <span class="ctog on">Claim Type</span>
+      <span class="ctog on">System</span>
+      <span class="ctog on">Office · Region</span>
+      <span class="ctog on">RSH</span>
+      <span class="ctog on">Last Run</span>
+      <span class="ctog on">Tags</span>
+      <span class="ctog">Date Created</span>
+      <span class="ctog">LOB</span>
+      <span class="ctog">CRP</span>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="tw">
+    <table>
+      <colgroup>
+        <col style="width:36px">
+        <col style="width:130px">
+        <col style="min-width:200px">
+        <col style="width:118px">
+        <col style="width:148px">
+        <col style="width:120px">
+        <col style="width:72px">
+        <col style="width:120px">
+        <col style="width:150px">
+        <col style="width:76px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="thchk"><input type="checkbox"></th>
+          <th>Status <span class="si srt">↑</span></th>
+          <th>Scenario Name <span class="si">↕</span></th>
+          <th>Claim Type <span class="si">↕</span></th>
+          <th>System <span class="si">↕</span></th>
+          <th>Office · Region <span class="si">↕</span></th>
+          <th>RSH <span class="si">↕</span></th>
+          <th>Last Run <span class="si">↕</span></th>
+          <th>Tags</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ROW 1 — Combined ASC+Fac · Provider Proposal · RSH Yes -->
+        <tr class="sel">
+          <td style="padding-left:12px;"><input type="checkbox" checked></td>
+          <td><span class="b b-pp">Provider Proposal</span></td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">TX-Austin 2026 ASC+Fac Combined</span>
+                <span class="b b-comb">⛓ Combined</span>
+              </div>
+              <span class="mono">SCN-40291</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
+          <td style="font-size:11px;">ASC Network</td>
+          <td>
+            <div class="off-cell">TX — Austin</div>
+            <div class="reg-cell">South Central</div>
+          </td>
+          <td><span class="b b-yes">Yes</span></td>
+          <td class="dc">May 5, 2026 <span class="ts">10:32 AM</span></td>
+          <td><div class="tr"><span class="ctag blue">TX-Neg-4</span><span class="ctag amber">Due May 19</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+        <!-- ROW 2 — ASC Base · Cigna Proposal · RSH Yes -->
+        <tr class="sel">
+          <td style="padding-left:12px;"><input type="checkbox" checked></td>
+          <td><span class="b b-cp">Cigna Proposal</span></td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">TX-Austin 2026 ASC Base</span>
+              </div>
+              <span class="mono">SCN-40187</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-asc">ASC</span></div></td>
+          <td style="font-size:11px;">ASC Network</td>
+          <td>
+            <div class="off-cell">TX — Austin</div>
+            <div class="reg-cell">South Central</div>
+          </td>
+          <td><span class="b b-yes">Yes</span></td>
+          <td class="dc">May 12, 2026 <span class="ts">2:14 PM</span></td>
+          <td><div class="tr"><span class="ctag green">Q1 Final</span><span class="ctag amber">Pending Review</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+        <!-- ROW 3 — Prof+Fac Combined · Final · RSH Yes -->
+        <tr>
+          <td style="padding-left:12px;"><input type="checkbox"></td>
+          <td><span class="b b-fin">Final</span></td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">WA-Seattle Prof+Fac Combined</span>
+                <span class="b b-comb">⛓ Combined</span>
+              </div>
+              <span class="mono">SCN-38902</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-prof">Professional</span><span class="ct ct-fac">Facility</span></div></td>
+          <td style="font-size:11px;">Commercial PPO</td>
+          <td>
+            <div class="off-cell">WA — Seattle</div>
+            <div class="reg-cell">Pacific NW</div>
+          </td>
+          <td><span class="b b-yes">Yes</span></td>
+          <td class="dc">May 14, 2026 <span class="ts">9:20 AM</span></td>
+          <td><div class="tr"><span class="ctag blue">WA-Neg-2</span><span class="ctag green">Signed</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+        <!-- ROW 4 — Facility · Test · RSH No -->
+        <tr>
+          <td style="padding-left:12px;"><input type="checkbox"></td>
+          <td><span class="b b-test">Test</span></td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">[COPY] TX-Austin Facility Draft</span>
+              </div>
+              <span class="mono">SCN-39714</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-fac">Facility</span></div></td>
+          <td style="font-size:11px;">Medicare Advantage</td>
+          <td>
+            <div class="off-cell">TX — Austin</div>
+            <div class="reg-cell">South Central</div>
+          </td>
+          <td><span class="b b-no">No</span></td>
+          <td class="dc">May 1, 2026 <span class="ts">9:05 AM</span></td>
+          <td><div class="tr"><span class="ctag">Draft</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- BULK BAR -->
+    <div class="bulk">
+      <span class="sc">2 selected</span>
+      <div class="bdiv"></div>
+      <button class="bcomb">⛓ Combine Selected</button>
+      <span class="bgh">🏷 Batch Tag</span>
+      <span class="bgh">↗ Export</span>
+      <span class="bdis">✕ Clear</span>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pag">
+      <span>Rows per page:
+        <select style="border:none;font-size:11px;color:var(--ink);background:transparent;cursor:pointer;font-family:var(--font);">
+          <option>25</option><option>50</option><option>100</option>
+        </select>
+      </span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span>1–4 of 24 my &nbsp;·&nbsp; 312 org-wide</span>
+        <div class="pbtns">
+          <div class="pb">‹</div>
+          <div class="pb a">1</div>
+          <div class="pb">2</div>
+          <div class="pb">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggleAdv() {
+    const p = document.getElementById('adv-panel');
+    const t = document.getElementById('adv-trigger');
+    p.classList.toggle('open');
+    const isOpen = p.classList.contains('open');
+    t.classList.toggle('on', isOpen);
+  }
+  const msInp = document.getElementById('ms-inp');
+  const msDd  = document.getElementById('ms-dd');
+  if (msInp) {
+    msInp.addEventListener('focus', () => msDd.style.display = 'block');
+    msInp.addEventListener('blur',  () => setTimeout(() => msDd.style.display = 'none', 150));
+  }
+</script>
+</body>
+</html>
