@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario Search — Redesign Phase 1 v2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CIGNA CANVAS DESIGN TOKENS — Light Mode
+    ============================================================ */
+    :root {
+      --bg-screen:        #F8F9FF;
+      --bg-white:         #FFFFFF;
+      --bg-screen-low:    #F1F3FC;
+      --bg-screen-lowest: #DBDDE9;
+      --bg-system:        #353331;
+      --bg-info:          #E6F0FF;
+      --bg-success:       #EDF3E8;
+      --bg-warning:       #F8E9B3;
+      --bg-critical:      #FDEDE8;
+
+      --type-default:     #353331;
+      --type-accent:      #6B6966;
+      --type-disabled:    #A3A19F;
+      --type-reversed:    #FFFFFF;
+
+      --border-default:   #6B6966;
+      --border-emphasis:  #E0DDDA;
+      --border-subtle:    #F2F0EE;
+      --table-divider:    #C1C4D4;
+      --table-border:     #DBDDE9;
+
+      --table-header:     #F1F3FC;
+      --table-header-active: #EEEBE8;
+      --table-cell-hover: #FBFAF9;
+      --table-cell-selected: #D7E9FF;
+
+      --interactive-primary: #0033FF;
+      --interactive-dark:    #110081;
+      --interactive-hover:   #D7E9FF;
+
+      --success:     #00874D;
+      --success-bg:  #EDF3E8;
+      --success-dark:#004226;
+      --success-mid: #B0F9DB;
+      --warning:     #EAB80B;
+      --warning-bg:  #F8E9B3;
+      --warning-dark:#816506;
+      --critical:    #A90000;
+      --critical-bg: #FDEDE8;
+      --critical-mid:#F5867F;
+      --info:        #3879DB;
+      --info-bg:     #E6F0FF;
+      --info-dark:   #110081;
+
+      --blue-50:  #F8F9FF;
+      --blue-75:  #E6F0FF;
+      --blue-100: #D7E9FF;
+      --blue-200: #B4D1FF;
+      --blue-600: #0033FF;
+      --blue-900: #110081;
+
+      --neutral-60:  #FBFAF9;
+      --neutral-90:  #F2F0EE;
+      --neutral-100: #EEEBE8;
+      --neutral-200: #E0DDDA;
+      --neutral-300: #CCC9C6;
+      --neutral-400: #B7B5B3;
+      --neutral-500: #A3A19F;
+      --neutral-700: #6B6966;
+      --neutral-800: #54524F;
+      --neutral-900: #353331;
+
+      --purple-50:  #F5F0FF;
+      --purple-200: #CFBAFF;
+      --purple-600: #8256E7;
+      --purple-900: #3F2C6B;
+
+      --silver-100: #F1F3FC;
+      --silver-200: #DBDDE9;
+      --silver-400: #C1C4D4;
+
+      --shadow-sm: 0 1px 3px rgba(52,42,118,0.08), 0 1px 2px rgba(52,42,118,0.05);
+      --shadow:    0 4px 12px rgba(52,42,118,0.10), 0 2px 4px rgba(52,42,118,0.05);
+      --shadow-lg: 0 10px 30px rgba(52,42,118,0.14), 0 4px 8px rgba(52,42,118,0.06);
+
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --r4: 4px; --r6: 6px; --r8: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg-screen); color: var(--type-default); font-size: 13px; line-height: 1.5; }
+
+    /* NAV */
+    .global-nav { background: var(--bg-system); height: 48px; display: flex; align-items: center; padding: 0 24px; gap: 32px; }
+    .global-nav .logo { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -0.2px; }
+    .global-nav nav { display: flex; gap: 24px; }
+    .global-nav nav a { font-size: 13px; color: rgba(255,255,255,0.65); text-decoration: none; }
+    .global-nav nav a.active { color: #fff; font-weight: 600; border-bottom: 2px solid var(--blue-600); padding-bottom: 2px; }
+
+    .breadcrumb-bar { background: var(--bg-white); border-bottom: 1px solid var(--border-emphasis); padding: 9px 24px; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--type-accent); }
+    .breadcrumb-bar .sep { color: var(--neutral-400); }
+    .breadcrumb-bar .cur { color: var(--type-default); font-weight: 500; }
+
+    /* LAYOUT */
+    .page-body { max-width: 1560px; margin: 0 auto; padding: 20px 24px 48px; }
+
+    /* PAGE HEADER */
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .page-header h1 { font-size: 20px; font-weight: 600; color: var(--type-default); letter-spacing: -0.3px; margin-bottom: 2px; }
+    .page-header p { font-size: 12px; color: var(--type-accent); }
+    .page-header-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* BUTTONS */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: var(--r4); font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: all 0.1s; white-space: nowrap; font-family: var(--font); }
+    .btn-primary { background: var(--interactive-primary); color: #fff; border-color: var(--interactive-primary); }
+    .btn-primary:hover { background: var(--interactive-dark); }
+    .btn-secondary { background: var(--bg-white); color: var(--type-default); border-color: var(--border-default); }
+    .btn-secondary:hover { background: var(--neutral-90); }
+    .btn-ghost { background: transparent; color: var(--type-accent); border-color: transparent; }
+    .btn-ghost:hover { background: var(--neutral-90); }
+
+    /* ============================================================
+       MY / ALL TABS
+    ============================================================ */
+    .scope-tabs {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 14px;
+      border-bottom: 2px solid var(--border-emphasis);
+    }
+    .scope-tab {
+      padding: 8px 18px 9px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--type-accent);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.1s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .scope-tab:hover { color: var(--type-default); }
+    .scope-tab.active { color: var(--interactive-primary); border-bottom-color: var(--interactive-primary); font-weight: 600; }
+    .scope-tab .count-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 18px;
+      padding: 0 6px;
+      border-radius: 100px;
+      font-size: 10px;
+      font-weight: 700;
+      background: var(--blue-75);
+      color: var(--info-dark);
+    }
+    .scope-tab.active .count-pill { background: var(--interactive-primary); color: #fff; }
+
+    /* ============================================================
+       SEARCH + FILTER BAR
+    ============================================================ */
+    .search-filter-bar {
+      background: var(--bg-white);
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r8);
+      padding: 12px 14px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .search-input-wrap { position: relative; flex: 1; }
+    .search-input-wrap .sicon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--neutral-500); font-size: 13px; }
+    .search-input { width: 100%; padding: 7px 10px 7px 32px; border: 1px solid var(--border-emphasis); border-radius: var(--r4); font-size: 12px; color: var(--type-default); background: var(--bg-white); outline: none; font-family: var(--font); }
+    .search-input:focus { border-color: var(--interactive-primary); }
+    .search-input::placeholder { color: var(--neutral-500); }
+
+    /* Quick filters row */
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .filter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--type-accent); margin-right: 2px; }
+
+    .filter-select { padding: 4px 24px 4px 8px; border: 1px solid var(--border-emphasis); border-radius: var(--r4); font-size: 11px; color: var(--type-default); background: var(--bg-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%238B8986' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 7px center; appearance: none; cursor: pointer; outline: none; font-family: var(--font); }
+    .filter-select:focus { border-color: var(--interactive-primary); }
+
+    .pill-group { display: flex; gap: 3px; }
+    .pill { display: inline-flex; align-items: center; gap: 3px; padding: 3px 9px; border-radius: 100px; font-size: 11px; font-weight: 500; cursor: pointer; border: 1px solid var(--border-emphasis); background: var(--bg-white); color: var(--type-accent); transition: all 0.1s; }
+    .pill:hover { background: var(--neutral-90); }
+    .pill.active { background: var(--blue-75); border-color: var(--blue-200); color: var(--info-dark); font-weight: 600; }
+
+    .clear-btn { font-size: 11px; color: var(--info); cursor: pointer; margin-left: auto; text-decoration: underline; }
+
+    /* Active filter strip */
+    .active-filters { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; padding-top: 9px; border-top: 1px solid var(--border-subtle); margin-top: 9px; }
+    .af-label { font-size: 10px; color: var(--type-accent); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+    .af-chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; border-radius: 100px; font-size: 11px; font-weight: 500; background: var(--blue-75); color: var(--info-dark); border: 1px solid var(--blue-200); }
+    .af-chip .x { font-size: 9px; cursor: pointer; opacity: 0.55; margin-left: 1px; }
+    .af-chip .x:hover { opacity: 1; }
+
+    /* ============================================================
+       ADVANCED FILTERS PANEL (slide-down, shown as static in wireflow)
+    ============================================================ */
+    .adv-filters-panel {
+      background: var(--bg-white);
+      border: 1px solid var(--border-emphasis);
+      border-radius: var(--r8);
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow-sm);
+    }
+    .adv-filters-panel h4 {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--type-accent);
+      margin-bottom: 12px;
+    }
+    .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px 16px; }
+    .adv-field label { display: block; font-size: 10px; font-weight: 600; color: var(--type-accent); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+    .adv-field select,
+    .adv-field input[type="text"],
+    .adv-field input[type="date"] { width: 100%; padding: 5px 8px; border: 1px solid var(--border-emphasis); border-radius: var(--r4); font-size: 11px; color: var(--type-default); background: var(--bg-white); outline: none; font-family: var(--font); }
+    .adv-field select:focus,
+    .adv-field input:focus { border-color: var(--interactive-primary); }
+    .date-range { display: flex; gap: 4px; align-items: center; }
+    .date-range span { font-size: 10px; color: var(--type-accent); flex-shrink: 0; }
+    .adv-actions { display: flex; gap: 8px; margin-top: 12px; justify-content: flex-end; }
+    .adv-note { font-size: 10px; color: var(--type-accent); margin-top: 10px; font-style: italic; }
+
+    /* ============================================================
+       RESULTS META
+    ============================================================ */
+    .results-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .results-count { font-size: 12px; color: var(--type-accent); }
+    .results-count strong { color: var(--type-default); }
+
+    .col-control-bar { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .col-toggle { font-size: 10px; padding: 2px 7px; border: 1px solid var(--border-emphasis); border-radius: var(--r4); background: var(--bg-white); cursor: pointer; color: var(--type-accent); font-family: var(--font); }
+    .col-toggle.on { background: var(--blue-75); border-color: var(--blue-200); color: var(--info-dark); font-weight: 600; }
+
+    /* ============================================================
+       TABLE
+    ============================================================ */
+    .table-wrap { background: var(--bg-white); border: 1px solid var(--table-border); border-radius: var(--r8); overflow: hidden; box-shadow: var(--shadow-sm); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+
+    thead th { background: var(--table-header); color: var(--type-default); font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; padding: 9px 10px; border-bottom: 1px solid var(--table-divider); text-align: left; white-space: nowrap; cursor: pointer; user-select: none; }
+    thead th:hover { background: var(--table-header-active); }
+    thead th .si { opacity: 0.35; margin-left: 3px; font-size: 9px; }
+    thead th.sorted .si { opacity: 1; color: var(--interactive-primary); }
+    .col-check { width: 34px; padding: 9px 0 9px 12px !important; cursor: default !important; }
+    .col-check:hover { background: var(--table-header) !important; }
+
+    tbody tr { border-bottom: 1px solid var(--border-subtle); transition: background 0.07s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--table-cell-hover); }
+    tbody tr.sel { background: var(--table-cell-selected); }
+    tbody td { padding: 9px 10px; vertical-align: middle; }
+
+    /* Name cell */
+    .scen-name-cell { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .scen-name { font-weight: 500; color: var(--interactive-primary); cursor: pointer; }
+    .scen-name:hover { text-decoration: underline; }
+
+    /* Sub-info under name */
+    .scen-sub { font-size: 10px; color: var(--type-accent); margin-top: 1px; }
+
+    /* ============================================================
+       BADGES
+    ============================================================ */
+    .badge { display: inline-flex; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; border: 1px solid transparent; }
+    .b-ok      { background: #B0F9DB; color: var(--success-dark); border-color: rgba(0,135,77,0.3); }
+    .b-run     { background: var(--blue-100); color: var(--info-dark); border-color: rgba(56,121,219,0.3); }
+    .b-warn    { background: var(--warning-bg); color: var(--warning-dark); border-color: rgba(234,184,11,0.4); }
+    .b-err     { background: var(--critical-bg); color: var(--critical); border-color: rgba(169,0,0,0.25); }
+    .b-neutral { background: var(--neutral-100); color: var(--type-accent); border-color: var(--neutral-200); }
+    .b-combined{ background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-200); }
+    .b-test    { background: var(--warning-bg); color: var(--warning-dark); border-color: rgba(234,184,11,0.4); }
+
+    /* Claim type tags */
+    .ct { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: var(--r4); font-size: 10px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+    .ct-fac  { background: #DDFDFB; color: #002F32; border-color: #13C8A4; }
+    .ct-prof { background: var(--purple-50); color: var(--purple-900); border-color: var(--purple-200); }
+    .ct-asc  { background: var(--warning-bg); color: var(--warning-dark); border-color: rgba(234,184,11,0.5); }
+
+    /* Custom tags */
+    .ctag { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 100px; font-size: 10px; font-weight: 500; background: var(--blue-50); color: var(--info); border: 1px solid var(--blue-200); white-space: nowrap; }
+    .ctag.g { background: var(--success-bg); color: var(--success-dark); border-color: rgba(0,135,77,0.3); }
+    .ctag.o { background: var(--warning-bg); color: var(--warning-dark); border-color: rgba(234,184,11,0.4); }
+
+    .tag-row { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+
+    /* RSH — Yes/No badge */
+    .rsh-yes { background: var(--success-bg); color: var(--success); border-color: rgba(0,135,77,0.3); }
+    .rsh-no  { background: var(--neutral-90); color: var(--type-accent); border-color: var(--neutral-200); }
+
+    /* Monospace ID */
+    .mono { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 11px; color: var(--type-accent); }
+
+    /* Date + count cells */
+    .date-cell { font-size: 11px; color: var(--type-accent); white-space: nowrap; }
+    .count-cell { font-size: 12px; font-weight: 600; color: var(--type-default); }
+
+    /* ============================================================
+       PAGINATION
+    ============================================================ */
+    .pagination { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--type-accent); }
+    .page-btns { display: flex; gap: 3px; }
+    .pbtn { width: 26px; height: 26px; border: 1px solid var(--border-emphasis); border-radius: var(--r4); background: var(--bg-white); display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; color: var(--type-default); }
+    .pbtn:hover { background: var(--neutral-90); }
+    .pbtn.a { background: var(--interactive-primary); color: #fff; border-color: var(--interactive-primary); font-weight: 700; }
+
+    /* ============================================================
+       BULK ACTION BAR
+    ============================================================ */
+    .bulk-bar { background: var(--bg-system); color: #fff; padding: 11px 18px; display: flex; align-items: center; gap: 10px; border-radius: 0 0 var(--r8) var(--r8); box-shadow: var(--shadow-lg); }
+    .bulk-bar .sel-count { font-size: 12px; font-weight: 600; flex-shrink: 0; }
+    .bulk-div { width: 1px; height: 18px; background: rgba(255,255,255,0.18); flex-shrink: 0; }
+    .btn-combine { background: var(--interactive-primary); color: #fff; border: none; padding: 6px 14px; border-radius: var(--r4); font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: var(--font); }
+    .btn-combine:hover { background: #0026d1; }
+    .bulk-ghost { font-size: 11px; color: rgba(255,255,255,0.72); cursor: pointer; padding: 5px 8px; border-radius: var(--r4); display: flex; align-items: center; gap: 4px; }
+    .bulk-ghost:hover { background: rgba(255,255,255,0.1); color: #fff; }
+    .bulk-dismiss { margin-left: auto; font-size: 11px; opacity: 0.55; cursor: pointer; }
+    .bulk-dismiss:hover { opacity: 1; }
+
+    /* ============================================================
+       ANNOTATION LEGEND
+    ============================================================ */
+    .ann-panel { background: var(--bg-white); border: 1px solid var(--border-emphasis); border-radius: var(--r8); padding: 16px; margin-top: 20px; box-shadow: var(--shadow-sm); }
+    .ann-panel h3 { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--type-accent); margin-bottom: 14px; }
+    .leg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+    .leg-item { display: flex; flex-direction: column; gap: 3px; }
+    .leg-label { font-size: 11px; font-weight: 600; color: var(--type-default); display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .leg-desc { font-size: 11px; color: var(--type-accent); line-height: 1.55; }
+    .npill { display: inline-flex; padding: 1px 5px; background: var(--purple-50); color: var(--purple-600); border-radius: 100px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid var(--purple-200); }
+    .epill { display: inline-flex; padding: 1px 5px; background: var(--success-bg); color: var(--success-dark); border-radius: 100px; font-size: 9px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; border: 1px solid rgba(0,135,77,0.3); }
+
+    /* Tooltip */
+    .twrap { position: relative; display: inline-flex; }
+    .twrap .tip { position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: var(--bg-system); color: #fff; font-size: 10px; padding: 4px 8px; border-radius: var(--r4); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.13s; z-index: 10; }
+    .twrap:hover .tip { opacity: 1; }
+
+    input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--interactive-primary); cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="global-nav">
+  <div class="logo">Contract Modeling</div>
+  <nav>
+    <a href="#">Dashboard</a>
+    <a href="#" class="active">Scenarios</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+  </nav>
+</div>
+<div class="breadcrumb-bar">
+  <span>Scenarios</span><span class="sep"> › </span><span class="cur">Search</span>
+</div>
+
+<div class="page-body">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div>
+      <h1>Scenario Search</h1>
+      <p>Search, filter, and launch individual or combined scenarios across contract offices</p>
+    </div>
+    <div class="page-header-actions">
+      <button class="btn btn-secondary">⚙ Manage Tags</button>
+      <button class="btn btn-secondary">↗ Export</button>
+      <button class="btn btn-primary">＋ New Scenario</button>
+    </div>
+  </div>
+
+  <!-- MY SCENARIOS / ALL SCENARIOS TABS -->
+  <div class="scope-tabs">
+    <div class="scope-tab active">
+      My Scenarios
+      <span class="count-pill">24</span>
+    </div>
+    <div class="scope-tab">
+      All Scenarios
+      <span class="count-pill">312</span>
+    </div>
+  </div>
+
+  <!-- SEARCH + QUICK FILTERS -->
+  <div class="search-filter-bar">
+    <div class="search-row">
+      <div class="search-input-wrap">
+        <span class="sicon">🔍</span>
+        <input type="text" class="search-input" placeholder="Search by name, ID, system, contract office, region, or tag…">
+      </div>
+      <button class="btn btn-secondary" onclick="document.getElementById('adv-panel').style.display=document.getElementById('adv-panel').style.display==='none'?'block':'none'">
+        ⧉ Advanced Filters
+      </button>
+    </div>
+
+    <!-- QUICK FILTERS — CRP Type removed, RSH simplified to Yes/No -->
+    <div class="filter-row">
+      <span class="filter-label">Quick:</span>
+
+      <!-- Claim Type -->
+      <select class="filter-select">
+        <option>Claim Type: All</option>
+        <option selected>ASC</option>
+        <option>Facility</option>
+        <option>Professional</option>
+        <option>Mixed</option>
+      </select>
+
+      <!-- Run Status -->
+      <select class="filter-select">
+        <option>Run Status: All</option>
+        <option>Completed</option>
+        <option>Running</option>
+        <option>Failed</option>
+        <option>Test</option>
+      </select>
+
+      <!-- RSH Pushed — Yes / No only -->
+      <select class="filter-select">
+        <option>RSH Pushed: All</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+
+      <!-- Scenario type pills -->
+      <div class="pill-group">
+        <span class="pill">All</span>
+        <span class="pill active">⛓ Combined</span>
+        <span class="pill">Individual</span>
+      </div>
+
+      <span class="clear-btn">Clear all</span>
+    </div>
+
+    <!-- ACTIVE FILTER STRIP -->
+    <div class="active-filters">
+      <span class="af-label">Active:</span>
+      <span class="af-chip">Claim Type: ASC <span class="x">✕</span></span>
+      <span class="af-chip">Type: Combined <span class="x">✕</span></span>
+      <span class="af-chip">Office: TX-Austin <span class="x">✕</span></span>
+    </div>
+  </div>
+
+  <!-- ADVANCED FILTERS PANEL (shown expanded in wireflow) -->
+  <div class="adv-filters-panel" id="adv-panel">
+    <h4>Advanced Filters</h4>
+    <div class="adv-grid">
+
+      <div class="adv-field">
+        <label>Region</label>
+        <select>
+          <option>All Regions</option>
+          <option>South Central</option>
+          <option>Pacific Northwest</option>
+          <option>Mid-Atlantic</option>
+          <option>Great Plains</option>
+          <option>Northeast</option>
+        </select>
+      </div>
+
+      <div class="adv-field">
+        <label>Contract Office</label>
+        <input type="text" placeholder="e.g. TX-Austin">
+      </div>
+
+      <div class="adv-field">
+        <label>System Name</label>
+        <select>
+          <option>All Systems</option>
+          <option>Medicare Advantage</option>
+          <option>Commercial PPO</option>
+          <option>Medicaid</option>
+          <option>ASC Network</option>
+          <option>Evernorth PBM</option>
+        </select>
+      </div>
+
+      <div class="adv-field">
+        <label>CRP Type</label>
+        <select>
+          <option>All CRP Types</option>
+          <option>A — Amendment</option>
+          <option>B — Base</option>
+          <option>D — Draft</option>
+          <option>O — Other</option>
+        </select>
+      </div>
+
+      <div class="adv-field">
+        <label>Line of Business (LOB)</label>
+        <select>
+          <option>All LOBs</option>
+          <option>OAP</option>
+          <option>New Business</option>
+          <option>Renewal</option>
+        </select>
+      </div>
+
+      <div class="adv-field">
+        <label>Created By</label>
+        <input type="text" placeholder="User name or ID">
+      </div>
+
+      <div class="adv-field">
+        <label>Date Created</label>
+        <div class="date-range">
+          <input type="date" style="flex:1">
+          <span>–</span>
+          <input type="date" style="flex:1">
+        </div>
+      </div>
+
+      <div class="adv-field">
+        <label>Last Run Date</label>
+        <div class="date-range">
+          <input type="date" style="flex:1">
+          <span>–</span>
+          <input type="date" style="flex:1">
+        </div>
+      </div>
+
+      <div class="adv-field">
+        <label>Provider Count</label>
+        <div class="date-range">
+          <input type="text" placeholder="Min" style="flex:1">
+          <span>–</span>
+          <input type="text" placeholder="Max" style="flex:1">
+        </div>
+      </div>
+
+      <div class="adv-field">
+        <label>Tag</label>
+        <input type="text" placeholder="e.g. Q1-Final, TX-Neg-Group-4">
+      </div>
+
+    </div>
+    <div class="adv-actions">
+      <button class="btn btn-ghost">Reset</button>
+      <button class="btn btn-primary">Apply Filters</button>
+    </div>
+    <p class="adv-note">CRP Type, LOB, Region, System, Provider Count, and date ranges are available here. Quick filters above cover the most-used daily lookups.</p>
+  </div>
+
+  <!-- RESULTS META -->
+  <div class="results-meta">
+    <span class="results-count">Showing <strong>4</strong> of <strong>24</strong> my scenarios · 312 total</span>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span style="font-size:10px;color:var(--type-accent);">Columns:</span>
+      <div class="col-control-bar">
+        <span class="col-toggle on">Status</span>
+        <span class="col-toggle on">Claim Type</span>
+        <span class="col-toggle on">RSH</span>
+        <span class="col-toggle on">Tags</span>
+        <span class="col-toggle on">System</span>
+        <span class="col-toggle on">Region</span>
+        <span class="col-toggle on">Providers</span>
+        <span class="col-toggle">LOB</span>
+        <span class="col-toggle">CRP</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="col-check"><input type="checkbox"></th>
+          <th>Run Status <span class="si sorted">↑</span></th>
+          <th>Scenario Name <span class="si">↕</span></th>
+          <th>ID <span class="si">↕</span></th>
+          <th>Claim Type <span class="si">↕</span></th>
+          <th>System Name <span class="si">↕</span></th>
+          <th>Contract Office <span class="si">↕</span></th>
+          <th>Region <span class="si">↕</span></th>
+          <th>Providers <span class="si">↕</span></th>
+          <th>Pushed to RSH <span class="si">↕</span></th>
+          <th>Date Created <span class="si">↕</span></th>
+          <th>Last Run <span class="si">↕</span></th>
+          <th>Tags</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ROW 1 — My scenario, Combined ASC+Fac, RSH Yes -->
+        <tr class="sel">
+          <td class="col-check"><input type="checkbox" checked></td>
+          <td><span class="badge b-ok">● Completed</span></td>
+          <td>
+            <div class="scen-name-cell">
+              <span class="scen-name">TX-Austin 2026 ASC+Fac Combined</span>
+              <span class="badge b-combined">⛓ Combined</span>
+            </div>
+          </td>
+          <td class="mono">SCN-40291</td>
+          <td>
+            <div class="tag-row">
+              <span class="ct ct-asc">ASC</span>
+              <span class="ct ct-fac">Facility</span>
+            </div>
+          </td>
+          <td style="font-size:11px;">ASC Network</td>
+          <td style="font-size:11px;">TX — Austin</td>
+          <td style="font-size:11px;">South Central</td>
+          <td class="count-cell twrap">
+            142
+            <span class="tip">142 providers in scope</span>
+          </td>
+          <td><span class="badge rsh-yes">Yes</span></td>
+          <td class="date-cell">Jan 14, 2026</td>
+          <td class="date-cell">May 5, 2026<br><span style="font-size:10px;color:var(--type-disabled)">10:32 AM</span></td>
+          <td>
+            <div class="tag-row">
+              <span class="ctag">TX-Neg-4</span>
+              <span class="ctag g">Q1 Final</span>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;gap:3px;">
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button>
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 2 — My scenario, ASC Base, RSH Yes -->
+        <tr class="sel">
+          <td class="col-check"><input type="checkbox" checked></td>
+          <td><span class="badge b-ok">● Completed</span></td>
+          <td>
+            <div class="scen-name-cell">
+              <span class="scen-name">TX-Austin 2026 ASC Base</span>
+            </div>
+          </td>
+          <td class="mono">SCN-40187</td>
+          <td>
+            <div class="tag-row">
+              <span class="ct ct-asc">ASC</span>
+            </div>
+          </td>
+          <td style="font-size:11px;">ASC Network</td>
+          <td style="font-size:11px;">TX — Austin</td>
+          <td style="font-size:11px;">South Central</td>
+          <td class="count-cell twrap">
+            89
+            <span class="tip">89 providers in scope</span>
+          </td>
+          <td><span class="badge rsh-yes">Yes</span></td>
+          <td class="date-cell">Nov 3, 2025</td>
+          <td class="date-cell">May 12, 2026<br><span style="font-size:10px;color:var(--type-disabled)">2:14 PM</span></td>
+          <td>
+            <div class="tag-row">
+              <span class="ctag g">Q1 Final</span>
+              <span class="ctag o">Pending Review</span>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;gap:3px;">
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button>
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 3 — Prof+Fac Combined, Running, RSH No -->
+        <tr>
+          <td class="col-check"><input type="checkbox"></td>
+          <td><span class="badge b-run">◌ Running</span></td>
+          <td>
+            <div class="scen-name-cell">
+              <span class="scen-name">WA-Seattle Prof+Fac Combined</span>
+              <span class="badge b-combined">⛓ Combined</span>
+            </div>
+          </td>
+          <td class="mono">SCN-38902</td>
+          <td>
+            <div class="tag-row">
+              <span class="ct ct-prof">Professional</span>
+              <span class="ct ct-fac">Facility</span>
+            </div>
+          </td>
+          <td style="font-size:11px;">Commercial PPO</td>
+          <td style="font-size:11px;">WA — Seattle</td>
+          <td style="font-size:11px;">Pacific NW</td>
+          <td class="count-cell twrap">
+            317
+            <span class="tip">317 providers in scope</span>
+          </td>
+          <td><span class="badge rsh-no">No</span></td>
+          <td class="date-cell">Mar 2, 2026</td>
+          <td class="date-cell">Running…<br><span style="font-size:10px;color:var(--type-disabled)">Est. 8 min</span></td>
+          <td>
+            <div class="tag-row">
+              <span class="ctag">WA-Neg-2</span>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;gap:3px;">
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⏹ Stop</button>
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+        <!-- ROW 4 — Facility draft, Failed, RSH No -->
+        <tr>
+          <td class="col-check"><input type="checkbox"></td>
+          <td><span class="badge b-err">✕ Failed</span></td>
+          <td>
+            <div class="scen-name-cell">
+              <span class="scen-name">[COPY] TX-Austin Facility Draft</span>
+            </div>
+          </td>
+          <td class="mono">SCN-39714</td>
+          <td>
+            <div class="tag-row">
+              <span class="ct ct-fac">Facility</span>
+            </div>
+          </td>
+          <td style="font-size:11px;">Medicare Advantage</td>
+          <td style="font-size:11px;">TX — Austin</td>
+          <td style="font-size:11px;">South Central</td>
+          <td class="count-cell twrap">
+            54
+            <span class="tip">54 providers in scope</span>
+          </td>
+          <td><span class="badge rsh-no">No</span></td>
+          <td class="date-cell">Apr 18, 2026</td>
+          <td class="date-cell">May 1, 2026<br><span style="font-size:10px;color:var(--type-disabled)">9:05 AM</span></td>
+          <td>
+            <div class="tag-row">
+              <span class="ctag o">Draft</span>
+            </div>
+          </td>
+          <td>
+            <div style="display:flex;gap:3px;">
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Retry</button>
+              <button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button>
+            </div>
+          </td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- BULK BAR inside table-wrap -->
+    <div class="bulk-bar">
+      <span class="sel-count">2 scenarios selected</span>
+      <div class="bulk-div"></div>
+      <button class="btn-combine">⛓ Combine Selected</button>
+      <span class="bulk-ghost">🏷 Batch Tag</span>
+      <span class="bulk-ghost">↗ Export</span>
+      <span class="bulk-dismiss">✕ Clear selection</span>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pagination">
+      <span>Rows per page:
+        <select style="border:none;font-size:11px;color:var(--type-default);background:transparent;cursor:pointer;font-family:var(--font);">
+          <option>25</option><option>50</option><option>100</option>
+        </select>
+      </span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span>1–4 of 24 (my) · 312 total</span>
+        <div class="page-btns">
+          <div class="pbtn">‹</div>
+          <div class="pbtn a">1</div>
+          <div class="pbtn">2</div>
+          <div class="pbtn">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANNOTATION LEGEND -->
+  <div class="ann-panel">
+    <h3>Phase 1 v2 — Changes from Feedback</h3>
+    <div class="leg-grid">
+
+      <div class="leg-item">
+        <div class="leg-label">My Scenarios / All Scenarios <span class="npill">NEW</span></div>
+        <div class="leg-desc">Tab toggle at the top of the table. "My Scenarios" scoped to the current user's 24 scenarios by default — avoids drowning in all 312. Switching to "All" shows the org-wide set. Count badges update live with filters applied.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">Advanced Filters panel <span class="npill">NEW</span></div>
+        <div class="leg-desc">Opened via the "Advanced Filters" button. Contains: Region, Contract Office, System Name, CRP Type, LOB, Created By, Date Created range, Last Run range, Provider Count range, and Tag. Quick filter bar stays lean — CRP Type moved here.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">CRP Type — moved to Advanced Filters <span class="epill">MOVED</span></div>
+        <div class="leg-desc">Removed from the quick filter bar per feedback. Still fully filterable in Advanced Filters. The quick bar now only carries Claim Type, Run Status, RSH Pushed, and scenario type pills — the four most frequent daily lookups.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">Pushed to RSH — Yes / No <span class="epill">SIMPLIFIED</span></div>
+        <div class="leg-desc">Replaced the dot indicator (Synced/Stale/Unknown) with a plain Yes/No badge. Matches how users actually think about it from their Excel tracker. The live API feed still powers it — but the surface is binary.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">System Name column <span class="npill">NEW</span></div>
+        <div class="leg-desc">Shows which contracting system the scenario belongs to (e.g. Medicare Advantage, Commercial PPO, ASC Network). Filterable in Advanced Filters. Addresses the need to distinguish scenarios across institutional systems without opening each one.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">Region column <span class="npill">NEW</span></div>
+        <div class="leg-desc">Geographic region of the contract office (South Central, Pacific NW, etc.). Distinct from Contract Office — users often filter by region first, then office. Filterable in Advanced Filters. Both columns visible by default.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">Provider Count column <span class="npill">NEW</span></div>
+        <div class="leg-desc">Number of providers in scope for this scenario. Hover shows tooltip. Filterable in Advanced Filters by min/max range. Addresses the need to quickly gauge scenario scale without opening the scenario detail page.</div>
+      </div>
+
+      <div class="leg-item">
+        <div class="leg-label">Date Created + Last Run with timestamps <span class="epill">ENHANCED</span></div>
+        <div class="leg-desc">Both date columns now show date + time. Date Created is separate from Last Run — users care about both: when did I first build this, and when did I last execute it. Sortable independently.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end page-body -->
+</body>
+</html>
