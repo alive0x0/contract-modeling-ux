@@ -1,0 +1,1651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combined Scenario — UX Wireflow</title>
+<style>
+  :root {
+    --bg: #f4f5f7;
+    --surface: #ffffff;
+    --surface-2: #f8f9fa;
+    --border: #e1e4e8;
+    --border-strong: #c9cdd4;
+    --ink: #1a1d23;
+    --ink-2: #4a5060;
+    --ink-3: #8b90a0;
+    --accent: #0f7b6c;
+    --accent-light: #e6f4f2;
+    --accent-2: #1e88e5;
+    --accent-2-light: #e3f2fd;
+    --warning: #f59e0b;
+    --warning-light: #fffbeb;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --success: #16a34a;
+    --success-light: #f0fdf4;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --new-badge: #0ea5e9;
+    --radius: 6px;
+    --radius-lg: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.06);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.13), 0 4px 8px rgba(0,0,0,0.08);
+    --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  /* ── TOP CHROME ── */
+  .top-bar {
+    background: #1a2332;
+    color: #e2e8f0;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .top-bar .logo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+    margin-right: 8px;
+  }
+  .top-bar .nav-tabs {
+    display: flex;
+    gap: 2px;
+    flex: 1;
+  }
+  .top-bar .nav-tab {
+    padding: 5px 12px;
+    border-radius: 5px;
+    font-size: 12px;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .top-bar .nav-tab:hover { background: rgba(255,255,255,0.07); color: #e2e8f0; }
+  .top-bar .nav-tab.active { background: rgba(255,255,255,0.12); color: #fff; font-weight: 500; }
+  .top-bar .user-chip {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* ── FLOW NAV ── */
+  .flow-nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--ink-3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .flow-step:hover { color: var(--ink-2); border-bottom-color: var(--border-strong); }
+  .flow-step.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .flow-step .step-num {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1.5px solid var(--border-strong);
+    color: var(--ink-3);
+    font-size: 10px;
+    font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .flow-step.active .step-num {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
+  .flow-step.done .step-num {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+  .flow-step.done { color: var(--ink-2); }
+  .flow-arrow {
+    display: flex; align-items: center;
+    color: var(--border-strong);
+    padding: 0 2px;
+    font-size: 14px;
+  }
+
+  /* ── ANNOTATION BANNER ── */
+  .annotation {
+    background: #1a2332;
+    color: #94a3b8;
+    font-size: 11.5px;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1px solid #0f1724;
+  }
+  .annotation strong { color: #e2e8f0; }
+  .annotation .pill {
+    background: rgba(15,123,108,0.25);
+    color: #4ecca3;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .annotation .pill.new { background: rgba(14,165,233,0.2); color: #38bdf8; }
+  .annotation .pill.enhanced { background: rgba(124,58,237,0.2); color: #a78bfa; }
+
+  /* ── SCREEN CONTAINER ── */
+  .screen-container {
+    padding: 24px;
+    min-height: calc(100vh - 120px);
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── PAGE HEADER ── */
+  .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .page-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 2px;
+  }
+  .page-subtitle { font-size: 12px; color: var(--ink-3); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: #0a6557; }
+  .btn-secondary { background: var(--surface); color: var(--ink-2); border: 1px solid var(--border-strong); }
+  .btn-secondary:hover { background: var(--bg); }
+  .btn-ghost { background: transparent; color: var(--ink-2); }
+  .btn-ghost:hover { background: var(--bg); }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-sm { padding: 5px 10px; font-size: 11px; }
+  .btn-icon { padding: 6px; border-radius: var(--radius); }
+
+  /* ── TABS ── */
+  .tab-bar {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    gap: 0;
+  }
+  .tab {
+    padding: 9px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    white-space: nowrap;
+  }
+  .tab:hover { color: var(--ink-2); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab .count {
+    background: var(--bg);
+    color: var(--ink-3);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 20px;
+    margin-left: 5px;
+  }
+
+  /* ── FILTER BAR ── */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .search-input {
+    flex: 1;
+    min-width: 200px;
+    max-width: 320px;
+    position: relative;
+  }
+  .search-input input {
+    width: 100%;
+    padding: 7px 10px 7px 32px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 12px;
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
+    transition: border 0.15s;
+  }
+  .search-input input:focus { border-color: var(--accent); }
+  .search-input svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); }
+
+  .filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    background: var(--accent-light);
+    border: 1px solid #b2d8d3;
+    color: var(--accent);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .filter-chip:hover { background: #d0ede9; }
+
+  .select-filter {
+    padding: 7px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 12px;
+    background: var(--surface);
+    color: var(--ink-2);
+    outline: none;
+    cursor: pointer;
+  }
+
+  /* ── NEW: BULK ACTION BAR ── */
+  .bulk-bar {
+    background: #1a2332;
+    color: #e2e8f0;
+    padding: 10px 16px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-md);
+  }
+  .bulk-bar .count { font-size: 12px; font-weight: 700; color: #fff; flex: 1; }
+  .bulk-bar .count span { color: #4ecca3; }
+  .bulk-bar .btn-combine {
+    background: var(--accent);
+    color: white;
+    padding: 6px 14px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    display: flex; align-items: center; gap: 6px;
+    transition: background 0.15s;
+  }
+  .bulk-bar .btn-combine:hover { background: #0a6557; }
+  .bulk-bar .btn-clear {
+    background: transparent;
+    color: #94a3b8;
+    padding: 6px 10px;
+    border-radius: var(--radius);
+    font-size: 11px;
+    cursor: pointer;
+    border: 1px solid #2d3a4a;
+  }
+  .bulk-bar .btn-clear:hover { color: #e2e8f0; background: rgba(255,255,255,0.06); }
+
+  /* ── TABLE ── */
+  .table-wrap {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  thead tr {
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  thead th {
+    padding: 9px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-3);
+    white-space: nowrap;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  thead th.check-col { width: 36px; padding-left: 14px; }
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.1s;
+  }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--surface-2); }
+  tbody tr.selected { background: var(--accent-light) !important; }
+  tbody td {
+    padding: 10px 12px;
+    font-size: 12px;
+    color: var(--ink-2);
+    vertical-align: middle;
+  }
+  tbody td.name-cell {
+    color: var(--ink);
+    font-weight: 500;
+    max-width: 220px;
+  }
+  .name-truncate {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 210px;
+    display: block;
+  }
+
+  /* status badges */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+  }
+  .badge-finished { background: var(--success-light); color: var(--success); }
+  .badge-test { background: var(--bg); color: var(--ink-3); border: 1px solid var(--border-strong); }
+  .badge-running { background: var(--warning-light); color: var(--warning); }
+  .badge-combined { background: var(--purple-light); color: var(--purple); }
+  .badge-new { background: var(--accent-2-light); color: var(--accent-2); }
+
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .dot-finished { background: var(--success); }
+  .dot-running { background: var(--warning); }
+  .dot-test { background: var(--ink-3); }
+
+  .checkbox {
+    width: 15px; height: 15px;
+    border: 1.5px solid var(--border-strong);
+    border-radius: 3px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    background: white;
+    flex-shrink: 0;
+  }
+  .checkbox.checked {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .action-dots {
+    color: var(--ink-3);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .action-dots:hover { background: var(--bg); color: var(--ink); }
+
+  .tag-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 7px;
+    background: var(--accent-2-light);
+    border: 1px solid #b3d9f7;
+    color: var(--accent-2);
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+  }
+
+  /* ── SCENARIO ID MONO CHIP ── */
+  .id-chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-3);
+    background: var(--bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  /* ── CALLOUT ── */
+  .callout {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: var(--radius);
+    font-size: 12px;
+    margin-bottom: 16px;
+    align-items: flex-start;
+  }
+  .callout-new { background: var(--accent-2-light); border: 1px solid #b3d9f7; color: #1565c0; }
+  .callout-enhanced { background: var(--purple-light); border: 1px solid #d8b4fe; color: #5b21b6; }
+  .callout-warning { background: var(--warning-light); border: 1px solid #fcd34d; color: #92400e; }
+  .callout-success { background: var(--success-light); border: 1px solid #86efac; color: #14532d; }
+  .callout svg { flex-shrink: 0; margin-top: 1px; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 24px;
+  }
+  .modal {
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 100%;
+    max-width: 580px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .modal-header {
+    padding: 18px 20px 14px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .modal-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+  .modal-subtitle { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+  .modal-close {
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 3px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+  .modal-close:hover { background: var(--bg); color: var(--ink); }
+  .modal-body { padding: 18px 20px; }
+  .modal-footer {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  /* ── SCENARIO SOURCE CARD ── */
+  .source-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+  .source-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface-2);
+    transition: border-color 0.15s;
+  }
+  .source-item:hover { border-color: var(--border-strong); }
+  .source-item .source-id { font-family: var(--mono); font-size: 11px; color: var(--accent); font-weight: 700; flex-shrink: 0; }
+  .source-item .source-name { flex: 1; font-size: 12px; color: var(--ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .source-item .source-meta { font-size: 11px; color: var(--ink-3); flex-shrink: 0; }
+  .source-item .remove-btn {
+    color: var(--ink-3);
+    cursor: pointer;
+    padding: 2px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .source-item .remove-btn:hover { background: var(--danger-light); color: var(--danger); }
+
+  /* ── PREFLIGHT CHECK ── */
+  .preflight {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+  }
+  .preflight-title { font-size: 11px; font-weight: 700; color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
+  .preflight-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 12px;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .preflight-row:last-child { border-bottom: none; }
+  .preflight-row .pf-label { flex: 1; }
+  .preflight-row .pf-val { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+  .pf-ok { color: var(--success); }
+  .pf-warn { color: var(--warning); }
+  .pf-err { color: var(--danger); }
+
+  /* ── COMBINED REPORT SCREEN ── */
+  .report-section { margin-bottom: 20px; }
+  .report-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .provenance-card {
+    background: var(--purple-light);
+    border: 1px solid #d8b4fe;
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 16px;
+  }
+  .provenance-card .prov-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .provenance-card .prov-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #5b21b6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .prov-sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .prov-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: white;
+    border: 1px solid #d8b4fe;
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--purple);
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .prov-link:hover { background: #ede9fe; }
+  .prov-link .prov-id { font-family: var(--mono); font-size: 10px; opacity: 0.7; }
+
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .metric-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    box-shadow: var(--shadow);
+  }
+  .metric-label { font-size: 10.5px; color: var(--ink-3); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px; }
+  .metric-val { font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.02em; }
+  .metric-delta { font-size: 11px; margin-top: 2px; }
+  .delta-pos { color: var(--success); }
+  .delta-neg { color: var(--danger); }
+
+  .manage-sources-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: var(--purple-light);
+    border: 1px solid #d8b4fe;
+    color: var(--purple);
+    border-radius: var(--radius);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .manage-sources-btn:hover { background: #ede9fe; }
+
+  /* ── FORM ELEMENTS ── */
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--ink-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 5px;
+  }
+  .form-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius);
+    font-size: 12px;
+    background: var(--surface);
+    color: var(--ink);
+    outline: none;
+    transition: border 0.15s;
+  }
+  .form-input:focus { border-color: var(--accent); }
+  .form-hint { font-size: 11px; color: var(--ink-3); margin-top: 4px; }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 16px 0;
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--ink-3);
+  }
+  .empty-state svg { margin-bottom: 12px; opacity: 0.3; }
+  .empty-state h3 { font-size: 14px; font-weight: 700; color: var(--ink-2); margin-bottom: 6px; }
+  .empty-state p { font-size: 12px; }
+
+  /* ── SIDEBAR PANEL ── */
+  .panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.3);
+    z-index: 150;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .side-panel {
+    background: var(--surface);
+    width: 380px;
+    height: 100%;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .side-panel-header {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+  .side-panel-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+  .side-panel-footer {
+    padding: 14px 18px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+  /* ── LAYOUT HELPER ── */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .flex { display: flex; }
+  .flex-center { display: flex; align-items: center; }
+  .gap-8 { gap: 8px; }
+  .gap-6 { gap: 6px; }
+  .ml-auto { margin-left: auto; }
+  .mt-8 { margin-top: 8px; }
+  .mb-8 { margin-bottom: 8px; }
+  .mb-12 { margin-bottom: 12px; }
+  .text-xs { font-size: 11px; }
+  .text-muted { color: var(--ink-3); }
+
+  /* ── TOOLTIP ANNOTATION ── */
+  .anno-box {
+    position: absolute;
+    background: #1a2332;
+    color: #e2e8f0;
+    font-size: 11px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: var(--shadow-md);
+  }
+  .anno-box::after {
+    content: '';
+    position: absolute;
+    left: 14px; bottom: -6px;
+    border: 6px solid transparent;
+    border-top-color: #1a2332;
+    border-bottom: none;
+  }
+
+  .highlight-ring {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+  }
+
+  /* region tag color variants */
+  .tag-west { background: #fff7ed; border-color: #fed7aa; color: #c2410c; }
+  .tag-central { background: #f0fdf4; border-color: #bbf7d0; color: #15803d; }
+  .tag-east { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+  .tag-national { background: var(--accent-light); border-color: #b2d8d3; color: var(--accent); }
+
+  .breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    color: var(--ink-3);
+    margin-bottom: 14px;
+  }
+  .breadcrumb a { color: var(--accent); text-decoration: none; cursor: pointer; }
+  .breadcrumb a:hover { text-decoration: underline; }
+
+  /* Timeline simplified */
+  .timeline-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+    background: var(--surface);
+  }
+  .tl-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+  .tl-name { flex: 1; font-size: 12px; color: var(--ink); font-weight: 500; }
+  .tl-type { font-size: 11px; color: var(--ink-3); }
+  .tl-count { font-size: 11px; font-weight: 700; color: var(--ink-2); }
+
+</style>
+</head>
+<body>
+
+<!-- TOP CHROME -->
+<div class="top-bar">
+  <span class="logo">Contract Modeling</span>
+  <div class="nav-tabs">
+    <div class="nav-tab active">Home</div>
+    <div class="nav-tab">Scenarios</div>
+    <div class="nav-tab">Patcher</div>
+    <div class="nav-tab">Ratesheet History ▾</div>
+    <div class="nav-tab">Ratesheet Maintenance</div>
+    <div class="nav-tab">Contact Us</div>
+  </div>
+  <span style="font-size:12px;color:#64748b;margin-right:8px;">Help</span>
+  <div class="user-chip">SB</div>
+</div>
+
+<!-- FLOW NAV -->
+<div class="flow-nav" id="flowNav">
+  <div class="flow-step active" id="step1" onclick="showScreen(1)">
+    <div class="step-num" id="sn1">1</div>
+    Search &amp; Select Scenarios
+  </div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" id="step2" onclick="showScreen(2)">
+    <div class="step-num" id="sn2">2</div>
+    Pre-flight Check
+  </div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" id="step3" onclick="showScreen(3)">
+    <div class="step-num" id="sn3">3</div>
+    Combined Report + Provenance
+  </div>
+  <div class="flow-arrow">›</div>
+  <div class="flow-step" id="step4" onclick="showScreen(4)">
+    <div class="step-num" id="sn4">4</div>
+    Manage Sources (In-Place)
+  </div>
+</div>
+
+<!-- ANNOTATION BAR -->
+<div class="annotation" id="annotationBar">
+  <span class="pill">Step 1 of 4</span>
+  <span><strong>Search &amp; Select Scenarios</strong> — User filters the list and selects scenarios to combine via multi-select. No Excel tracker needed.</span>
+  <span class="pill new" style="margin-left:auto;">NEW</span>
+  <span style="font-size:11px;color:#64748b;">Multi-select + Combine Selected replaces manual ID hunting</span>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 1 — SEARCH & SELECT
+═══════════════════════════════════════════════════ -->
+<div class="screen active" id="screen1">
+<div class="screen-container">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">Search for Scenarios</div>
+      <div class="page-subtitle">Select scenarios to combine, or open individually to review</div>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-secondary">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download
+      </button>
+      <button class="btn btn-primary" onclick="showScreen(2)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        NEW SCENARIO
+      </button>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <div class="tab active">My Scenarios <span class="count">47</span></div>
+    <div class="tab">My Contract Office Scenarios <span class="count">12</span></div>
+    <div class="tab">All Scenarios</div>
+  </div>
+
+  <div class="callout callout-new">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span><strong>New:</strong> Select multiple scenarios below and use <strong>Combine Selected</strong> to generate a combined view — no need to copy IDs manually.</span>
+  </div>
+
+  <div class="filter-bar">
+    <div class="search-input">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b90a0" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search name, system, office…" value="">
+    </div>
+    <select class="select-filter">
+      <option>All Types</option>
+      <option>Facility</option>
+      <option>Professional</option>
+    </select>
+    <select class="select-filter">
+      <option>All Systems</option>
+      <option>Endeavor Health</option>
+      <option>Dignity Health</option>
+    </select>
+    <select class="select-filter">
+      <option>All Offices</option>
+      <option>Illinois - Chicago</option>
+      <option>Florida - All Other</option>
+    </select>
+    <div class="filter-chip">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Facility
+    </div>
+    <div class="filter-chip">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+      Endeavor Health
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-left:2px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <span class="text-xs text-muted" style="margin-left:2px">Clear all</span>
+  </div>
+
+  <!-- BULK ACTION BAR (visible when selections made) -->
+  <div class="bulk-bar" id="bulkBar">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ecca3" stroke-width="2.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+    <span class="count"><span>4</span> scenarios selected</span>
+    <button class="btn-combine" onclick="showScreen(2)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6m6-3h6M8.46 8.46l7.08 7.08"/></svg>
+      Combine Selected
+    </button>
+    <button class="btn-clear">Clear selection</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th class="check-col">
+            <div class="checkbox checked">
+              <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+          </th>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Type</th>
+          <th>System</th>
+          <th>Region Tag</th>
+          <th>Date Modified ↓</th>
+          <th>Last Run</th>
+          <th>Run Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Row 1 selected -->
+        <tr class="selected">
+          <td><div class="checkbox checked"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">[COPY] [COPY] SWEDISH HOSPITAL</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#80577</span><span class="badge badge-combined">⊕ Combined</span></div>
+          </td>
+          <td><span class="badge badge-finished"><span class="dot dot-finished"></span>Finished</span></td>
+          <td>Facility</td>
+          <td style="font-size:11px">Endeavor Health</td>
+          <td><span class="tag-chip tag-central">Central</span></td>
+          <td style="font-size:11px">03-30-2026</td>
+          <td style="font-size:11px">03/30 9:54am</td>
+          <td><span class="badge badge-finished">Finished</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+        <!-- Row 2 selected -->
+        <tr class="selected">
+          <td><div class="checkbox checked"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">[COPY] SWEDISH HOSPITAL</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#79578</span></div>
+          </td>
+          <td><span class="badge badge-finished"><span class="dot dot-finished"></span>Finished</span></td>
+          <td>Facility</td>
+          <td style="font-size:11px">Endeavor Health</td>
+          <td><span class="tag-chip tag-central">Central</span></td>
+          <td style="font-size:11px">03-19-2026</td>
+          <td style="font-size:11px">03/19 9:27am</td>
+          <td><span class="badge badge-finished">Finished</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+        <!-- Row 3 selected -->
+        <tr class="selected">
+          <td><div class="checkbox checked"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">fac</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#73008</span></div>
+          </td>
+          <td><span class="badge badge-test">Test</span></td>
+          <td>Facility</td>
+          <td style="font-size:11px">AGA-affiliated</td>
+          <td><span class="tag-chip tag-west">West</span></td>
+          <td style="font-size:11px">02-16-2026</td>
+          <td style="font-size:11px">—</td>
+          <td><span class="badge badge-test">Test</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+        <!-- Row 4 selected -->
+        <tr class="selected">
+          <td><div class="checkbox checked"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">[COPY] MUSC Charleston 1.26.26 Full Fixed</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#73733</span></div>
+          </td>
+          <td><span class="badge badge-finished"><span class="dot dot-finished"></span>Finished</span></td>
+          <td>Facility</td>
+          <td style="font-size:11px">Medical Univ. of South CA</td>
+          <td><span class="tag-chip tag-east">East</span></td>
+          <td style="font-size:11px">01-28-2026</td>
+          <td style="font-size:11px">01/28 10:52am</td>
+          <td><span class="badge badge-finished">Finished</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+        <!-- Unselected rows -->
+        <tr>
+          <td><div class="checkbox"></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">[COPY] Multi-Schedule Scenario for Office Ho...</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#82572</span></div>
+          </td>
+          <td><span class="badge badge-test">Test</span></td>
+          <td>Professional</td>
+          <td style="font-size:11px">Florida - All Other</td>
+          <td>—</td>
+          <td style="font-size:11px">04-16-2026</td>
+          <td style="font-size:11px">—</td>
+          <td><span class="badge badge-test">Test</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+        <tr>
+          <td><div class="checkbox"></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">pro.sync.test.</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#71502</span><span class="badge badge-combined">⊕ Combined</span></div>
+          </td>
+          <td><span class="badge badge-finished"><span class="dot dot-finished"></span>Finished</span></td>
+          <td>Professional</td>
+          <td style="font-size:11px">New York - Metro</td>
+          <td>—</td>
+          <td style="font-size:11px">02-10-2026</td>
+          <td style="font-size:11px">02/10 11:53am</td>
+          <td><span class="badge badge-finished">Finished</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+        <tr>
+          <td><div class="checkbox"></div></td>
+          <td class="name-cell">
+            <span class="name-truncate">[COPY] Elliott TEST</span>
+            <div class="flex gap-6 mt-8"><span class="id-chip">#69908</span></div>
+          </td>
+          <td><span class="badge badge-finished"><span class="dot dot-finished"></span>Finished</span></td>
+          <td>Facility</td>
+          <td style="font-size:11px">Lifebridge Health</td>
+          <td><span class="tag-chip tag-east">East</span></td>
+          <td style="font-size:11px">12-02-2025</td>
+          <td style="font-size:11px">12/02 10:40am</td>
+          <td><span class="badge badge-finished">Finished</span></td>
+          <td><span class="action-dots">···</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="flex-center gap-8 mt-8" style="justify-content:space-between; padding: 8px 0">
+    <div style="font-size:11px;color:var(--ink-3)">Page Size: <strong>15</strong> &nbsp;|&nbsp; 1 to 15 of 47</div>
+    <div style="font-size:11px;color:var(--ink-3)">← 1 2 3 → &nbsp; Page 1 of 4</div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 2 — PRE-FLIGHT CHECK
+═══════════════════════════════════════════════════ -->
+<div class="screen" id="screen2">
+<div class="screen-container" style="max-width:640px; margin:0 auto">
+
+  <div class="breadcrumb">
+    <a onclick="showScreen(1)">← My Scenarios</a>
+    <span>›</span>
+    <span>Combine Scenarios</span>
+  </div>
+
+  <div class="page-header" style="margin-bottom:20px">
+    <div>
+      <div class="page-title">Combine Scenarios</div>
+      <div class="page-subtitle">Review selected scenarios and verify compatibility before running</div>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="report-section-title">Selected Scenarios (4)</div>
+
+    <div class="source-list">
+      <div class="source-item">
+        <div class="source-id">#80577</div>
+        <div class="source-name">[COPY] [COPY] SWEDISH HOSPITAL</div>
+        <span class="badge badge-finished" style="flex-shrink:0">Finished</span>
+        <span class="tag-chip tag-central" style="flex-shrink:0">Central</span>
+        <div class="remove-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="source-item">
+        <div class="source-id">#79578</div>
+        <div class="source-name">[COPY] SWEDISH HOSPITAL</div>
+        <span class="badge badge-finished" style="flex-shrink:0">Finished</span>
+        <span class="tag-chip tag-central" style="flex-shrink:0">Central</span>
+        <div class="remove-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="source-item">
+        <div class="source-id">#73008</div>
+        <div class="source-name">fac</div>
+        <span class="badge badge-test" style="flex-shrink:0">Test</span>
+        <span class="tag-chip tag-west" style="flex-shrink:0">West</span>
+        <div class="remove-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+      <div class="source-item">
+        <div class="source-id">#73733</div>
+        <div class="source-name">[COPY] MUSC Charleston 1.26.26 Full Fixed</div>
+        <span class="badge badge-finished" style="flex-shrink:0">Finished</span>
+        <span class="tag-chip tag-east" style="flex-shrink:0">East</span>
+        <div class="remove-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:12px;color:var(--accent);cursor:pointer;margin-top:4px;display:inline-flex;align-items:center;gap:5px;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Add another scenario
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PRE-FLIGHT CHECK -->
+  <div class="report-section">
+    <div class="report-section-title">Compatibility Check</div>
+
+    <div class="preflight">
+      <div class="preflight-title">Requirements</div>
+      <div class="preflight-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="pf-label">Effective Date</span>
+        <span class="pf-val">01-01-2026 (all match)</span>
+        <span class="pf-ok">✓</span>
+      </div>
+      <div class="preflight-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="pf-label">Proposed Effective Date</span>
+        <span class="pf-val">01-01-2026 (all match)</span>
+        <span class="pf-ok">✓</span>
+      </div>
+      <div class="preflight-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="pf-label">Claim Date Range</span>
+        <span class="pf-val">2023-01 → 2025-12 (all match)</span>
+        <span class="pf-ok">✓</span>
+      </div>
+      <div class="preflight-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="pf-label">Claim Version</span>
+        <span class="pf-val">v3.2 (all match)</span>
+        <span class="pf-ok">✓</span>
+      </div>
+      <div class="preflight-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="pf-label">Lines of Business</span>
+        <span class="pf-val">Facility (all match)</span>
+        <span class="pf-ok">✓</span>
+      </div>
+      <div class="preflight-row">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        <span class="pf-label">Future Value Setting</span>
+        <span class="pf-val">Standard (all match)</span>
+        <span class="pf-ok">✓</span>
+      </div>
+    </div>
+
+    <div class="callout callout-success">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      <span><strong>All 4 scenarios are compatible.</strong> This combination is ready to run.</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- NAME IT -->
+  <div class="report-section">
+    <div class="report-section-title">Name This Combined Scenario</div>
+    <div class="form-group">
+      <label class="form-label">Scenario Name</label>
+      <input class="form-input" type="text" value="Tenant National — Central + West + East Hospitals" />
+      <div class="form-hint">This name appears in your scenario list. The source IDs will always be stored separately.</div>
+    </div>
+    <div class="two-col">
+      <div class="form-group">
+        <label class="form-label">Region Tag <span style="font-weight:400;text-transform:none;font-size:10px">(optional)</span></label>
+        <select class="form-input">
+          <option>National</option>
+          <option>West</option>
+          <option>Central</option>
+          <option>East</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Negotiation Group <span style="font-weight:400;text-transform:none;font-size:10px">(optional)</span></label>
+        <input class="form-input" type="text" value="Tenant 2026" />
+      </div>
+    </div>
+  </div>
+
+  <div class="flex gap-8" style="justify-content:flex-end;margin-top:8px">
+    <button class="btn btn-secondary" onclick="showScreen(1)">← Back</button>
+    <button class="btn btn-primary" onclick="showScreen(3)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6m6-3h6M8.46 8.46l7.08 7.08"/></svg>
+      Run Combined Scenario
+    </button>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 3 — COMBINED REPORT + PROVENANCE
+═══════════════════════════════════════════════════ -->
+<div class="screen" id="screen3">
+<div class="screen-container">
+
+  <div class="breadcrumb">
+    <a onclick="showScreen(1)">My Scenarios</a>
+    <span>›</span>
+    <span style="color:var(--ink)">Tenant National — Central + West + East Hospitals</span>
+  </div>
+
+  <div class="page-header" style="margin-bottom:16px">
+    <div>
+      <div class="flex-center gap-8 mb-8">
+        <div class="page-title">Tenant National — Central + West + East Hospitals</div>
+        <span class="badge badge-combined">⊕ Combined</span>
+        <span class="badge badge-finished"><span class="dot dot-finished"></span>Finished</span>
+      </div>
+      <div class="flex-center gap-8">
+        <span class="id-chip">#84021</span>
+        <span class="text-xs text-muted">Run: 04-21-2026 at 10:14am</span>
+        <span class="tag-chip tag-national">National</span>
+      </div>
+    </div>
+    <div class="flex gap-8">
+      <button class="manage-sources-btn" onclick="showScreen(4)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6m6-3h6M8.46 8.46l7.08 7.08"/></svg>
+        Manage Sources
+      </button>
+      <button class="btn btn-secondary btn-sm">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        Edit Timeline
+      </button>
+      <button class="btn btn-primary btn-sm">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Re-run
+      </button>
+    </div>
+  </div>
+
+  <!-- PROVENANCE CARD — NEW -->
+  <div class="provenance-card">
+    <div class="prov-header">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6m6-3h6M8.46 8.46l7.08 7.08"/></svg>
+      <span class="prov-title">Built from 4 source scenarios</span>
+      <span style="font-size:11px;color:#7c6aad;margin-left:auto">Tenant 2026 · Combined on 04-21-2026</span>
+    </div>
+    <div class="prov-sources">
+      <a class="prov-link" onclick="showScreen(1)">
+        [COPY] [COPY] SWEDISH HOSPITAL
+        <span class="prov-id">#80577</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <a class="prov-link" onclick="showScreen(1)">
+        [COPY] SWEDISH HOSPITAL
+        <span class="prov-id">#79578</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <a class="prov-link" onclick="showScreen(1)">
+        fac
+        <span class="prov-id">#73008</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+      <a class="prov-link" onclick="showScreen(1)">
+        MUSC Charleston 1.26.26
+        <span class="prov-id">#73733</span>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="metric-grid">
+    <div class="metric-card">
+      <div class="metric-label">Facilities</div>
+      <div class="metric-val">247</div>
+      <div class="metric-delta text-xs text-muted">Across 4 scenarios</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Combined Trend</div>
+      <div class="metric-val">3.2%</div>
+      <div class="metric-delta delta-pos text-xs">↑ vs. 2.8% prior</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Transfer Metrics</div>
+      <div class="metric-val">$84M</div>
+      <div class="metric-delta text-xs text-muted">Projected annual</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Claim Volume</div>
+      <div class="metric-val">18,402</div>
+      <div class="metric-delta text-xs text-muted">Claims analyzed</div>
+    </div>
+  </div>
+
+  <!-- TABS -->
+  <div class="tab-bar" style="margin-bottom:14px">
+    <div class="tab active">Modeling Summary</div>
+    <div class="tab">Scenario Detail</div>
+    <div class="tab">Claims</div>
+    <div class="tab">Timeline</div>
+    <div class="tab">Uncertainty Analysis</div>
+  </div>
+
+  <!-- SIMPLIFIED REPORT BODY -->
+  <div class="two-col" style="gap:14px">
+    <div>
+      <div class="report-section-title" style="margin-bottom:10px">Timeline — 247 Facilities</div>
+      <div class="timeline-item">
+        <div class="tl-dot" style="background:#c2410c"></div>
+        <span class="tl-name">SWEDISH HOSPITAL ASC #1</span>
+        <span class="tl-type">ASC</span>
+        <span class="tl-count">68 fac</span>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-dot" style="background:#15803d"></div>
+        <span class="tl-name">SWEDISH HOSPITAL — Hospitals</span>
+        <span class="tl-type">Hospital</span>
+        <span class="tl-count">72 fac</span>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-dot" style="background:#1d4ed8"></div>
+        <span class="tl-name">AGA Endoscopy Centers</span>
+        <span class="tl-type">ASC</span>
+        <span class="tl-count">51 fac</span>
+      </div>
+      <div class="timeline-item">
+        <div class="tl-dot" style="background:#7c3aed"></div>
+        <span class="tl-name">MUSC Charleston — Full Fixed</span>
+        <span class="tl-type">Hospital</span>
+        <span class="tl-count">56 fac</span>
+      </div>
+      <div style="font-size:11px;color:var(--ink-3);margin-top:8px;padding-left:4px">Showing 4 of 247 facilities</div>
+    </div>
+    <div>
+      <div class="report-section-title" style="margin-bottom:10px">Trend by Region</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <table style="width:100%">
+          <thead>
+            <tr style="background:var(--surface-2);border-bottom:1px solid var(--border)">
+              <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em">Region</th>
+              <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em">Trend</th>
+              <th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em">Facilities</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:9px 12px"><span class="tag-chip tag-central">Central</span></td>
+              <td style="padding:9px 12px;font-size:13px;font-weight:700;color:var(--ink)">3.8%</td>
+              <td style="padding:9px 12px;font-size:12px;color:var(--ink-2)">140</td>
+            </tr>
+            <tr style="border-bottom:1px solid var(--border)">
+              <td style="padding:9px 12px"><span class="tag-chip tag-west">West</span></td>
+              <td style="padding:9px 12px;font-size:13px;font-weight:700;color:var(--ink)">2.4%</td>
+              <td style="padding:9px 12px;font-size:12px;color:var(--ink-2)">51</td>
+            </tr>
+            <tr>
+              <td style="padding:9px 12px"><span class="tag-chip tag-east">East</span></td>
+              <td style="padding:9px 12px;font-size:13px;font-weight:700;color:var(--ink)">2.9%</td>
+              <td style="padding:9px 12px;font-size:12px;color:var(--ink-2)">56</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     SCREEN 4 — MANAGE SOURCES (IN-PLACE)
+═══════════════════════════════════════════════════ -->
+<div class="screen" id="screen4">
+<div class="screen-container">
+
+  <div class="breadcrumb">
+    <a onclick="showScreen(1)">My Scenarios</a>
+    <span>›</span>
+    <a onclick="showScreen(3)">Tenant National — Central + West + East Hospitals</a>
+    <span>›</span>
+    <span style="color:var(--ink)">Manage Sources</span>
+  </div>
+
+  <div class="page-header" style="margin-bottom:20px">
+    <div>
+      <div class="page-title">Manage Sources</div>
+      <div class="page-subtitle">Add or remove scenarios from this combined view, then re-run to update the report</div>
+    </div>
+    <div class="flex gap-8">
+      <button class="btn btn-secondary" onclick="showScreen(3)">Cancel</button>
+      <button class="btn btn-primary" onclick="showScreen(3)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        Save &amp; Re-run
+      </button>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start">
+
+    <!-- LEFT: CURRENT SOURCES -->
+    <div>
+      <div class="report-section-title">Current Sources (4)</div>
+      <div class="source-list" style="margin-bottom:8px">
+        <div class="source-item">
+          <div class="source-id">#80577</div>
+          <div>
+            <div class="source-name">[COPY] [COPY] SWEDISH HOSPITAL</div>
+            <div style="font-size:11px;color:var(--ink-3);margin-top:2px">Facility · Endeavor Health · Finished</div>
+          </div>
+          <span class="tag-chip tag-central" style="flex-shrink:0">Central</span>
+          <div class="remove-btn" title="Remove from combination">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </div>
+        </div>
+        <div class="source-item">
+          <div class="source-id">#79578</div>
+          <div>
+            <div class="source-name">[COPY] SWEDISH HOSPITAL</div>
+            <div style="font-size:11px;color:var(--ink-3);margin-top:2px">Facility · Endeavor Health · Finished</div>
+          </div>
+          <span class="tag-chip tag-central" style="flex-shrink:0">Central</span>
+          <div class="remove-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </div>
+        </div>
+        <div class="source-item">
+          <div class="source-id">#73008</div>
+          <div>
+            <div class="source-name">fac</div>
+            <div style="font-size:11px;color:var(--ink-3);margin-top:2px">Facility · AGA-affiliated · Test</div>
+          </div>
+          <span class="tag-chip tag-west" style="flex-shrink:0">West</span>
+          <div class="remove-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </div>
+        </div>
+        <div class="source-item">
+          <div class="source-id">#73733</div>
+          <div>
+            <div class="source-name">[COPY] MUSC Charleston 1.26.26</div>
+            <div style="font-size:11px;color:var(--ink-3);margin-top:2px">Facility · Med Univ South CA · Finished</div>
+          </div>
+          <span class="tag-chip tag-east" style="flex-shrink:0">East</span>
+          <div class="remove-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: ADD SCENARIOS -->
+    <div>
+      <div class="report-section-title">Add Scenarios</div>
+
+      <div class="search-input" style="max-width:100%;margin-bottom:10px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8b90a0" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        <input type="text" placeholder="Search by name, ID, or system…" style="width:100%" />
+      </div>
+
+      <div class="callout callout-warning" style="padding:9px 12px;margin-bottom:10px">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span>Only compatible scenarios are shown. Scenarios must match effective date, claim range, and LOB.</span>
+      </div>
+
+      <!-- Candidate list -->
+      <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">
+        <div style="padding:7px 10px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em">Compatible Scenarios (3 found)</div>
+
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;flex-shrink:0">#84103</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:500;color:var(--ink)">St. Joseph Dignity Health — Chicago</div>
+            <div style="font-size:11px;color:var(--ink-3)">Facility · Dignity Health · Test</div>
+          </div>
+          <span class="tag-chip tag-central">Central</span>
+          <button class="btn btn-secondary btn-sm">+ Add</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .1s" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;flex-shrink:0">#81200</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:500;color:var(--ink)">PHOENIX CHILDRENS MED GRP — West</div>
+            <div style="font-size:11px;color:var(--ink-3)">Facility · Phoenix · Test</div>
+          </div>
+          <span class="tag-chip tag-west">West</span>
+          <button class="btn btn-secondary btn-sm">+ Add</button>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .1s" onmouseover="this.style.background='#f8f9fa'" onmouseout="this.style.background='white'">
+          <div style="font-family:var(--mono);font-size:11px;color:var(--accent);font-weight:700;flex-shrink:0">#79200</div>
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:500;color:var(--ink)">[COPY] HUP Alone — Rad Therapy</div>
+            <div style="font-size:11px;color:var(--ink-3)">Facility · Univ. of Pennsylvania · Test</div>
+          </div>
+          <span class="tag-chip tag-east">East</span>
+          <button class="btn btn-secondary btn-sm">+ Add</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;padding:10px 12px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius)">
+        <div style="font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Add by Scenario ID</div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" type="text" placeholder="e.g. 84103" style="flex:1;margin:0" />
+          <button class="btn btn-secondary btn-sm">Validate &amp; Add</button>
+        </div>
+        <div style="font-size:11px;color:var(--ink-3);margin-top:5px">The system will check compatibility before adding.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="callout callout-enhanced" style="margin-top:20px">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span>When you save, the source list updates and the combined scenario re-runs automatically. The original source scenarios are unchanged.</span>
+  </div>
+
+</div>
+</div>
+
+<script>
+  const annotations = [
+    {
+      step: 1,
+      pill: "Step 1 of 4",
+      title: "Search & Select Scenarios",
+      desc: "Filter the list, then check boxes to select scenarios to combine. Bulk action bar appears. No Excel needed.",
+      tags: [{label:"NEW", cls:"new"}, {label:"Multi-select + Combine Selected", cls:""}]
+    },
+    {
+      step: 2,
+      pill: "Step 2 of 4",
+      title: "Pre-flight Compatibility Check",
+      desc: "Before running, the system validates that all selected scenarios share required properties. Errors surface here — not after wasted compute.",
+      tags: [{label:"NEW", cls:"new"}, {label:"Compatibility validator", cls:""}]
+    },
+    {
+      step: 3,
+      pill: "Step 3 of 4",
+      title: "Combined Report + Provenance",
+      desc: "Full combined report — same fidelity as building from scratch. Provenance card shows exactly which source scenarios built this, with clickable links.",
+      tags: [{label:"ENHANCED", cls:"enhanced"}, {label:"Provenance card with source links", cls:""}]
+    },
+    {
+      step: 4,
+      pill: "Step 4 of 4",
+      title: "Manage Sources In-Place",
+      desc: "Add or remove source scenarios directly from the combined scenario page. No need to leave and rebuild. Compatible candidates are pre-filtered.",
+      tags: [{label:"NEW", cls:"new"}, {label:"In-place source management", cls:""}]
+    }
+  ];
+
+  function showScreen(n) {
+    // Screens
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen' + n).classList.add('active');
+
+    // Steps
+    for (let i = 1; i <= 4; i++) {
+      const step = document.getElementById('step' + i);
+      const sn = document.getElementById('sn' + i);
+      step.classList.remove('active', 'done');
+      if (i < n) {
+        step.classList.add('done');
+        sn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>`;
+      } else if (i === n) {
+        step.classList.add('active');
+        sn.textContent = i;
+      } else {
+        sn.textContent = i;
+      }
+    }
+
+    // Annotation
+    const a = annotations[n - 1];
+    const bar = document.getElementById('annotationBar');
+    let tagsHtml = a.tags.map(t =>
+      t.cls ? `<span class="pill ${t.cls}" style="margin-left:${t.cls?'8':'0'}px">${t.label}</span><span style="font-size:11px;color:#64748b">${''}</span>` :
+              `<span style="font-size:11px;color:#64748b">${t.label}</span>`
+    ).join('');
+
+    bar.innerHTML = `
+      <span class="pill">${a.pill}</span>
+      <span><strong>${a.title}</strong> — ${a.desc}</span>
+      ${a.tags.map(t => t.cls ? `<span class="pill ${t.cls}" style="margin-left:auto">${t.label}</span>` : `<span style="font-size:11px;color:#64748b;margin-left:4px">${t.label}</span>`).join('')}
+    `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Init
+  showScreen(1);
+</script>
+</body>
+</html>
