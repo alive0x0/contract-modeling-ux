@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario Search — v3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CIGNA CANVAS TOKENS — Light Mode
+    ============================================================ */
+    :root {
+      --bg-screen:     #F8F9FF;
+      --bg-white:      #FFFFFF;
+      --bg-low:        #F1F3FC;
+      --bg-lowest:     #DBDDE9;
+      --bg-system:     #353331;
+      --bg-info:       #E6F0FF;
+      --bg-success:    #EDF3E8;
+      --bg-warning:    #F8E9B3;
+      --bg-critical:   #FDEDE8;
+
+      --ink:           #353331;
+      --ink-2:         #6B6966;
+      --ink-3:         #A3A19F;
+      --ink-rev:       #FFFFFF;
+
+      --border:        #E0DDDA;
+      --border-strong: #6B6966;
+      --border-subtle: #F2F0EE;
+      --table-div:     #C1C4D4;
+      --table-border:  #DBDDE9;
+
+      --th-bg:         #F1F3FC;
+      --th-active:     #EEEBE8;
+      --row-hover:     #FBFAF9;
+      --row-sel:       #D7E9FF;
+
+      --blue:          #0033FF;
+      --blue-dk:       #110081;
+      --blue-lt:       #E6F0FF;
+      --blue-100:      #D7E9FF;
+      --blue-200:      #B4D1FF;
+
+      --n60:  #FBFAF9; --n90:  #F2F0EE; --n100: #EEEBE8;
+      --n200: #E0DDDA; --n300: #CCC9C6; --n400: #B7B5B3;
+      --n500: #A3A19F; --n600: #8B8986; --n700: #6B6966;
+      --n800: #54524F; --n900: #353331;
+
+      --purple-50:  #F5F0FF;
+      --purple-200: #CFBAFF;
+      --purple-600: #8256E7;
+      --purple-900: #3F2C6B;
+
+      --green:     #00874D; --green-bg: #EDF3E8; --green-dk: #004226; --green-mid: #B0F9DB;
+      --amber:     #EAB80B; --amber-bg: #F8E9B3; --amber-dk: #816506;
+      --red:       #A90000; --red-bg:   #FDEDE8; --red-mid:  #F5867F;
+      --teal-bg:   #DDFDFB; --teal:     #002F32; --teal-brd: #13C8A4;
+
+      --sh-sm: 0 1px 3px rgba(52,42,118,.07), 0 1px 2px rgba(52,42,118,.04);
+      --sh:    0 4px 12px rgba(52,42,118,.09), 0 2px 4px rgba(52,42,118,.04);
+      --sh-lg: 0 10px 28px rgba(52,42,118,.13), 0 4px 8px rgba(52,42,118,.05);
+
+      --font: 'Inter', system-ui, -apple-system, sans-serif;
+      --r4: 4px; --r6: 6px; --r8: 8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg-screen); color: var(--ink); font-size: 13px; line-height: 1.5; min-height: 100vh; }
+
+    /* ── NAV ── */
+    .gnav { background: var(--bg-system); height: 48px; display: flex; align-items: center; padding: 0 24px; gap: 32px; }
+    .gnav .logo { font-size: 15px; font-weight: 700; color: #fff; letter-spacing: -.2px; }
+    .gnav nav { display: flex; gap: 24px; }
+    .gnav nav a { font-size: 13px; color: rgba(255,255,255,.6); text-decoration: none; }
+    .gnav nav a.on { color: #fff; font-weight: 600; border-bottom: 2px solid var(--blue); padding-bottom: 2px; }
+
+    .bc { background: var(--bg-white); border-bottom: 1px solid var(--border); padding: 8px 24px; font-size: 12px; color: var(--ink-2); display: flex; gap: 5px; align-items: center; }
+    .bc .sep { color: var(--n400); }
+    .bc .cur { color: var(--ink); font-weight: 500; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 1560px; margin: 0 auto; padding: 20px 24px 48px; }
+
+    /* ── PAGE HEADER ── */
+    .ph { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px; }
+    .ph h1 { font-size: 20px; font-weight: 600; letter-spacing: -.3px; margin-bottom: 1px; }
+    .ph p { font-size: 12px; color: var(--ink-2); }
+    .ph-acts { display: flex; gap: 8px; align-items: center; }
+
+    /* ── BUTTONS ── */
+    .btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: var(--r4); font-size: 12px; font-weight: 500; cursor: pointer; border: 1px solid transparent; transition: background .1s, border-color .1s; white-space: nowrap; font-family: var(--font); }
+    .btn-primary  { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-secondary{ background: var(--bg-white); color: var(--ink); border-color: var(--border-strong); }
+    .btn-secondary:hover { background: var(--n90); }
+    .btn-ghost    { background: transparent; color: var(--ink-2); border-color: transparent; }
+    .btn-ghost:hover { background: var(--n90); }
+
+    /* ── MY / ALL TABS ── */
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 14px; }
+    .tab  { padding: 8px 18px 9px; font-size: 13px; font-weight: 500; color: var(--ink-2); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: color .1s; display: flex; align-items: center; gap: 6px; }
+    .tab:hover { color: var(--ink); }
+    .tab.on { color: var(--blue); border-bottom-color: var(--blue); font-weight: 600; }
+    .tab .cp { min-width: 20px; height: 18px; padding: 0 6px; border-radius: 100px; font-size: 10px; font-weight: 700; background: var(--blue-lt); color: var(--blue-dk); display: inline-flex; align-items: center; justify-content: center; }
+    .tab.on .cp { background: var(--blue); color: #fff; }
+
+    /* ── SUMMARY PULSE ── */
+    .pulse {
+      display: flex; align-items: center; gap: 0;
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--r8);
+      margin-bottom: 12px;
+      overflow: hidden;
+      box-shadow: var(--sh-sm);
+    }
+    .pulse-item {
+      flex: 1; padding: 10px 16px;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .pulse-item:last-child { border-right: none; }
+    .pulse-val { font-size: 20px; font-weight: 600; letter-spacing: -.4px; color: var(--ink); line-height: 1; }
+    .pulse-val.ok   { color: var(--green); }
+    .pulse-val.run  { color: #3879DB; }
+    .pulse-val.fail { color: var(--red); }
+    .pulse-val.warn { color: var(--amber-dk); }
+    .pulse-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+    .pulse-sub { font-size: 10px; color: var(--ink-3); }
+
+    /* ── FILTER BAR ── */
+    .fbar {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-radius: var(--r8);
+      padding: 11px 14px;
+      margin-bottom: 12px;
+      box-shadow: var(--sh-sm);
+    }
+    .fbar-row1 { display: flex; gap: 8px; align-items: center; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap .si { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--n500); font-size: 13px; pointer-events: none; }
+    .search-inp { width: 100%; padding: 7px 10px 7px 32px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 12px; color: var(--ink); background: var(--bg-white); outline: none; font-family: var(--font); transition: border-color .1s; }
+    .search-inp:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .search-inp::placeholder { color: var(--n500); }
+
+    /* Advanced Filters trigger — shows count badge when active */
+    .adv-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 12px; border-radius: var(--r4); font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px solid var(--border-strong);
+      background: var(--bg-white); color: var(--ink); font-family: var(--font);
+      white-space: nowrap; transition: background .1s;
+    }
+    .adv-btn:hover { background: var(--n90); }
+    .adv-btn.has-filters { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+    .adv-btn .filter-count {
+      background: var(--blue); color: #fff;
+      border-radius: 100px; font-size: 9px; font-weight: 700;
+      padding: 1px 5px; min-width: 16px; text-align: center;
+    }
+
+    /* Save View button */
+    .save-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 6px 11px; border-radius: var(--r4); font-size: 12px; font-weight: 500;
+      cursor: pointer; border: 1px dashed var(--n400);
+      background: transparent; color: var(--ink-2); font-family: var(--font);
+      white-space: nowrap; transition: all .1s;
+    }
+    .save-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); border-style: solid; }
+
+    /* Quick filter row */
+    .fbar-row2 { display: flex; gap: 6px; align-items: center; margin-top: 9px; flex-wrap: wrap; }
+
+    .fsel {
+      padding: 4px 22px 4px 8px;
+      border: 1px solid var(--border);
+      border-radius: var(--r4);
+      font-size: 11px; color: var(--ink);
+      background: var(--bg-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%238B8986' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 7px center;
+      appearance: none; cursor: pointer; outline: none; font-family: var(--font);
+      transition: border-color .1s;
+    }
+    .fsel:focus { border-color: var(--blue); }
+    /* Active state — shows the filter is set */
+    .fsel.active { border-color: var(--blue); background-color: var(--blue-lt); color: var(--blue-dk); font-weight: 500; }
+
+    .fsep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+
+    /* Combined toggle — single pill, not a group */
+    .combo-toggle {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border-radius: 100px;
+      font-size: 11px; font-weight: 500; cursor: pointer;
+      border: 1px solid var(--purple-200);
+      background: var(--purple-50); color: var(--purple-600);
+      transition: all .1s;
+    }
+    .combo-toggle:hover { background: var(--purple-200); }
+    .combo-toggle.on { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
+
+    /* ── ADVANCED FILTERS PANEL ── */
+    .adv-panel {
+      background: var(--bg-white);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--blue);
+      border-radius: 0 0 var(--r8) var(--r8);
+      padding: 16px 16px 14px;
+      margin-top: -13px; /* tuck under fbar's border-radius */
+      margin-bottom: 12px;
+      box-shadow: var(--sh);
+    }
+    .adv-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .adv-hdr h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+    .adv-close { font-size: 11px; color: var(--ink-3); cursor: pointer; padding: 2px 6px; border-radius: var(--r4); }
+    .adv-close:hover { background: var(--n90); color: var(--ink); }
+
+    .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 16px; }
+    .adv-f label { display: block; font-size: 10px; font-weight: 600; color: var(--ink-2); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; }
+
+    /* Contract Office — multi-select tag input */
+    .multi-select-field {
+      border: 1px solid var(--border);
+      border-radius: var(--r4);
+      padding: 4px 6px;
+      min-height: 30px;
+      display: flex; flex-wrap: wrap; gap: 3px; align-items: center;
+      cursor: text;
+      background: var(--bg-white);
+      transition: border-color .1s;
+    }
+    .multi-select-field:focus-within { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .ms-tag {
+      display: inline-flex; align-items: center; gap: 3px;
+      padding: 1px 6px 1px 7px; border-radius: 100px;
+      font-size: 10px; font-weight: 500;
+      background: var(--blue-lt); color: var(--blue-dk);
+      border: 1px solid var(--blue-200);
+    }
+    .ms-tag .rm { font-size: 9px; opacity: .5; cursor: pointer; line-height: 1; }
+    .ms-tag .rm:hover { opacity: 1; }
+    .ms-input { border: none; outline: none; font-size: 11px; font-family: var(--font); color: var(--ink); background: transparent; min-width: 80px; padding: 1px 2px; }
+    .ms-input::placeholder { color: var(--n500); }
+    .ms-dropdown {
+      position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+      background: var(--bg-white); border: 1px solid var(--border);
+      border-radius: var(--r6); box-shadow: var(--sh);
+      z-index: 100; overflow: hidden;
+    }
+    .ms-dropdown-item { padding: 7px 10px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+    .ms-dropdown-item:hover { background: var(--blue-lt); }
+    .ms-dropdown-item.sel { color: var(--blue); font-weight: 500; }
+    .ms-wrap { position: relative; }
+
+    .adv-f select,
+    .adv-f input[type="text"],
+    .adv-f input[type="date"] {
+      width: 100%; padding: 5px 8px;
+      border: 1px solid var(--border); border-radius: var(--r4);
+      font-size: 11px; color: var(--ink); background: var(--bg-white);
+      outline: none; font-family: var(--font); transition: border-color .1s;
+    }
+    .adv-f select:focus, .adv-f input:focus { border-color: var(--blue); }
+    .adv-f select { padding-right: 24px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%238B8986' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; }
+    .dr { display: flex; gap: 4px; align-items: center; }
+    .dr span { font-size: 10px; color: var(--ink-2); flex-shrink: 0; }
+
+    .adv-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; border-top: 1px solid var(--border-subtle); padding-top: 12px; }
+    .adv-foot-hint { font-size: 10px; color: var(--ink-3); font-style: italic; }
+    .adv-foot-acts { display: flex; gap: 8px; }
+
+    /* ── RESULTS TOOLBAR ── */
+    .rtbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .rc { font-size: 12px; color: var(--ink-2); }
+    .rc strong { color: var(--ink); }
+    .col-bar { display: flex; align-items: center; gap: 5px; }
+    .ctog { font-size: 10px; padding: 2px 7px; border: 1px solid var(--border); border-radius: var(--r4); background: var(--bg-white); cursor: pointer; color: var(--ink-2); font-family: var(--font); transition: all .1s; }
+    .ctog.on { background: var(--blue-lt); border-color: var(--blue-200); color: var(--blue-dk); font-weight: 600; }
+
+    /* ── TABLE ── */
+    .tw { background: var(--bg-white); border: 1px solid var(--table-border); border-radius: var(--r8); overflow: hidden; box-shadow: var(--sh-sm); }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+
+    /* Column widths — tight defaults */
+    .w-chk { width: 36px; }
+    .w-status { width: 108px; }
+    .w-name { width: auto; min-width: 200px; }
+    .w-id { width: 88px; }
+    .w-ct { width: 110px; }
+    .w-sys { width: 140px; }
+    .w-off { width: 110px; }
+    .w-reg { width: 100px; }
+    .w-rsh { width: 80px; }
+    .w-dc { width: 100px; }
+    .w-lr { width: 120px; }
+    .w-tags { width: 140px; }
+    .w-act { width: 76px; }
+
+    thead th {
+      background: var(--th-bg); color: var(--ink); font-weight: 600;
+      font-size: 10px; text-transform: uppercase; letter-spacing: .04em;
+      padding: 9px 10px; border-bottom: 1px solid var(--table-div);
+      text-align: left; white-space: nowrap; cursor: pointer; user-select: none;
+      overflow: hidden; text-overflow: ellipsis;
+    }
+    thead th:hover { background: var(--th-active); }
+    thead th .si { opacity: .3; margin-left: 3px; font-size: 8px; }
+    thead th.srt .si { opacity: 1; color: var(--blue); }
+    .thchk { cursor: default !important; padding: 9px 0 9px 12px !important; }
+    .thchk:hover { background: var(--th-bg) !important; }
+
+    tbody tr { border-bottom: 1px solid var(--border-subtle); transition: background .06s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--row-hover); }
+    tbody tr.sel { background: var(--row-sel); }
+    tbody td { padding: 9px 10px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Name cell */
+    .nc { display: flex; flex-direction: column; gap: 3px; }
+    .nc-top { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .sname { font-weight: 500; color: var(--blue); cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .sname:hover { text-decoration: underline; }
+
+    /* Two-status cell */
+    .status-cell { display: flex; flex-direction: column; gap: 3px; }
+
+    /* ── BADGES ── */
+    .b { display: inline-flex; align-items: center; gap: 2px; padding: 2px 6px; border-radius: 100px; font-size: 10px; font-weight: 600; letter-spacing: .02em; white-space: nowrap; border: 1px solid transparent; }
+    /* Run status */
+    .b-ok   { background: var(--green-mid); color: var(--green-dk); border-color: rgba(0,135,77,.3); }
+    .b-run  { background: var(--blue-200); color: var(--blue-dk); border-color: rgba(56,121,219,.3); }
+    .b-fail { background: var(--red-bg); color: var(--red); border-color: rgba(169,0,0,.25); }
+    /* Scenario status */
+    .b-live { background: var(--green-bg); color: var(--green); border-color: rgba(0,135,77,.25); }
+    .b-test { background: var(--amber-bg); color: var(--amber-dk); border-color: rgba(234,184,11,.4); }
+    .b-draft{ background: var(--n100); color: var(--ink-2); border-color: var(--n200); }
+    /* Combined */
+    .b-comb { background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-200); }
+    /* RSH */
+    .b-yes  { background: var(--green-bg); color: var(--green); border-color: rgba(0,135,77,.3); }
+    .b-no   { background: var(--n90); color: var(--ink-2); border-color: var(--n200); }
+
+    /* Claim type */
+    .ct { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: var(--r4); font-size: 10px; font-weight: 600; white-space: nowrap; border: 1px solid transparent; }
+    .ct-fac  { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-brd); }
+    .ct-prof { background: var(--purple-50); color: var(--purple-900); border-color: var(--purple-200); }
+    .ct-asc  { background: var(--amber-bg); color: var(--amber-dk); border-color: rgba(234,184,11,.5); }
+
+    /* Custom tags */
+    .ctag { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 100px; font-size: 10px; font-weight: 500; background: var(--bg-low); color: var(--ink-2); border: 1px solid var(--border); white-space: nowrap; }
+    .ctag.blue { background: var(--blue-lt); color: var(--blue-dk); border-color: var(--blue-200); }
+    .ctag.green{ background: var(--green-bg); color: var(--green-dk); border-color: rgba(0,135,77,.3); }
+    .ctag.amber{ background: var(--amber-bg); color: var(--amber-dk); border-color: rgba(234,184,11,.4); }
+
+    .tr { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+    .mono { font-family: 'SF Mono','Fira Code','Consolas',monospace; font-size: 10px; color: var(--ink-2); }
+    .dc { font-size: 11px; color: var(--ink-2); white-space: nowrap; }
+    .dc .ts { font-size: 10px; color: var(--ink-3); display: block; margin-top: 1px; }
+    .sys-cell { font-size: 11px; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .off-cell { font-size: 11px; color: var(--ink-2); }
+    .reg-cell { font-size: 11px; color: var(--ink-2); }
+
+    /* ── BULK BAR ── */
+    .bulk { background: var(--bg-system); color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .bulk .sc { font-size: 12px; font-weight: 600; }
+    .bdiv { width: 1px; height: 18px; background: rgba(255,255,255,.18); }
+    .bcomb { background: var(--blue); color: #fff; border: none; padding: 5px 13px; border-radius: var(--r4); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 5px; }
+    .bcomb:hover { background: #0026d1; }
+    .bgh { font-size: 11px; color: rgba(255,255,255,.7); cursor: pointer; padding: 4px 8px; border-radius: var(--r4); display: flex; align-items: center; gap: 4px; }
+    .bgh:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .bdis { margin-left: auto; font-size: 11px; opacity: .5; cursor: pointer; }
+    .bdis:hover { opacity: 1; }
+
+    /* ── PAGINATION ── */
+    .pag { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-top: 1px solid var(--border-subtle); font-size: 11px; color: var(--ink-2); }
+    .pbtns { display: flex; gap: 3px; }
+    .pb { width: 26px; height: 26px; border: 1px solid var(--border); border-radius: var(--r4); background: var(--bg-white); display: flex; align-items: center; justify-content: center; font-size: 11px; cursor: pointer; color: var(--ink); }
+    .pb:hover { background: var(--n90); }
+    .pb.a { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 700; }
+
+    /* ── TOOLTIP ── */
+    .tw2 { position: relative; display: inline-flex; }
+    .tw2 .tip { position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: var(--bg-system); color: #fff; font-size: 10px; padding: 4px 8px; border-radius: var(--r4); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .12s; z-index: 20; }
+    .tw2:hover .tip { opacity: 1; }
+
+    input[type="checkbox"] { width: 13px; height: 13px; accent-color: var(--blue); cursor: pointer; }
+
+    /* ── EMPTY STATE (shown when 0 results) ── */
+    .empty { padding: 48px 24px; text-align: center; }
+    .empty h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+    .empty p { font-size: 12px; color: var(--ink-2); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="gnav">
+  <div class="logo">Contract Modeling</div>
+  <nav>
+    <a href="#">Dashboard</a>
+    <a href="#" class="on">Scenarios</a>
+    <a href="#">Reports</a>
+    <a href="#">Admin</a>
+  </nav>
+</div>
+<div class="bc">
+  <span>Scenarios</span><span class="sep"> › </span><span class="cur">Search</span>
+</div>
+
+<div class="wrap">
+
+  <!-- PAGE HEADER -->
+  <div class="ph">
+    <div>
+      <h1>Scenario Search</h1>
+      <p>Find, run, and combine scenarios across systems and contract offices</p>
+    </div>
+    <div class="ph-acts">
+      <button class="btn btn-secondary">⚙ Manage Tags</button>
+      <button class="btn btn-secondary">↗ Export</button>
+      <button class="btn btn-primary">＋ New Scenario</button>
+    </div>
+  </div>
+
+  <!-- MY / ALL TABS -->
+  <div class="tabs">
+    <div class="tab on">My Scenarios <span class="cp">24</span></div>
+    <div class="tab">All Scenarios <span class="cp">312</span></div>
+  </div>
+
+  <!-- SUMMARY PULSE BAR -->
+  <div class="pulse">
+    <div class="pulse-item">
+      <div class="pulse-val ok">18</div>
+      <div class="pulse-lbl">Completed</div>
+      <div class="pulse-sub">last 30 days</div>
+    </div>
+    <div class="pulse-item">
+      <div class="pulse-val run">3</div>
+      <div class="pulse-lbl">Running</div>
+      <div class="pulse-sub">right now</div>
+    </div>
+    <div class="pulse-item">
+      <div class="pulse-val fail">1</div>
+      <div class="pulse-lbl">Failed</div>
+      <div class="pulse-sub">needs attention</div>
+    </div>
+    <div class="pulse-item">
+      <div class="pulse-val warn">2</div>
+      <div class="pulse-lbl">Not in RSH</div>
+      <div class="pulse-sub">pending push</div>
+    </div>
+    <div class="pulse-item">
+      <div class="pulse-val" style="color:var(--purple-600)">6</div>
+      <div class="pulse-lbl">Combined</div>
+      <div class="pulse-sub">of 24 scenarios</div>
+    </div>
+    <div class="pulse-item">
+      <div class="pulse-val">4</div>
+      <div class="pulse-lbl">Regions</div>
+      <div class="pulse-sub">SC · PNW · MA · GP</div>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="fbar">
+    <!-- Row 1: Search + Advanced Filters + Save View -->
+    <div class="fbar-row1">
+      <div class="search-wrap">
+        <span class="si">🔍</span>
+        <input type="text" class="search-inp" placeholder="Search by name, ID, system, region, office, or tag…">
+      </div>
+      <!-- Advanced Filters — shows badge count when filters active -->
+      <button class="adv-btn has-filters" id="adv-trigger" onclick="toggleAdv()">
+        ⧉ Filters
+        <span class="filter-count">3</span>
+      </button>
+      <button class="save-btn">⊕ Save View</button>
+    </div>
+
+    <!-- Row 2: Lean quick filters — Claim Type, Run Status, Scenario Status, RSH, Combined toggle -->
+    <div class="fbar-row2">
+
+      <!-- Claim Type -->
+      <select class="fsel active" title="Claim Type">
+        <option>Claim Type</option>
+        <option selected>ASC</option>
+        <option>Facility</option>
+        <option>Professional</option>
+        <option>Mixed</option>
+      </select>
+
+      <!-- Run Status — execution result -->
+      <select class="fsel" title="Run Status">
+        <option>Run Status</option>
+        <option>Completed</option>
+        <option>Running</option>
+        <option>Failed</option>
+      </select>
+
+      <!-- Scenario Status — separate axis: lifecycle state -->
+      <select class="fsel" title="Scenario Status">
+        <option>Scenario Status</option>
+        <option>Live</option>
+        <option>Test</option>
+        <option>Draft</option>
+      </select>
+
+      <!-- RSH Pushed -->
+      <select class="fsel" title="Pushed to RSH">
+        <option>RSH Pushed</option>
+        <option>Yes</option>
+        <option>No</option>
+      </select>
+
+      <div class="fsep"></div>
+
+      <!-- Combined toggle — single deliberate action, not a group -->
+      <span class="combo-toggle on">⛓ Combined only</span>
+
+    </div>
+  </div>
+
+  <!-- ADVANCED FILTERS PANEL — tucked under filter bar -->
+  <div class="adv-panel" id="adv-panel">
+    <div class="adv-hdr">
+      <h4>Advanced Filters</h4>
+      <span class="adv-close" onclick="toggleAdv()">✕ Close</span>
+    </div>
+    <div class="adv-grid">
+
+      <!-- Region -->
+      <div class="adv-f">
+        <label>Region</label>
+        <select>
+          <option>All Regions</option>
+          <option selected>South Central</option>
+          <option>Pacific Northwest</option>
+          <option>Mid-Atlantic</option>
+          <option>Great Plains</option>
+          <option>Northeast</option>
+        </select>
+      </div>
+
+      <!-- Contract Office — multi-select tag input -->
+      <div class="adv-f">
+        <label>Contract Office</label>
+        <div class="ms-wrap">
+          <div class="multi-select-field">
+            <span class="ms-tag">TX — Austin <span class="rm">✕</span></span>
+            <span class="ms-tag">TX — Dallas <span class="rm">✕</span></span>
+            <input type="text" class="ms-input" placeholder="+ Add office…">
+          </div>
+          <!-- Dropdown suggestion list (static in wireflow) -->
+          <div class="ms-dropdown" style="display:none;">
+            <div class="ms-dropdown-item sel">✓ TX — Austin</div>
+            <div class="ms-dropdown-item sel">✓ TX — Dallas</div>
+            <div class="ms-dropdown-item">TX — Houston</div>
+            <div class="ms-dropdown-item">WA — Seattle</div>
+            <div class="ms-dropdown-item">NY — Albany</div>
+            <div class="ms-dropdown-item">GA — Atlanta</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- System Name -->
+      <div class="adv-f">
+        <label>System Name</label>
+        <select>
+          <option>All Systems</option>
+          <option>Medicare Advantage</option>
+          <option>Commercial PPO</option>
+          <option>Medicaid</option>
+          <option>ASC Network</option>
+          <option>Evernorth PBM</option>
+        </select>
+      </div>
+
+      <!-- CRP Type -->
+      <div class="adv-f">
+        <label>CRP Type</label>
+        <select>
+          <option>All CRP Types</option>
+          <option>A — Amendment</option>
+          <option>B — Base</option>
+          <option>D — Draft</option>
+          <option>O — Other</option>
+        </select>
+      </div>
+
+      <!-- LOB -->
+      <div class="adv-f">
+        <label>Line of Business</label>
+        <select>
+          <option>All LOBs</option>
+          <option>OAP</option>
+          <option>New Business</option>
+          <option>Renewal</option>
+        </select>
+      </div>
+
+      <!-- Created By -->
+      <div class="adv-f">
+        <label>Created By</label>
+        <input type="text" placeholder="Name or user ID">
+      </div>
+
+      <!-- Date Created range -->
+      <div class="adv-f">
+        <label>Date Created</label>
+        <div class="dr">
+          <input type="date" style="flex:1">
+          <span>–</span>
+          <input type="date" style="flex:1">
+        </div>
+      </div>
+
+      <!-- Last Run range -->
+      <div class="adv-f">
+        <label>Last Run</label>
+        <div class="dr">
+          <input type="date" style="flex:1">
+          <span>–</span>
+          <input type="date" style="flex:1">
+        </div>
+      </div>
+
+      <!-- Tag -->
+      <div class="adv-f">
+        <label>Tag</label>
+        <input type="text" placeholder="e.g. Q1-Final, TX-Neg-4">
+      </div>
+
+    </div>
+
+    <div class="adv-foot">
+      <span class="adv-foot-hint">Region, Office (multi), System, CRP, LOB, Created By, date ranges, and tags</span>
+      <div class="adv-foot-acts">
+        <button class="btn btn-ghost">Reset all</button>
+        <button class="btn btn-primary">Apply</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS TOOLBAR -->
+  <div class="rtbar">
+    <span class="rc">Showing <strong>4</strong> of <strong>24</strong> my scenarios &nbsp;·&nbsp; 312 org-wide</span>
+    <div class="col-bar">
+      <span style="font-size:10px;color:var(--ink-2);margin-right:2px;">Columns:</span>
+      <span class="ctog on">Run Status</span>
+      <span class="ctog on">Scenario Status</span>
+      <span class="ctog on">Claim Type</span>
+      <span class="ctog on">System</span>
+      <span class="ctog on">Office · Region</span>
+      <span class="ctog on">RSH</span>
+      <span class="ctog on">Last Run</span>
+      <span class="ctog on">Tags</span>
+      <span class="ctog">Date Created</span>
+      <span class="ctog">LOB</span>
+      <span class="ctog">CRP</span>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="tw">
+    <table>
+      <colgroup>
+        <col class="w-chk"><col class="w-status"><col class="w-name">
+        <col class="w-ct"><col class="w-sys"><col class="w-off">
+        <col class="w-rsh"><col class="w-lr"><col class="w-tags"><col class="w-act">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="thchk w-chk"><input type="checkbox"></th>
+          <th class="w-status">
+            <span>Run Status <span class="si srt">↑</span></span>
+            <div style="font-size:8px;font-weight:400;color:var(--n600);letter-spacing:0;text-transform:none;margin-top:1px;">Scenario Status</div>
+          </th>
+          <th class="w-name">Scenario Name <span class="si">↕</span></th>
+          <th class="w-ct">Claim Type <span class="si">↕</span></th>
+          <th class="w-sys">System <span class="si">↕</span></th>
+          <th class="w-off">Office · Region <span class="si">↕</span></th>
+          <th class="w-rsh">RSH <span class="si">↕</span></th>
+          <th class="w-lr">Last Run <span class="si srt">↓</span></th>
+          <th class="w-tags">Tags</th>
+          <th class="w-act">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <!-- ROW 1: Combined ASC+Fac · Completed · Live · RSH Yes -->
+        <tr class="sel">
+          <td class="w-chk" style="padding-left:12px;"><input type="checkbox" checked></td>
+          <td>
+            <div class="status-cell">
+              <span class="b b-ok">● Completed</span>
+              <span class="b b-live">Live</span>
+            </div>
+          </td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">TX-Austin 2026 ASC+Fac Combined</span>
+                <span class="b b-comb">⛓ Combined</span>
+              </div>
+              <span class="mono">SCN-40291</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
+          <td class="sys-cell">ASC Network</td>
+          <td>
+            <div class="off-cell">TX — Austin</div>
+            <div class="reg-cell" style="font-size:10px;margin-top:1px;">South Central</div>
+          </td>
+          <td><span class="b b-yes">Yes</span></td>
+          <td class="dc">May 5, 2026 <span class="ts">10:32 AM</span></td>
+          <td><div class="tr"><span class="ctag blue">TX-Neg-4</span><span class="ctag green">Q1 Final</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+        <!-- ROW 2: ASC Base · Completed · Test · RSH Yes -->
+        <tr class="sel">
+          <td class="w-chk" style="padding-left:12px;"><input type="checkbox" checked></td>
+          <td>
+            <div class="status-cell">
+              <span class="b b-ok">● Completed</span>
+              <span class="b b-test">Test</span>
+            </div>
+          </td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">TX-Austin 2026 ASC Base</span>
+              </div>
+              <span class="mono">SCN-40187</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-asc">ASC</span></div></td>
+          <td class="sys-cell">ASC Network</td>
+          <td>
+            <div class="off-cell">TX — Austin</div>
+            <div class="reg-cell" style="font-size:10px;margin-top:1px;">South Central</div>
+          </td>
+          <td><span class="b b-yes">Yes</span></td>
+          <td class="dc">May 12, 2026 <span class="ts">2:14 PM</span></td>
+          <td><div class="tr"><span class="ctag green">Q1 Final</span><span class="ctag amber">Pending Review</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Run</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+        <!-- ROW 3: Prof+Fac Combined · Running · Live · RSH No -->
+        <tr>
+          <td class="w-chk" style="padding-left:12px;"><input type="checkbox"></td>
+          <td>
+            <div class="status-cell">
+              <span class="b b-run">◌ Running</span>
+              <span class="b b-live">Live</span>
+            </div>
+          </td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">WA-Seattle Prof+Fac Combined</span>
+                <span class="b b-comb">⛓ Combined</span>
+              </div>
+              <span class="mono">SCN-38902</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-prof">Professional</span><span class="ct ct-fac">Facility</span></div></td>
+          <td class="sys-cell">Commercial PPO</td>
+          <td>
+            <div class="off-cell">WA — Seattle</div>
+            <div class="reg-cell" style="font-size:10px;margin-top:1px;">Pacific NW</div>
+          </td>
+          <td><span class="b b-no">No</span></td>
+          <td class="dc">Running… <span class="ts">Est. 8 min</span></td>
+          <td><div class="tr"><span class="ctag blue">WA-Neg-2</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⏹ Stop</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+        <!-- ROW 4: Facility · Failed · Draft · RSH No -->
+        <tr>
+          <td class="w-chk" style="padding-left:12px;"><input type="checkbox"></td>
+          <td>
+            <div class="status-cell">
+              <span class="b b-fail">✕ Failed</span>
+              <span class="b b-draft">Draft</span>
+            </div>
+          </td>
+          <td>
+            <div class="nc">
+              <div class="nc-top">
+                <span class="sname">[COPY] TX-Austin Facility Draft</span>
+              </div>
+              <span class="mono">SCN-39714</span>
+            </div>
+          </td>
+          <td><div class="tr"><span class="ct ct-fac">Facility</span></div></td>
+          <td class="sys-cell">Medicare Advantage</td>
+          <td>
+            <div class="off-cell">TX — Austin</div>
+            <div class="reg-cell" style="font-size:10px;margin-top:1px;">South Central</div>
+          </td>
+          <td><span class="b b-no">No</span></td>
+          <td class="dc">May 1, 2026 <span class="ts">9:05 AM</span></td>
+          <td><div class="tr"><span class="ctag amber">Draft</span></div></td>
+          <td><div style="display:flex;gap:3px;"><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">▶ Retry</button><button class="btn btn-ghost" style="padding:3px 7px;font-size:11px;">⋯</button></div></td>
+        </tr>
+
+      </tbody>
+    </table>
+
+    <!-- BULK ACTION BAR -->
+    <div class="bulk">
+      <span class="sc">2 selected</span>
+      <div class="bdiv"></div>
+      <button class="bcomb">⛓ Combine Selected</button>
+      <span class="bgh">🏷 Batch Tag</span>
+      <span class="bgh">↗ Export</span>
+      <span class="bdis">✕ Clear</span>
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="pag">
+      <span>Rows per page:
+        <select style="border:none;font-size:11px;color:var(--ink);background:transparent;cursor:pointer;font-family:var(--font);">
+          <option>25</option><option>50</option><option>100</option>
+        </select>
+      </span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span>1–4 of 24 my &nbsp;·&nbsp; 312 org-wide</span>
+        <div class="pbtns">
+          <div class="pb">‹</div>
+          <div class="pb a">1</div>
+          <div class="pb">2</div>
+          <div class="pb">›</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end wrap -->
+
+<script>
+  function toggleAdv() {
+    const p = document.getElementById('adv-panel');
+    const t = document.getElementById('adv-trigger');
+    const open = p.style.display !== 'none';
+    p.style.display = open ? 'none' : 'block';
+    t.textContent = '';
+    t.innerHTML = open
+      ? '⧉ Filters <span class="filter-count">3</span>'
+      : '⧉ Filters <span class="filter-count">3</span>';
+  }
+  // Show ms dropdown on input focus (wireflow demo)
+  document.addEventListener('DOMContentLoaded', () => {
+    const inp = document.querySelector('.ms-input');
+    if (inp) {
+      inp.addEventListener('focus', () => {
+        document.querySelector('.ms-dropdown').style.display = 'block';
+      });
+      inp.addEventListener('blur', () => {
+        setTimeout(() => { document.querySelector('.ms-dropdown').style.display = 'none'; }, 150);
+      });
+    }
+  });
+</script>
+</body>
+</html>
