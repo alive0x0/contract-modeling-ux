@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Scenario Search — Redesign Phase 1</title>
+  <title>Scenario Search — Redesign Phase 1 (Specs Confirmed)</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ============================================================
@@ -852,16 +852,6 @@
     </div>
   </div>
 
-  <!-- OPEN QUESTION BANNERS (wireflow annotation style) -->
-  <div class="oq-banner">
-    <span class="oq-icon">❓</span>
-    <span><strong>Open Q — Custom Tags:</strong> Users need to tag scenarios by claim type (Facility, Professional, ASC) and by negotiation group. Should tags be user-created freeform, or from a controlled vocabulary? This mockup shows a hybrid: system claim-type tags (Facility/Prof/ASC) + user custom tags (freeform).</span>
-  </div>
-  <div class="oq-banner">
-    <span class="oq-icon">❓</span>
-    <span><strong>Open Q — RSH Sync Status:</strong> Users track in Excel whether a scenario has been updated in RSH. Should this be a live feed (API integration) or a manual flag? This mockup shows a dot indicator with "Synced / Stale / Unknown" states. Needs backend signal to be real.</span>
-  </div>
-
   <!-- SEARCH + FILTER BAR -->
   <div class="search-filter-bar">
     <div class="search-row">
@@ -1185,7 +1175,7 @@
           Claim Type Tags
           <span class="new-pill">NEW</span>
         </div>
-        <div class="legend-desc">System-generated tags for Facility, Professional, and ASC claim types. Addresses Skander's blind spot — no column currently distinguishes ASC from Facility scenarios.</div>
+        <div class="legend-desc">Auto-populated from scenario metadata (Facility, Professional, ASC) — users can also add or edit these tags. System inference is the default; manual override is always available.</div>
       </div>
 
       <div class="legend-item">
@@ -1194,7 +1184,7 @@
           User Custom Tags
           <span class="new-pill">NEW</span>
         </div>
-        <div class="legend-desc">Freeform tags users can apply to any scenario. Replaces the naming conventions ([COPY], manual prefixes) and Excel workarounds for grouping by negotiation group or project phase.</div>
+        <div class="legend-desc">Freeform — users create any tags they want. No controlled vocabulary. Useful for negotiation groups, project phases, or any team-specific taxonomy.</div>
       </div>
 
       <div class="legend-item">
@@ -1202,7 +1192,7 @@
           RSH Sync Status
           <span class="new-pill">NEW</span>
         </div>
-        <div class="legend-desc">Visible indicator showing whether a scenario has been pushed to RSH and if the RSH copy is still current. States: Synced ✓, Stale (source updated since last push), Unknown. Eliminates Excel tracking.</div>
+        <div class="legend-desc">Live API feed from RSH. The indicator reads directly from the RSH integration — no manual flagging required. States: Synced (pushed and current), Stale (source scenario re-ran since last push), Unknown (no RSH connection for this scenario).</div>
       </div>
 
       <div class="legend-item">
