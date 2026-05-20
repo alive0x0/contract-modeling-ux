@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Scenario Dashboard — v7</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════
+       CIGNA CANVAS TOKENS — from Figma node tree
+       File: Combined Scenarios · Reference page
+    ══════════════════════════════════════════ */
+    :root {
+      --bg-page:      #f8f9ff;
+      --bg-white:     #ffffff;
+      --bg-header:    #fdfdff;
+
+      --ink:          #353331;
+      --ink-2:        #6b6966;
+      --ink-3:        #a3a19f;
+
+      --blue:         #0033ff;
+      --blue-dk:      #110081;
+      --blue-lt:      #e6f0ff;
+      --blue-100:     #d7e9ff;
+      --blue-200:     #b4d1ff;
+      --blue-mid:     #424dcf;
+
+      --border:       #e0ddda;
+      --border-sub:   #f2f0ee;
+      --table-brd:    #dbdde9;
+      --th-bg:        #f2f0ee;
+      --row-hover:    #fbfaf9;
+      --row-sel:      #e6f0ff;
+
+      --green:        #007442;
+      --green-bg:     #edf3e8;
+      --green-dk:     #004226;
+      --green-mid:    #b0f9db;
+      --amber:        #816506;
+      --amber-bg:     #f8e9b3;
+      --red:          #c83333;
+      --red-bg:       #fdede8;
+      --red-dk:       #660000;
+      --teal-bg:      #ddfdfb;
+      --teal:         #002f32;
+      --teal-brd:     #13c8a4;
+
+      --purple-50:    #f5f0ff;
+      --purple-200:   #cfbaff;
+      --purple-600:   #8256e7;
+      --purple-900:   #3f2c6b;
+
+      /* Negotiation stage tokens */
+      --s-test-bg:   #f2f0ee; --s-test-ink:  #54524f; --s-test-brd:  #ccc9c6;
+      --s-cp-bg:     #e6f0ff; --s-cp-ink:    #110081; --s-cp-brd:    #b4d1ff;
+      --s-pp-bg:     #f5f0ff; --s-pp-ink:    #3f2c6b; --s-pp-brd:    #cfbaff;
+      --s-fin-bg:    #edf3e8; --s-fin-ink:   #004226; --s-fin-brd:   rgba(0,116,66,.3);
+
+      --sh-sm: 0 1px 3px rgba(52,42,118,.07), 0 1px 2px rgba(52,42,118,.04);
+      --sh:    0 4px 12px rgba(52,42,118,.09), 0 2px 4px rgba(52,42,118,.04);
+
+      --font: 'Nunito Sans', system-ui, -apple-system, sans-serif;
+      --icon: 'Material Symbols Rounded';
+      --r4: 4px; --r8: 8px; --rpill: 1000px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--bg-page); color: var(--ink); font-size: 14px; line-height: 1.5; }
+
+    .mi { font-family: var(--icon); font-weight: 400; font-style: normal; font-size: 18px; line-height: 1; display: inline-block; white-space: nowrap; -webkit-font-smoothing: antialiased; vertical-align: middle; user-select: none; }
+    .mi-sm { font-size: 14px; } .mi-lg { font-size: 21px; }
+
+    /* ── NAV (40px, exact from Figma) ── */
+    .nav { background: var(--bg-white); border-bottom: 1px solid var(--border); height: 40px; display: flex; align-items: center; padding: 0 16px 0 12px; position: sticky; top: 0; z-index: 100; gap: 0; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; padding: 4px 8px; }
+    .nav-logo-mark { width: 24px; height: 24px; background: var(--blue); border-radius: var(--r4); display: flex; align-items: center; justify-content: center; }
+    .nav-logo-mark .mi { font-size: 13px; color: #fff; }
+    .nav-logo-name { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
+    .nav-links { display: flex; align-items: stretch; height: 40px; padding: 0 24px; }
+    .nav-link { display: flex; align-items: center; gap: 4px; padding: 12px 16px 4px; font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; border-bottom: 2px solid transparent; text-decoration: none; white-space: nowrap; }
+    .nav-link:hover { color: var(--blue); }
+    .nav-link.active { color: var(--blue); border-bottom-color: var(--blue); padding-bottom: 2px; }
+    .nav-right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+    .nav-icon { display: flex; align-items: center; color: var(--ink-2); cursor: pointer; }
+    .nav-icon:hover { color: var(--blue); }
+    .nav-help { font-size: 14px; font-weight: 600; color: var(--ink); cursor: pointer; padding: 12px 16px 4px; border-bottom: 2px solid transparent; }
+    .nav-help:hover { color: var(--blue); }
+    .nav-avatar { width: 28px; height: 28px; border-radius: var(--rpill); background: var(--blue); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; cursor: pointer; }
+
+    /* ── SCREEN HEADER (96px, exact from Figma) ── */
+    .screen-header { background: var(--bg-header); border-bottom: 1px solid var(--border); padding: 16px; display: flex; align-items: center; gap: 48px; }
+    .sh-back { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 600; color: var(--blue); cursor: pointer; margin-bottom: 4px; }
+    .sh-title { font-size: 28px; font-weight: 700; color: var(--ink); letter-spacing: -.3px; line-height: 1.1; }
+    .sh-subtitle { font-size: 14px; font-weight: 400; color: var(--ink-2); margin-top: 2px; }
+    .sh-meta-item { display: flex; flex-direction: column; gap: 2px; }
+    .sh-meta-val { font-size: 22px; font-weight: 800; color: var(--ink); line-height: 1; }
+    .sh-meta-lbl { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-2); }
+
+    /* ── ATTENTION STRIP ── */
+    .attention { background: var(--red-bg); border-bottom: 1px solid var(--red); padding: 8px 24px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .alert-item { display: flex; align-items: center; gap: 6px; padding: 4px 10px; background: var(--bg-white); border-radius: var(--r4); font-size: 12px; font-weight: 600; }
+    .alert-item.crit { border: 1px solid var(--red); color: var(--red); }
+    .alert-item.warn { border: 1px solid var(--amber); color: var(--amber); }
+    .alert-item.info { border: 1px solid var(--border); color: var(--ink-2); }
+    .alert-item .mi { font-size: 14px; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width: 1560px; margin: 0 auto; padding: 20px 24px 48px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── SECTION HEADER ── */
+    .sec-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .sec-hdr-left { display: flex; align-items: center; gap: 8px; }
+    .sec-hdr-left .mi { color: var(--blue); font-size: 18px; }
+    .sec-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .sec-sub { font-size: 12px; font-weight: 400; color: var(--ink-2); margin-top: 1px; }
+    .sec-see-all { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 700; color: var(--blue); cursor: pointer; }
+    .sec-see-all .mi { font-size: 14px; }
+
+    /* ── RENEWAL CARDS ── */
+    .renewal-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+
+    .renewal-card { background: var(--bg-white); border-radius: var(--r8); overflow: hidden; box-shadow: var(--sh-sm); display: flex; flex-direction: column; }
+    .renewal-card.crit { border: 1px solid var(--red); }
+    .renewal-card.warn { border: 1px solid var(--amber); }
+    .renewal-card.norm { border: 1px solid var(--border); }
+
+    .rc-strip { padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; }
+    .rc-strip.crit { background: var(--red-bg); }
+    .rc-strip.warn { background: var(--amber-bg); }
+    .rc-strip.norm { background: var(--border-sub); }
+    .rc-fac { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--ink); }
+    .rc-fac .mi { font-size: 14px; }
+    .rc-fac.crit .mi, .rc-fac.crit { color: var(--red); }
+    .rc-fac.warn .mi, .rc-fac.warn { color: var(--amber); }
+    .rc-days { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: var(--rpill); }
+    .rc-days.crit { background: var(--red-bg); color: var(--red); border: 1px solid var(--red); }
+    .rc-days.warn { background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(129,101,6,.4); }
+    .rc-days.norm { background: var(--border-sub); color: var(--ink-2); border: 1px solid var(--border); }
+
+    .rc-renewal { display: flex; align-items: center; gap: 4px; padding: 5px 12px 3px; font-size: 11px; color: var(--ink-3); }
+    .rc-renewal strong { font-weight: 700; }
+    .rc-renewal .mi { font-size: 13px; }
+    .rc-div { height: 1px; background: var(--border-sub); margin: 0 12px; }
+
+    .sc-row { padding: 8px 12px; display: flex; flex-direction: column; gap: 4px; border-bottom: 1px solid var(--border-sub); }
+    .sc-row:last-of-type { border-bottom: none; }
+    .sc-name-row { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .sc-name { font-size: 12px; font-weight: 700; color: var(--blue); cursor: pointer; }
+    .sc-name.older { color: var(--ink-2); font-weight: 600; }
+    .sc-name:hover { text-decoration: underline; }
+    .sc-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .creator { display: inline-flex; align-items: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--ink-2); }
+    .av-dot { width: 15px; height: 15px; border-radius: var(--rpill); font-size: 7px; font-weight: 700; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sc-note { font-size: 11px; color: var(--ink-2); background: var(--bg-page); border-left: 2px solid var(--border); padding: 3px 8px; border-radius: 0 var(--r4) var(--r4) 0; line-height: 1.5; }
+    .sc-note strong { color: var(--ink); font-weight: 700; }
+
+    .rc-footer { padding: 8px 12px; background: var(--th-bg); display: flex; align-items: center; justify-content: space-between; margin-top: auto; }
+    .rc-footer-count { font-size: 11px; color: var(--ink-3); font-weight: 600; }
+    .btn-combine { display: inline-flex; align-items: center; gap: 4px; padding: 5px 10px; background: var(--blue); color: #fff; border: none; border-radius: var(--r4); font-size: 12px; font-weight: 700; cursor: pointer; font-family: var(--font); }
+    .btn-combine:hover { background: var(--blue-dk); }
+    .btn-combine .mi { font-size: 14px; }
+
+    /* ── TEAM ACTIVITY ── */
+    .team-panel { background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--r8); overflow: hidden; box-shadow: var(--sh-sm); }
+    .tp-hdr { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid var(--border-sub); }
+    .tp-hdr-title { font-size: 15px; font-weight: 700; color: var(--ink); }
+    .tp-period { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--ink-2); padding: 3px 8px; border: 1px solid var(--border); border-radius: var(--r4); cursor: pointer; }
+    .tp-period:hover { border-color: var(--blue); color: var(--blue); }
+    .tp-hint { font-size: 11px; color: var(--ink-3); }
+    .tp-members { display: flex; overflow-x: auto; }
+    .mc { flex: 1; min-width: 190px; padding: 12px 14px; border-right: 1px solid var(--border-sub); display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: background .06s; }
+    .mc:last-child { border-right: none; }
+    .mc:hover { background: var(--row-hover); }
+    .mc.active { background: var(--row-sel); border-top: 2px solid var(--blue); margin-top: -1px; }
+    .mc-top { display: flex; align-items: center; gap: 8px; }
+    .mc-av { width: 30px; height: 30px; border-radius: var(--rpill); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .mc-name { font-size: 13px; font-weight: 700; color: var(--ink); }
+    .mc-role { font-size: 11px; color: var(--ink-3); }
+    .mc-stats { display: flex; gap: 14px; }
+    .mc-stat-val { font-size: 20px; font-weight: 800; line-height: 1; }
+    .mc-stat-lbl { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-3); margin-top: 1px; }
+    .mc-note { font-size: 11px; color: var(--ink-2); background: var(--bg-page); border-left: 2px solid var(--border); padding: 4px 8px; border-radius: 0 var(--r4) var(--r4) 0; line-height: 1.5; }
+    .mc-note strong { color: var(--ink); font-weight: 700; }
+    .mc-note-ts { font-size: 10px; color: var(--ink-3); display: block; margin-top: 2px; }
+
+    /* ── FILTER BAR ── */
+    .fbar { background: var(--bg-white); border: 1px solid var(--border); border-radius: var(--r8); padding: 11px 14px; box-shadow: var(--sh-sm); }
+    .fbar-r1 { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .search-wrap { position: relative; flex: 1; }
+    .search-wrap .mi { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--ink-3); font-size: 18px; pointer-events: none; }
+    .search-inp { width: 100%; height: 36px; padding: 0 10px 0 36px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 13px; font-family: var(--font); color: var(--ink); background: var(--bg-white); outline: none; }
+    .search-inp:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,51,255,.08); }
+    .search-inp::placeholder { color: var(--ink-3); }
+    .filter-btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 12px; border-radius: var(--r4); font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; border: 1px solid var(--border); background: var(--bg-white); color: var(--ink); white-space: nowrap; }
+    .filter-btn:hover { border-color: var(--blue); color: var(--blue); }
+    .filter-btn.on { border-color: var(--blue); background: var(--blue-lt); color: var(--blue); }
+    .filter-btn .mi { font-size: 18px; }
+    .filter-count { background: var(--blue); color: #fff; border-radius: var(--rpill); font-size: 9px; font-weight: 700; padding: 1px 5px; }
+    .save-btn { display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: var(--r4); font-size: 13px; font-weight: 600; font-family: var(--font); cursor: pointer; border: 1px dashed var(--ink-3); background: transparent; color: var(--ink-2); white-space: nowrap; }
+    .save-btn:hover { border-color: var(--blue); border-style: solid; color: var(--blue); background: var(--blue-lt); }
+    .save-btn .mi { font-size: 18px; }
+    .fbar-r2 { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+    .fsel { height: 32px; padding: 0 22px 0 9px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 13px; font-weight: 600; font-family: var(--font); color: var(--ink); background: var(--bg-white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%23353331' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 7px center; appearance: none; cursor: pointer; outline: none; }
+    .fsel:focus { border-color: var(--blue); }
+    .fsel.on { border-color: var(--blue); background-color: var(--blue-lt); color: var(--blue-dk); }
+    .fsel-member { border-color: var(--purple-200); background-color: var(--purple-50); color: var(--purple-600); }
+    .fdiv { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
+    .combo-pill { display: inline-flex; align-items: center; gap: 4px; height: 32px; padding: 0 12px; border-radius: var(--rpill); font-size: 13px; font-weight: 600; cursor: pointer; border: 1px solid var(--purple-200); background: var(--purple-50); color: var(--purple-600); }
+    .combo-pill.on { background: var(--purple-600); color: #fff; border-color: var(--purple-600); }
+    .combo-pill .mi { font-size: 14px; }
+
+    /* ── ADV FILTERS ── */
+    .adv-panel { background: var(--bg-white); border: 1px solid var(--border); border-top: 2px solid var(--blue); border-radius: 0 0 var(--r8) var(--r8); padding: 16px; margin-top: -9px; display: none; box-shadow: var(--sh); }
+    .adv-panel.open { display: block; }
+    .adv-hdr { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .adv-hdr h4 { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-2); }
+    .adv-close { display: flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: var(--ink-3); cursor: pointer; padding: 2px 6px; border-radius: var(--r4); }
+    .adv-close:hover { background: var(--border-sub); color: var(--ink); }
+    .adv-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 16px; }
+    .adv-f label { display: block; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-2); margin-bottom: 4px; }
+    .adv-f select, .adv-f input { width: 100%; height: 32px; padding: 0 8px; border: 1px solid var(--border); border-radius: var(--r4); font-size: 12px; font-family: var(--font); color: var(--ink); background: var(--bg-white); outline: none; }
+    .adv-f select { padding-right: 22px; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='5' fill='none'%3E%3Cpath d='M1 1l3.5 3.5L8 1' stroke='%23353331' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 7px center; }
+    .adv-f select:focus, .adv-f input:focus { border-color: var(--blue); }
+    .dr { display: flex; gap: 4px; align-items: center; }
+    .dr span { font-size: 11px; color: var(--ink-3); }
+    .ms-field { border: 1px solid var(--border); border-radius: var(--r4); padding: 3px 6px; min-height: 32px; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; background: var(--bg-white); }
+    .ms-field:focus-within { border-color: var(--blue); }
+    .ms-chip { display: inline-flex; align-items: center; gap: 3px; padding: 1px 7px; border-radius: var(--rpill); font-size: 11px; font-weight: 600; background: var(--blue-lt); color: var(--blue-dk); border: 1px solid var(--blue-200); }
+    .ms-chip .rm { font-size: 9px; opacity: .5; cursor: pointer; }
+    .ms-chip .rm:hover { opacity: 1; }
+    .ms-input { border: none; outline: none; font-size: 12px; font-family: var(--font); background: transparent; min-width: 80px; color: var(--ink); }
+    .ms-input::placeholder { color: var(--ink-3); }
+    .adv-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-sub); }
+    .adv-hint { font-size: 10px; color: var(--ink-3); font-style: italic; }
+    .adv-acts { display: flex; gap: 8px; }
+
+    /* ── BUTTONS ── */
+    .btn { display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: var(--r4); font-size: 13px; font-weight: 700; font-family: var(--font); cursor: pointer; border: 1px solid transparent; white-space: nowrap; }
+    .btn .mi { font-size: 18px; }
+    .btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+    .btn-primary:hover { background: var(--blue-dk); }
+    .btn-ghost { background: transparent; color: var(--ink-2); }
+    .btn-ghost:hover { background: var(--border-sub); color: var(--ink); }
+
+    /* ── RESULTS TOOLBAR ── */
+    .rtbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .rc-count { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+    .rc-count strong { color: var(--ink); }
+    .col-bar { display: flex; align-items: center; gap: 4px; }
+    .ctog { font-size: 11px; font-weight: 600; padding: 2px 7px; border: 1px solid var(--border); border-radius: var(--r4); background: var(--bg-white); cursor: pointer; color: var(--ink-2); font-family: var(--font); }
+    .ctog.on { background: var(--blue-lt); border-color: var(--blue-200); color: var(--blue-dk); }
+
+    /* ── TABLE ── */
+    .tw { background: var(--bg-white); border: 1px solid var(--table-brd); border-radius: var(--r8); overflow: hidden; box-shadow: var(--sh-sm); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+    thead th { background: var(--th-bg); color: var(--ink); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 9px 12px; border-bottom: 1px solid var(--border); text-align: left; white-space: nowrap; cursor: pointer; user-select: none; overflow: hidden; text-overflow: ellipsis; font-family: var(--font); }
+    thead th:hover { background: var(--border-sub); }
+    .th-inner { display: flex; align-items: center; gap: 4px; }
+    .th-sort { color: var(--ink-3); font-size: 14px; }
+    .th-sort.active { color: var(--blue); }
+    .thchk { width: 40px; padding: 9px 0 9px 14px !important; cursor: default !important; }
+    .thchk:hover { background: var(--th-bg) !important; }
+    tbody tr { border-bottom: 1px solid var(--border-sub); transition: background .05s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: var(--row-hover); }
+    tbody tr.sel { background: var(--row-sel); }
+    tbody td { padding: 10px 12px; vertical-align: middle; overflow: hidden; text-overflow: ellipsis; }
+
+    /* Name cell */
+    .nc { display: flex; flex-direction: column; gap: 3px; }
+    .nc-top { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; }
+    .sname { font-size: 13px; font-weight: 700; color: var(--blue); cursor: pointer; }
+    .sname:hover { text-decoration: underline; }
+    .sname.older { color: var(--ink-2); font-weight: 600; }
+    .nc-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .nc-id { font-size: 11px; font-weight: 600; color: var(--ink-3); font-family: 'SF Mono','Consolas',monospace; }
+    .nc-note { font-size: 11px; color: var(--ink-2); background: var(--bg-page); border-left: 2px solid var(--border); padding: 3px 8px; border-radius: 0 var(--r4) var(--r4) 0; max-width: 420px; line-height: 1.5; margin-top: 2px; }
+    .nc-note strong { color: var(--ink); font-weight: 700; }
+    .nc-note .nt { font-size: 10px; color: var(--ink-3); margin-left: 5px; }
+
+    /* Badges */
+    .b { display: inline-flex; align-items: center; gap: 2px; padding: 2px 7px; border-radius: var(--rpill); font-size: 11px; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+    .b .mi { font-size: 11px; }
+    .b-test { background: var(--s-test-bg); color: var(--s-test-ink); border-color: var(--s-test-brd); }
+    .b-cp   { background: var(--s-cp-bg);   color: var(--s-cp-ink);   border-color: var(--s-cp-brd); }
+    .b-pp   { background: var(--s-pp-bg);   color: var(--s-pp-ink);   border-color: var(--s-pp-brd); }
+    .b-fin  { background: var(--s-fin-bg);  color: var(--s-fin-ink);  border-color: var(--s-fin-brd); }
+    .b-comb { background: var(--purple-50); color: var(--purple-600); border-color: var(--purple-200); }
+    .b-yes  { background: var(--green-bg);  color: var(--green);      border-color: rgba(0,116,66,.3); }
+    .b-no   { background: var(--border-sub);color: var(--ink-3);      border-color: var(--border); }
+    .b-latest { background: var(--green-mid); color: var(--green-dk); border-color: rgba(0,116,66,.3); }
+    .b-older  { background: var(--border-sub); color: var(--ink-3); border-color: var(--border); }
+
+    .ct { display: inline-flex; align-items: center; padding: 2px 6px; border-radius: var(--r4); font-size: 11px; font-weight: 700; white-space: nowrap; border: 1px solid transparent; }
+    .ct-fac  { background: var(--teal-bg); color: var(--teal); border-color: var(--teal-brd); }
+    .ct-prof { background: var(--purple-50); color: var(--purple-900); border-color: var(--purple-200); }
+    .ct-asc  { background: var(--amber-bg); color: var(--amber); border-color: rgba(129,101,6,.4); }
+
+    .ctag { display: inline-flex; padding: 1px 7px; border-radius: var(--rpill); font-size: 11px; font-weight: 600; background: var(--bg-page); color: var(--ink-2); border: 1px solid var(--border); white-space: nowrap; }
+    .ctag.blue  { background: var(--blue-lt); color: var(--blue-dk); border-color: var(--blue-200); }
+    .ctag.green { background: var(--green-bg); color: var(--green-dk); border-color: rgba(0,116,66,.3); }
+    .ctag.amber { background: var(--amber-bg); color: var(--amber); border-color: rgba(129,101,6,.3); }
+    .ctag.red   { background: var(--red-bg); color: var(--red); border-color: rgba(195,51,51,.3); }
+
+    .tr { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; }
+    .dc { font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+    .dc-ts { font-size: 10px; color: var(--ink-3); display: block; margin-top: 1px; }
+
+    /* Bulk bar */
+    .bulk { background: #353331; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px; }
+    .bulk .sc { font-size: 13px; font-weight: 700; }
+    .bdiv { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
+    .bgh { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.7); cursor: pointer; padding: 4px 8px; border-radius: var(--r4); }
+    .bgh:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .bgh .mi { font-size: 16px; }
+    .bdis { margin-left: auto; font-size: 12px; font-weight: 600; opacity: .5; cursor: pointer; }
+    .bdis:hover { opacity: 1; }
+
+    /* Pagination */
+    .pag { display: flex; align-items: center; justify-content: space-between; padding: 9px 14px; border-top: 1px solid var(--border-sub); font-size: 12px; font-weight: 600; color: var(--ink-2); }
+    .pbtns { display: flex; gap: 3px; }
+    .pb { width: 27px; height: 27px; border: 1px solid var(--border); border-radius: var(--r4); background: var(--bg-white); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--ink); }
+    .pb:hover { background: var(--border-sub); }
+    .pb.a { background: var(--blue); color: #fff; border-color: var(--blue); font-weight: 700; }
+    .pb .mi { font-size: 15px; }
+
+    /* Avatar colors */
+    .av-a { background: #3879db; } .av-b { background: #007442; }
+    .av-c { background: #8256e7; } .av-d { background: #009083; }
+    .av-e { background: #816506; }
+
+    /* Action icons */
+    .act { width: 30px; height: 30px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r4); cursor: pointer; color: var(--ink-2); border: 1px solid transparent; }
+    .act:hover { background: var(--border-sub); border-color: var(--border); color: var(--blue); }
+    .act .mi { font-size: 17px; }
+
+    input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--blue); cursor: pointer; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark"><span class="mi" style="font-variation-settings:'FILL' 1;font-size:13px">grid_view</span></div>
+    <span class="nav-logo-name">Contract Modeling</span>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="#">Scenario</a>
+    <a class="nav-link active" href="#">Scenarios</a>
+    <a class="nav-link" href="#">Ratesheet History</a>
+    <a class="nav-link" href="#">Ratesheet Maintenance</a>
+    <a class="nav-link" href="#">Admin Access</a>
+  </div>
+  <div class="nav-right">
+    <span class="nav-icon"><span class="mi">search</span></span>
+    <span class="nav-help">Help</span>
+    <span class="nav-icon"><span class="mi">notifications</span></span>
+    <div class="nav-avatar">GX</div>
+  </div>
+</nav>
+
+<!-- SCREEN HEADER -->
+<div class="screen-header">
+  <div>
+    <div class="sh-back"><span class="mi mi-sm">chevron_left</span> Back</div>
+    <div class="sh-title">Scenario Dashboard</div>
+    <div class="sh-subtitle">My Market · South Central Region</div>
+  </div>
+  <div class="sh-meta-item">
+    <div class="sh-meta-val">12</div>
+    <div class="sh-meta-lbl">Facilities</div>
+  </div>
+  <div class="sh-meta-item">
+    <div class="sh-meta-val">47</div>
+    <div class="sh-meta-lbl">Team Scenarios</div>
+  </div>
+  <div class="sh-meta-item">
+    <div class="sh-meta-val" style="color:var(--blue)">9</div>
+    <div class="sh-meta-lbl">Active Proposals</div>
+  </div>
+  <div class="sh-meta-item">
+    <div class="sh-meta-val" style="color:var(--green)">3</div>
+    <div class="sh-meta-lbl">Finals This Qtr</div>
+  </div>
+  <div class="sh-meta-item">
+    <div class="sh-meta-val" style="color:var(--amber)">5</div>
+    <div class="sh-meta-lbl">Renewals &lt;90 days</div>
+  </div>
+</div>
+
+<!-- ATTENTION STRIP -->
+<div class="attention">
+  <div class="alert-item crit">
+    <span class="mi mi-sm">warning</span>
+    3 provider proposals expire within 7 days — action required
+  </div>
+  <div class="alert-item warn">
+    <span class="mi mi-sm">upload</span>
+    9 scenarios not yet pushed to RSH — including 3 Finals
+  </div>
+  <div class="alert-item info">
+    <span class="mi mi-sm">event</span>
+    5 facility renewals within 90 days — ensure scenarios are at Final
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- SECTION 1: UPCOMING RENEWALS -->
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-hdr-left">
+        <span class="mi">event</span>
+        <div>
+          <div class="sec-title">Upcoming Renewals</div>
+          <div class="sec-sub">4 facilities in my market renewing within 90 days</div>
+        </div>
+      </div>
+      <div class="sec-see-all">See all <span class="mi mi-sm">chevron_right</span></div>
+    </div>
+
+    <div class="renewal-row">
+
+      <!-- Card 1: Critical -->
+      <div class="renewal-card crit">
+        <div class="rc-strip crit">
+          <div class="rc-fac crit"><span class="mi mi-sm">local_hospital</span> Piedmont Healthcare — TX</div>
+          <span class="rc-days crit">18d</span>
+        </div>
+        <div class="rc-renewal"><span class="mi mi-sm">schedule</span> Contract renewal <strong style="color:var(--red)">in 18 days</strong></div>
+        <div class="rc-div"></div>
+
+        <div class="sc-row">
+          <div class="sc-name-row">
+            <span class="sc-name">TX-Austin ASC+Fac Combined v3</span>
+            <span class="b b-latest">● Latest</span>
+            <span class="b b-comb"><span class="mi">link</span> Combined</span>
+          </div>
+          <div class="sc-meta">
+            <span class="b b-pp">Provider Proposal</span>
+            <span class="creator"><span class="av-dot av-a">SB</span> Skander B.</span>
+            <span class="b b-yes"><span class="mi">check_circle</span> RSH</span>
+            <span class="ctag red">Due May 19</span>
+          </div>
+          <div class="sc-note"><strong>v3:</strong> Updated rate assumptions, removed outlier providers from Q4 cohort</div>
+        </div>
+
+        <div class="sc-row">
+          <div class="sc-name-row">
+            <span class="sc-name older">TX-Austin ASC Base v2</span>
+            <span class="b b-older">Older</span>
+          </div>
+          <div class="sc-meta">
+            <span class="b b-cp">Cigna Proposal</span>
+            <span class="creator"><span class="av-dot av-a">SB</span> Skander B.</span>
+            <span class="b b-yes"><span class="mi">check_circle</span> RSH</span>
+          </div>
+          <div class="sc-note"><strong>v2:</strong> Base version before outlier removal — kept for comparison</div>
+        </div>
+
+        <div class="rc-footer">
+          <span class="rc-footer-count">2 scenarios attached</span>
+          <button class="btn-combine"><span class="mi">link</span> Combine</button>
+        </div>
+      </div>
+
+      <!-- Card 2: Warning -->
+      <div class="renewal-card warn">
+        <div class="rc-strip warn">
+          <div class="rc-fac warn"><span class="mi mi-sm">local_hospital</span> Baylor Scott &amp; White — TX</div>
+          <span class="rc-days warn">34d</span>
+        </div>
+        <div class="rc-renewal"><span class="mi mi-sm">schedule</span> Contract renewal <strong style="color:var(--amber)">in 34 days</strong></div>
+        <div class="rc-div"></div>
+
+        <div class="sc-row">
+          <div class="sc-name-row">
+            <span class="sc-name">TX-Dallas Facility v3</span>
+            <span class="b b-latest">● Latest</span>
+          </div>
+          <div class="sc-meta">
+            <span class="b b-cp">Cigna Proposal</span>
+            <span class="creator"><span class="av-dot av-c">MC</span> Marcus C.</span>
+            <span class="b b-no">RSH: No</span>
+          </div>
+          <div class="sc-note"><strong>v3:</strong> Revised LOB split after compliance review, new base rate applied</div>
+        </div>
+
+        <div class="sc-row">
+          <div class="sc-name-row">
+            <span class="sc-name">TX-Dallas Professional v2</span>
+            <span class="b b-latest">● Latest</span>
+          </div>
+          <div class="sc-meta">
+            <span class="b b-test">Test</span>
+            <span class="creator"><span class="av-dot av-c">MC</span> Marcus C.</span>
+            <span class="b b-no">RSH: No</span>
+          </div>
+          <div class="sc-note"><strong>v2:</strong> Test run — awaiting approval before submitting proposal</div>
+        </div>
+
+        <div class="rc-footer">
+          <span class="rc-footer-count">2 scenarios attached</span>
+          <button class="btn-combine"><span class="mi">link</span> Combine</button>
+        </div>
+      </div>
+
+      <!-- Card 3: Normal -->
+      <div class="renewal-card norm">
+        <div class="rc-strip norm">
+          <div class="rc-fac"><span class="mi mi-sm" style="color:var(--ink-2)">local_hospital</span> Providence Health — WA</div>
+          <span class="rc-days norm">47d</span>
+        </div>
+        <div class="rc-renewal"><span class="mi mi-sm">schedule</span> Contract renewal <strong>in 47 days</strong></div>
+        <div class="rc-div"></div>
+
+        <div class="sc-row">
+          <div class="sc-name-row">
+            <span class="sc-name">WA-Seattle Prof+Fac Combined v2</span>
+            <span class="b b-latest">● Latest</span>
+            <span class="b b-comb"><span class="mi">link</span> Combined</span>
+          </div>
+          <div class="sc-meta">
+            <span class="b b-fin"><span class="mi">task_alt</span> Final</span>
+            <span class="creator"><span class="av-dot av-b">PN</span> Priya N.</span>
+            <span class="b b-yes"><span class="mi">check_circle</span> RSH</span>
+            <span class="ctag green">Signed</span>
+          </div>
+          <div class="sc-note"><strong>v2:</strong> Finalized after provider counter-proposal — all terms agreed</div>
+        </div>
+
+        <div class="rc-footer">
+          <span class="rc-footer-count">1 scenario attached</span>
+          <button class="btn-combine"><span class="mi">link</span> Combine</button>
+        </div>
+      </div>
+
+      <!-- Card 4: Normal -->
+      <div class="renewal-card norm">
+        <div class="rc-strip norm">
+          <div class="rc-fac"><span class="mi mi-sm" style="color:var(--ink-2)">local_hospital</span> Atrium Health — NC</div>
+          <span class="rc-days norm">72d</span>
+        </div>
+        <div class="rc-renewal"><span class="mi mi-sm">schedule</span> Contract renewal <strong>in 72 days</strong></div>
+        <div class="rc-div"></div>
+
+        <div class="sc-row">
+          <div class="sc-name-row">
+            <span class="sc-name">NC-Charlotte Facility v1</span>
+            <span class="b b-latest">● Latest</span>
+          </div>
+          <div class="sc-meta">
+            <span class="b b-test">Test</span>
+            <span class="creator"><span class="av-dot av-e">DW</span> Derek W.</span>
+            <span class="b b-no">RSH: No</span>
+          </div>
+          <div class="sc-note"><strong>v1:</strong> First run — conservative rate assumptions pending market data</div>
+        </div>
+
+        <div class="rc-footer">
+          <span class="rc-footer-count">1 scenario attached</span>
+          <button class="btn-combine"><span class="mi">link</span> Combine</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SECTION 2: TEAM ACTIVITY -->
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-hdr-left">
+        <span class="mi">group</span>
+        <div>
+          <div class="sec-title">Recent Team Activity</div>
+          <div class="sec-sub">Latest scenario updates across all team members</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="tp-hint" style="font-size:11px;color:var(--ink-3)">Click member to filter</span>
+        <div class="tp-period"><span class="mi mi-sm">calendar_month</span> May 2026 <span class="mi mi-sm">arrow_drop_down</span></div>
+      </div>
+    </div>
+
+    <div class="team-panel">
+      <div class="tp-members">
+
+        <div class="mc active">
+          <div class="mc-top">
+            <div class="mc-av av-a">SB</div>
+            <div><div class="mc-name">Skander Belghith</div><div class="mc-role">Analyst · TX Region</div></div>
+          </div>
+          <div class="mc-stats">
+            <div><div class="mc-stat-val">8</div><div class="mc-stat-lbl">This month</div></div>
+            <div><div class="mc-stat-val" style="color:var(--purple-600)">3</div><div class="mc-stat-lbl">Combined</div></div>
+            <div><div class="mc-stat-val" style="color:var(--blue)">2</div><div class="mc-stat-lbl">Proposal</div></div>
+          </div>
+          <div class="mc-note"><strong>TX-Austin ASC 2026 v3</strong> — updated rate assumptions, removed outlier providers<span class="mc-note-ts">May 14 · 2:30 PM</span></div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-b">PN</div>
+            <div><div class="mc-name">Priya Nair</div><div class="mc-role">Analyst · WA Region</div></div>
+          </div>
+          <div class="mc-stats">
+            <div><div class="mc-stat-val">6</div><div class="mc-stat-lbl">This month</div></div>
+            <div><div class="mc-stat-val" style="color:var(--purple-600)">2</div><div class="mc-stat-lbl">Combined</div></div>
+            <div><div class="mc-stat-val" style="color:var(--green)">1</div><div class="mc-stat-lbl">Final</div></div>
+          </div>
+          <div class="mc-note"><strong>WA-Seattle Prof+Fac v2</strong> — finalized after provider counter, signed off<span class="mc-note-ts">May 14 · 9:20 AM</span></div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-c">MC</div>
+            <div><div class="mc-name">Marcus Chen</div><div class="mc-role">Sr. Analyst · GA Region</div></div>
+          </div>
+          <div class="mc-stats">
+            <div><div class="mc-stat-val">11</div><div class="mc-stat-lbl">This month</div></div>
+            <div><div class="mc-stat-val" style="color:var(--purple-600)">1</div><div class="mc-stat-lbl">Combined</div></div>
+            <div><div class="mc-stat-val" style="color:var(--blue)">4</div><div class="mc-stat-lbl">Proposal</div></div>
+          </div>
+          <div class="mc-note"><strong>GA-Atlanta Facility v4</strong> — revised LOB split after compliance review<span class="mc-note-ts">May 13 · 11:05 AM</span></div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-d">AT</div>
+            <div><div class="mc-name">Aisha Torres</div><div class="mc-role">Analyst · NY Region</div></div>
+          </div>
+          <div class="mc-stats">
+            <div><div class="mc-stat-val">5</div><div class="mc-stat-lbl">This month</div></div>
+            <div><div class="mc-stat-val" style="color:var(--ink-3)">0</div><div class="mc-stat-lbl">Combined</div></div>
+            <div><div class="mc-stat-val" style="color:var(--s-test-ink)">5</div><div class="mc-stat-lbl">Test</div></div>
+          </div>
+          <div class="mc-note"><strong>NY-Albany Commercial v2</strong> — waiting on updated network data<span class="mc-note-ts">May 12 · 4:45 PM</span></div>
+        </div>
+
+        <div class="mc">
+          <div class="mc-top">
+            <div class="mc-av av-e">DW</div>
+            <div><div class="mc-name">Derek Wu</div><div class="mc-role">Analyst · GP Region</div></div>
+          </div>
+          <div class="mc-stats">
+            <div><div class="mc-stat-val">4</div><div class="mc-stat-lbl">This month</div></div>
+            <div><div class="mc-stat-val" style="color:var(--purple-600)">1</div><div class="mc-stat-lbl">Combined</div></div>
+            <div><div class="mc-stat-val" style="color:var(--blue)">1</div><div class="mc-stat-lbl">Proposal</div></div>
+          </div>
+          <div class="mc-note"><strong>ND-Fargo ASC v1</strong> — first run, rate assumptions conservative<span class="mc-note-ts">May 10 · 10:18 AM</span></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3: ALL SCENARIOS TABLE -->
+  <div>
+    <div class="sec-hdr">
+      <div class="sec-hdr-left">
+        <span class="mi">table_chart</span>
+        <div>
+          <div class="sec-title">All Team Scenarios</div>
+          <div class="sec-sub">47 scenarios — search and filter to find what you need</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILTER BAR -->
+    <div class="fbar" style="margin-bottom:8px;">
+      <div class="fbar-r1">
+        <div class="search-wrap">
+          <span class="mi">search</span>
+          <input type="text" class="search-inp" placeholder="Search by name, ID, system, region, office, tag, or version…">
+        </div>
+        <button class="filter-btn on" onclick="toggleAdv()">
+          <span class="mi">tune</span> Filters <span class="filter-count">3</span>
+        </button>
+        <button class="save-btn"><span class="mi">bookmark_add</span> Save View</button>
+      </div>
+      <div class="fbar-r2">
+        <select class="fsel fsel-member">
+          <option>Created by: Skander B.</option>
+          <option>All team members</option>
+          <option>Skander Belghith</option>
+          <option>Priya Nair</option>
+          <option>Marcus Chen</option>
+          <option>Aisha Torres</option>
+          <option>Derek Wu</option>
+        </select>
+        <select class="fsel on">
+          <option>Claim Type</option>
+          <option selected>ASC</option>
+          <option>Facility</option>
+          <option>Professional</option>
+          <option>Mixed</option>
+        </select>
+        <select class="fsel">
+          <option selected>Scenario Status</option>
+          <option>Test</option>
+          <option>Cigna Proposal</option>
+          <option>Provider Proposal</option>
+          <option>Final</option>
+        </select>
+        <select class="fsel">
+          <option selected>RSH Pushed</option>
+          <option>Yes</option>
+          <option>No</option>
+        </select>
+        <div class="fdiv"></div>
+        <span class="combo-pill on"><span class="mi">link</span> Combined only</span>
+      </div>
+    </div>
+
+    <!-- ADVANCED FILTERS -->
+    <div class="adv-panel open" id="adv-panel">
+      <div class="adv-hdr">
+        <h4>Advanced Filters</h4>
+        <span class="adv-close" onclick="toggleAdv()"><span class="mi mi-sm">close</span> Close</span>
+      </div>
+      <div class="adv-grid">
+        <div class="adv-f">
+          <label>Region</label>
+          <select><option>All Regions</option><option selected>South Central</option><option>Pacific Northwest</option><option>Mid-Atlantic</option><option>Great Plains</option><option>Northeast</option></select>
+        </div>
+        <div class="adv-f">
+          <label>Contract Office (multi)</label>
+          <div class="ms-field">
+            <span class="ms-chip">TX — Austin <span class="rm">✕</span></span>
+            <input type="text" class="ms-input" placeholder="+ Add office…">
+          </div>
+        </div>
+        <div class="adv-f">
+          <label>System Name</label>
+          <select><option>All Systems</option><option>Medicare Advantage</option><option>Commercial PPO</option><option>Medicaid</option><option>ASC Network</option><option>Evernorth PBM</option></select>
+        </div>
+        <div class="adv-f">
+          <label>CRP Type</label>
+          <select><option>All CRP Types</option><option>A — Amendment</option><option>B — Base</option><option>D — Draft</option><option>O — Other</option></select>
+        </div>
+        <div class="adv-f">
+          <label>Line of Business</label>
+          <select><option>All LOBs</option><option>OAP</option><option>New Business</option><option>Renewal</option></select>
+        </div>
+        <div class="adv-f">
+          <label>Date Created</label>
+          <div class="dr"><input type="date" style="flex:1"><span>–</span><input type="date" style="flex:1"></div>
+        </div>
+        <div class="adv-f">
+          <label>Last Run</label>
+          <div class="dr"><input type="date" style="flex:1"><span>–</span><input type="date" style="flex:1"></div>
+        </div>
+        <div class="adv-f">
+          <label>Tag</label>
+          <input type="text" placeholder="e.g. Q1-Final, TX-Neg-4, v3">
+        </div>
+      </div>
+      <div class="adv-foot">
+        <span class="adv-hint">Region, Office (multi-select), System, CRP, LOB, date ranges, tag</span>
+        <div class="adv-acts">
+          <button class="btn btn-ghost">Reset all</button>
+          <button class="btn btn-primary">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS TOOLBAR -->
+    <div class="rtbar">
+      <span class="rc-count">Showing <strong>4</strong> of <strong>8</strong> by Skander B. &nbsp;·&nbsp; 47 team &nbsp;·&nbsp; 312 org-wide</span>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span style="font-size:11px;color:var(--ink-3);font-weight:600;">Columns:</span>
+        <div class="col-bar">
+          <span class="ctog on">Status</span>
+          <span class="ctog on">Claim Type</span>
+          <span class="ctog on">System</span>
+          <span class="ctog on">Office · Region</span>
+          <span class="ctog on">RSH</span>
+          <span class="ctog on">Last Run</span>
+          <span class="ctog">Date Created</span>
+          <span class="ctog">LOB</span>
+          <span class="ctog">CRP</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="tw">
+      <table>
+        <colgroup>
+          <col style="width:40px">
+          <col style="min-width:300px">
+          <col style="width:148px">
+          <col style="width:120px">
+          <col style="width:155px">
+          <col style="width:128px">
+          <col style="width:72px">
+          <col style="width:124px">
+          <col style="width:80px">
+        </colgroup>
+        <thead>
+          <tr>
+            <th class="thchk"><input type="checkbox"></th>
+            <th><div class="th-inner">Scenario Name <span class="mi th-sort active mi-sm">unfold_more</span></div></th>
+            <th><div class="th-inner">Status <span class="mi th-sort mi-sm">unfold_more</span></div></th>
+            <th><div class="th-inner">Claim Type <span class="mi th-sort mi-sm">unfold_more</span></div></th>
+            <th><div class="th-inner">System <span class="mi th-sort mi-sm">unfold_more</span></div></th>
+            <th><div class="th-inner">Office · Region <span class="mi th-sort mi-sm">unfold_more</span></div></th>
+            <th><div class="th-inner">RSH <span class="mi th-sort mi-sm">unfold_more</span></div></th>
+            <th><div class="th-inner">Last Run <span class="mi th-sort active mi-sm">arrow_downward</span></div></th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <!-- ROW 1 -->
+          <tr class="sel">
+            <td style="padding-left:14px;"><input type="checkbox" checked></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">TX-Austin ASC+Fac Combined 2026 v3</span>
+                  <span class="b b-latest">● Latest</span>
+                  <span class="b b-comb"><span class="mi">link</span> Combined</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-40291</span>
+                  <span class="creator"><span class="av-dot av-a">SB</span> Skander B.</span>
+                  <span class="ctag blue">TX-Neg-4</span>
+                  <span class="ctag red">Due May 19</span>
+                </div>
+                <div class="nc-note"><strong>v3:</strong> Updated rate assumptions, removed outlier providers from Q4 cohort <span class="nt">May 14 · 2:30 PM</span></div>
+              </div>
+            </td>
+            <td><span class="b b-pp">Provider Proposal</span></td>
+            <td><div class="tr"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
+            <td style="font-size:12px;font-weight:600;color:var(--ink)">ASC Network</td>
+            <td>
+              <div style="font-size:12px;font-weight:600;color:var(--ink-2)">TX — Austin</div>
+              <div style="font-size:11px;color:var(--ink-3);margin-top:1px">South Central</div>
+            </td>
+            <td><span class="b b-yes"><span class="mi">check_circle</span> Yes</span></td>
+            <td><div class="dc">May 14, 2026<span class="dc-ts">2:30 PM</span></div></td>
+            <td><div style="display:flex;gap:2px;"><span class="act"><span class="mi">play_arrow</span></span><span class="act"><span class="mi">more_vert</span></span></div></td>
+          </tr>
+
+          <!-- ROW 2 -->
+          <tr>
+            <td style="padding-left:14px;"><input type="checkbox"></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname older">TX-Austin ASC+Fac Combined 2026 v2</span>
+                  <span class="b b-older">Older</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-40187</span>
+                  <span class="creator"><span class="av-dot av-a">SB</span> Skander B.</span>
+                  <span class="ctag blue">TX-Neg-4</span>
+                </div>
+                <div class="nc-note" style="border-color:var(--ink-3)"><strong>v2:</strong> Base version before outlier removal — kept for comparison <span class="nt">May 5 · 10:32 AM</span></div>
+              </div>
+            </td>
+            <td><span class="b b-cp">Cigna Proposal</span></td>
+            <td><div class="tr"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
+            <td style="font-size:12px;font-weight:600;color:var(--ink)">ASC Network</td>
+            <td>
+              <div style="font-size:12px;font-weight:600;color:var(--ink-2)">TX — Austin</div>
+              <div style="font-size:11px;color:var(--ink-3);margin-top:1px">South Central</div>
+            </td>
+            <td><span class="b b-yes"><span class="mi">check_circle</span> Yes</span></td>
+            <td><div class="dc">May 5, 2026<span class="dc-ts">10:32 AM</span></div></td>
+            <td><div style="display:flex;gap:2px;"><span class="act"><span class="mi">play_arrow</span></span><span class="act"><span class="mi">more_vert</span></span></div></td>
+          </tr>
+
+          <!-- ROW 3 -->
+          <tr>
+            <td style="padding-left:14px;"><input type="checkbox"></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">WA-Seattle Prof+Fac Combined v2</span>
+                  <span class="b b-latest">● Latest</span>
+                  <span class="b b-comb"><span class="mi">link</span> Combined</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-38902</span>
+                  <span class="creator"><span class="av-dot av-b">PN</span> Priya N.</span>
+                  <span class="ctag blue">WA-Neg-2</span>
+                  <span class="ctag green">Signed</span>
+                </div>
+                <div class="nc-note"><strong>v2:</strong> Finalized after provider counter-proposal — all terms agreed <span class="nt">May 14 · 9:20 AM</span></div>
+              </div>
+            </td>
+            <td><span class="b b-fin"><span class="mi">task_alt</span> Final</span></td>
+            <td><div class="tr"><span class="ct ct-prof">Professional</span><span class="ct ct-fac">Facility</span></div></td>
+            <td style="font-size:12px;font-weight:600;color:var(--ink)">Commercial PPO</td>
+            <td>
+              <div style="font-size:12px;font-weight:600;color:var(--ink-2)">WA — Seattle</div>
+              <div style="font-size:11px;color:var(--ink-3);margin-top:1px">Pacific NW</div>
+            </td>
+            <td><span class="b b-yes"><span class="mi">check_circle</span> Yes</span></td>
+            <td><div class="dc">May 14, 2026<span class="dc-ts">9:20 AM</span></div></td>
+            <td><div style="display:flex;gap:2px;"><span class="act"><span class="mi">play_arrow</span></span><span class="act"><span class="mi">more_vert</span></span></div></td>
+          </tr>
+
+          <!-- ROW 4 -->
+          <tr>
+            <td style="padding-left:14px;"><input type="checkbox"></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">NY-Albany Commercial Facility v2</span>
+                  <span class="b b-latest">● Latest</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-39714</span>
+                  <span class="creator"><span class="av-dot av-d">AT</span> Aisha T.</span>
+                  <span class="ctag amber">Awaiting data</span>
+                </div>
+                <div class="nc-note"><strong>v2:</strong> Waiting on updated network data before submitting as Cigna Proposal <span class="nt">May 12 · 4:45 PM</span></div>
+              </div>
+            </td>
+            <td><span class="b b-test">Test</span></td>
+            <td><div class="tr"><span class="ct ct-fac">Facility</span></div></td>
+            <td style="font-size:12px;font-weight:600;color:var(--ink)">Medicare Advantage</td>
+            <td>
+              <div style="font-size:12px;font-weight:600;color:var(--ink-2)">NY — Albany</div>
+              <div style="font-size:11px;color:var(--ink-3);margin-top:1px">Mid-Atlantic</div>
+            </td>
+            <td><span class="b b-no">No</span></td>
+            <td><div class="dc">May 12, 2026<span class="dc-ts">4:45 PM</span></div></td>
+            <td><div style="display:flex;gap:2px;"><span class="act"><span class="mi">play_arrow</span></span><span class="act"><span class="mi">more_vert</span></span></div></td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <!-- BULK BAR -->
+      <div class="bulk">
+        <span class="sc">1 selected</span>
+        <div class="bdiv"></div>
+        <button class="btn-combine"><span class="mi">link</span> Combine Selected</button>
+        <span class="bgh"><span class="mi">label</span> Batch Tag</span>
+        <span class="bgh"><span class="mi">download</span> Export</span>
+        <span class="bdis">✕ Clear</span>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="pag">
+        <span>Rows per page:
+          <select style="border:none;font-size:12px;font-weight:600;color:var(--ink);background:transparent;cursor:pointer;font-family:var(--font);outline:none;">
+            <option>25</option><option>50</option><option>100</option>
+          </select>
+        </span>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span>1–4 of 8 by Skander B. &nbsp;·&nbsp; 47 team &nbsp;·&nbsp; 312 org</span>
+          <div class="pbtns">
+            <div class="pb"><span class="mi">chevron_left</span></div>
+            <div class="pb a">1</div>
+            <div class="pb">2</div>
+            <div class="pb"><span class="mi">chevron_right</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function toggleAdv() {
+    const p = document.getElementById('adv-panel');
+    const b = document.querySelector('.filter-btn');
+    p.classList.toggle('open');
+    b.classList.toggle('on', p.classList.contains('open'));
+  }
+</script>
+</body>
+</html>
