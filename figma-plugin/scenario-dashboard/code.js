@@ -9,8 +9,14 @@ figma.ui.onmessage = async (msg) => {
   try {
 
     // ── LOAD FONTS ────────────────────────────────────────────
+    // Load Inter first (Figma's default) so nodes created before fontName
+    // is set don't throw "unloaded font" errors.
     prog('Loading fonts…', 5);
     await Promise.all([
+      figma.loadFontAsync({ family: 'Inter', style: 'Regular' }),
+      figma.loadFontAsync({ family: 'Inter', style: 'Medium' }),
+      figma.loadFontAsync({ family: 'Inter', style: 'Semi Bold' }),
+      figma.loadFontAsync({ family: 'Inter', style: 'Bold' }),
       figma.loadFontAsync({ family: 'Nunito Sans', style: 'Regular' }),
       figma.loadFontAsync({ family: 'Nunito Sans', style: 'SemiBold' }),
       figma.loadFontAsync({ family: 'Nunito Sans', style: 'Bold' }),
@@ -69,26 +75,48 @@ figma.ui.onmessage = async (msg) => {
     const S = (c, w = 1) => [{ type: 'SOLID', color: c, strokeWeight: w }];
 
     // ── HELPERS ───────────────────────────────────────────────
+    // Map weight names to exact Nunito Sans style strings Figma recognises
+    const weightMap = {
+      'Regular':   'Regular',
+      'SemiBold':  'SemiBold',
+      'Bold':      'Bold',
+      'ExtraBold': 'ExtraBold',
+      // fallbacks
+      '400': 'Regular',
+      '600': 'SemiBold',
+      '700': 'Bold',
+      '800': 'ExtraBold',
+    };
+
     function txt(content, size, weight, color, opts = {}) {
       const t = figma.createText();
-      t.characters = content;
+      // IMPORTANT: set fontName BEFORE characters to avoid "unloaded font" error
+      const style = weightMap[weight] || 'Regular';
+      t.fontName = { family: 'Nunito Sans', style };
       t.fontSize = size;
-      t.fontName = { family: 'Nunito Sans', style: weight };
       t.fills = solid(color);
-      if (opts.width) { t.textAutoResize = 'HEIGHT'; t.resize(opts.width, 1); }
-      else t.textAutoResize = 'WIDTH_AND_HEIGHT';
+      if (opts.width) {
+        t.textAutoResize = 'HEIGHT';
+        t.resize(opts.width, 20);
+      } else {
+        t.textAutoResize = 'WIDTH_AND_HEIGHT';
+      }
       if (opts.lineHeight) t.lineHeight = { value: opts.lineHeight, unit: 'PIXELS' };
       if (opts.opacity !== undefined) t.opacity = opts.opacity;
+      // Set characters LAST — font must already be set
+      t.characters = content;
       return t;
     }
 
     function icon(name, size, color) {
       const t = figma.createText();
-      t.characters = name;
-      t.fontSize = size;
+      // Set fontName BEFORE characters
       t.fontName = { family: 'Material Symbols Rounded', style: 'Regular' };
+      t.fontSize = size;
       t.fills = solid(color);
       t.textAutoResize = 'WIDTH_AND_HEIGHT';
+      // Set characters LAST
+      t.characters = name;
       return t;
     }
 
