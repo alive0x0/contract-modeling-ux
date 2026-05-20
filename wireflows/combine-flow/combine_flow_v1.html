@@ -130,14 +130,29 @@
     .ctag.blue  { background: var(--blue-lt); color: var(--blue-dk); border-color: var(--blue-200); }
 
     /* Bulk bar */
-    .bulk { background: #353331; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-radius: 0 0 var(--r8) var(--r8); }
+    .bulk { background: #353331; color: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 10px; border-radius: 0 0 var(--r8) var(--r8); transition: background .2s; }
+    .bulk.has-conflict { background: #3a2508; }
     .bulk .sc { font-size: 13px; font-weight: 700; }
     .bdiv { width: 1px; height: 18px; background: rgba(255,255,255,.2); }
-    .btn-combine-bar { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; background: var(--blue); color: #fff; border: none; border-radius: var(--r4); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); }
-    .btn-combine-bar:hover { background: var(--blue-dk); }
+    .btn-combine-bar { display: inline-flex; align-items: center; gap: 5px; padding: 6px 14px; background: var(--blue); color: #fff; border: none; border-radius: var(--r4); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: background .15s; }
+    .btn-combine-bar:hover:not(:disabled) { background: var(--blue-dk); }
+    .btn-combine-bar:disabled { background: rgba(255,255,255,.15); color: rgba(255,255,255,.4); cursor: not-allowed; }
+    .conflict-msg { display: flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; color: #f8e9b3; }
+    .conflict-msg .mi { font-size: 16px; color: #f8e9b3; }
     .bgh { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: rgba(255,255,255,.7); cursor: pointer; padding: 4px 8px; border-radius: var(--r4); }
     .bgh:hover { color: #fff; background: rgba(255,255,255,.1); }
     .bdis { margin-left: auto; font-size: 12px; font-weight: 600; opacity: .5; cursor: pointer; }
+
+    /* Row conflict state */
+    tbody tr.conflict-row { background: #fff9f0 !important; }
+    tbody tr.conflict-row td:first-child { box-shadow: inset 3px 0 0 var(--amber); }
+    .conflict-tag { display: inline-flex; align-items: center; gap: 3px; padding: 1px 6px; border-radius: var(--rpill); font-size: 10px; font-weight: 700; background: var(--amber-bg); color: var(--amber); border: 1px solid rgba(129,101,6,.4); white-space: nowrap; cursor: help; }
+    .conflict-tag .mi { font-size: 11px; }
+
+    /* Tooltip */
+    .tip-wrap { position: relative; display: inline-flex; }
+    .tip-wrap .tip { position: absolute; bottom: calc(100% + 6px); left: 0; background: #2a1800; color: #f8e9b3; font-size: 11px; font-weight: 600; padding: 8px 12px; border-radius: var(--r4); pointer-events: none; opacity: 0; transition: opacity .13s; z-index: 50; border: 1px solid rgba(129,101,6,.5); width: 260px; white-space: normal; text-align: left; line-height: 1.6; }
+    .tip-wrap:hover .tip { opacity: 1; }
 
     /* Buttons */
     .btn { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: var(--r4); font-size: 13px; font-weight: 700; font-family: var(--font); cursor: pointer; border: 1px solid transparent; white-space: nowrap; }
@@ -365,9 +380,24 @@
           </tr>
         </thead>
         <tbody>
-          <tr class="sel" id="row-1">
+          <!-- data-lob / data-effdate / data-claimver used by live pre-check JS -->
+          <tr class="sel" id="row-1" data-lob="OAP" data-effdate="2027-01-01" data-claimver="v2026.Q1" data-daterange="2026-2028" data-fv="Standard">
             <td style="padding-left:14px;"><input type="checkbox" checked onchange="updateBulk()"></td>
-            <td><div class="nc"><div class="nc-top"><span class="sname">TX-Austin ASC+Fac Combined 2026 v3</span><span class="b b-latest">● Latest</span><span class="b b-comb"><span class="mi mi-xs">link</span> Combined</span></div><div class="nc-meta"><span class="nc-id">SCN-40291</span><span class="creator"><span class="av-dot av-a">SB</span>Skander B.</span><span class="ctag blue">TX-Neg-4</span></div></div></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">TX-Austin ASC+Fac Combined 2026 v3</span>
+                  <span class="b b-latest">● Latest</span>
+                  <span class="b b-comb"><span class="mi mi-xs">link</span> Combined</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-40291</span>
+                  <span class="creator"><span class="av-dot av-a">SB</span>Skander B.</span>
+                  <span class="ctag blue">TX-Neg-4</span>
+                  <span class="ctag" style="background:var(--border-sub);color:var(--ink-3);">LOB: OAP</span>
+                </div>
+              </div>
+            </td>
             <td><span class="b b-pp">Provider Proposal</span></td>
             <td><div style="display:flex;gap:3px;flex-wrap:wrap;"><span class="ct ct-asc">ASC</span><span class="ct ct-fac">Facility</span></div></td>
             <td style="font-size:12px;font-weight:600;">ASC Network</td>
@@ -375,9 +405,22 @@
             <td><span class="b b-yes"><span class="mi mi-xs">check_circle</span> Yes</span></td>
             <td><div class="dc">May 14, 2026<span class="dc-ts">2:30 PM</span></div></td>
           </tr>
-          <tr class="sel" id="row-2">
+          <tr class="sel" id="row-2" data-lob="New Business" data-effdate="2027-01-01" data-claimver="v2026.Q1" data-daterange="2026-2028" data-fv="Standard">
             <td style="padding-left:14px;"><input type="checkbox" checked onchange="updateBulk()"></td>
-            <td><div class="nc"><div class="nc-top"><span class="sname">TX-Austin ASC Base 2026 v2</span><span class="b b-latest">● Latest</span></div><div class="nc-meta"><span class="nc-id">SCN-40187</span><span class="creator"><span class="av-dot av-a">SB</span>Skander B.</span><span class="ctag blue">TX-Neg-4</span></div></div></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">TX-Austin ASC Base 2026 v2</span>
+                  <span class="b b-latest">● Latest</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-40187</span>
+                  <span class="creator"><span class="av-dot av-a">SB</span>Skander B.</span>
+                  <span class="ctag blue">TX-Neg-4</span>
+                  <span class="ctag" style="background:var(--border-sub);color:var(--ink-3);">LOB: New Business</span>
+                </div>
+              </div>
+            </td>
             <td><span class="b b-cp">Cigna Proposal</span></td>
             <td><div style="display:flex;gap:3px;"><span class="ct ct-asc">ASC</span></div></td>
             <td style="font-size:12px;font-weight:600;">ASC Network</td>
@@ -385,9 +428,22 @@
             <td><span class="b b-yes"><span class="mi mi-xs">check_circle</span> Yes</span></td>
             <td><div class="dc">May 12, 2026<span class="dc-ts">10:32 AM</span></div></td>
           </tr>
-          <tr id="row-3">
+          <tr id="row-3" data-lob="OAP" data-effdate="2027-01-01" data-claimver="v2026.Q1" data-daterange="2026-2028" data-fv="Standard">
             <td style="padding-left:14px;"><input type="checkbox" onchange="updateBulk()"></td>
-            <td><div class="nc"><div class="nc-top"><span class="sname">WA-Seattle Prof+Fac Combined v2</span><span class="b b-latest">● Latest</span><span class="b b-comb"><span class="mi mi-xs">link</span> Combined</span></div><div class="nc-meta"><span class="nc-id">SCN-38902</span><span class="creator"><span class="av-dot av-b">PN</span>Priya N.</span></div></div></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">WA-Seattle Prof+Fac Combined v2</span>
+                  <span class="b b-latest">● Latest</span>
+                  <span class="b b-comb"><span class="mi mi-xs">link</span> Combined</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-38902</span>
+                  <span class="creator"><span class="av-dot av-b">PN</span>Priya N.</span>
+                  <span class="ctag" style="background:var(--border-sub);color:var(--ink-3);">LOB: OAP</span>
+                </div>
+              </div>
+            </td>
             <td><span class="b b-fin"><span class="mi mi-xs">task_alt</span> Final</span></td>
             <td><div style="display:flex;gap:3px;flex-wrap:wrap;"><span class="ct ct-prof">Professional</span><span class="ct ct-fac">Facility</span></div></td>
             <td style="font-size:12px;font-weight:600;">Commercial PPO</td>
@@ -395,9 +451,21 @@
             <td><span class="b b-yes"><span class="mi mi-xs">check_circle</span> Yes</span></td>
             <td><div class="dc">May 14, 2026<span class="dc-ts">9:20 AM</span></div></td>
           </tr>
-          <tr id="row-4">
+          <tr id="row-4" data-lob="OAP" data-effdate="2028-01-01" data-claimver="v2026.Q1" data-daterange="2027-2029" data-fv="Standard">
             <td style="padding-left:14px;"><input type="checkbox" onchange="updateBulk()"></td>
-            <td><div class="nc"><div class="nc-top"><span class="sname">NY-Albany Commercial Facility v2</span><span class="b b-latest">● Latest</span></div><div class="nc-meta"><span class="nc-id">SCN-39714</span><span class="creator"><span class="av-dot av-c">AT</span>Aisha T.</span></div></div></td>
+            <td>
+              <div class="nc">
+                <div class="nc-top">
+                  <span class="sname">NY-Albany Commercial Facility v2</span>
+                  <span class="b b-latest">● Latest</span>
+                </div>
+                <div class="nc-meta">
+                  <span class="nc-id">SCN-39714</span>
+                  <span class="creator"><span class="av-dot av-c">AT</span>Aisha T.</span>
+                  <span class="ctag" style="background:var(--border-sub);color:var(--ink-3);">LOB: OAP</span>
+                </div>
+              </div>
+            </td>
             <td><span class="b b-test">Test</span></td>
             <td><div style="display:flex;gap:3px;"><span class="ct ct-fac">Facility</span></div></td>
             <td style="font-size:12px;font-weight:600;">Medicare Advantage</td>
@@ -408,11 +476,16 @@
         </tbody>
       </table>
 
-      <!-- BULK BAR -->
-      <div class="bulk">
+      <!-- BULK BAR — updates live as selection changes -->
+      <div class="bulk" id="bulk-bar">
         <span class="sc" id="sel-count">2 selected</span>
         <div class="bdiv"></div>
-        <button class="btn-combine-bar" onclick="goTo(2)">
+        <!-- Conflict message (hidden when no conflict) -->
+        <span class="conflict-msg" id="conflict-msg" style="display:none;">
+          <span class="mi">warning</span>
+          <span id="conflict-text"></span>
+        </span>
+        <button class="btn-combine-bar" id="combine-btn" onclick="goTo(2)">
           <span class="mi mi-sm">link</span> Combine Selected → Validate
         </button>
         <span class="bgh"><span class="mi mi-sm">label</span> Batch Tag</span>
@@ -907,12 +980,130 @@
 <script>
   let currentStep = 1;
 
+  // ── COMPATIBILITY RULES ──────────────────────────────────────
+  // Each rule: { key, label, getValue(row) }
+  // A conflict = any two selected rows have different values for the same rule
+  const RULES = [
+    { key: 'lob',       label: 'Line of Business', attr: 'data-lob' },
+    { key: 'effdate',   label: 'Effective Date',    attr: 'data-effdate' },
+    { key: 'claimver',  label: 'Claim Version',     attr: 'data-claimver' },
+    { key: 'daterange', label: 'Date Range',         attr: 'data-daterange' },
+    { key: 'fv',        label: 'Future Value',       attr: 'data-fv' },
+  ];
+
+  function getSelectedRows() {
+    return [...document.querySelectorAll('tbody tr')].filter(tr =>
+      tr.querySelector('input[type=checkbox]')?.checked
+    );
+  }
+
+  function checkCompatibility(rows) {
+    // Returns array of conflict objects: { rule, values: [{row, val}] }
+    const conflicts = [];
+    for (const rule of RULES) {
+      const values = rows.map(r => ({ row: r, val: r.getAttribute(rule.attr) || '' }));
+      const unique = [...new Set(values.map(v => v.val))];
+      if (unique.length > 1) {
+        conflicts.push({ rule, values, unique });
+      }
+    }
+    return conflicts;
+  }
+
+  function updateBulk() {
+    const rows = getSelectedRows();
+    const count = rows.length;
+    const bulk  = document.getElementById('bulk-bar');
+    const btn   = document.getElementById('combine-btn');
+    const msg   = document.getElementById('conflict-msg');
+    const txt   = document.getElementById('conflict-text');
+    const cntEl = document.getElementById('sel-count');
+
+    cntEl.textContent = count + ' selected';
+
+    // Clear all conflict styling first
+    document.querySelectorAll('tbody tr').forEach(tr => {
+      tr.classList.remove('conflict-row');
+      // Remove any injected conflict tags
+      tr.querySelectorAll('.injected-conflict-tag').forEach(el => el.remove());
+    });
+
+    if (count < 2) {
+      // Not enough to combine — just show count, no conflict
+      bulk.classList.remove('has-conflict');
+      msg.style.display = 'none';
+      btn.disabled = count < 2;
+      btn.innerHTML = `<span class="mi mi-sm">link</span> Combine Selected → Validate`;
+      return;
+    }
+
+    const conflicts = checkCompatibility(rows);
+
+    if (conflicts.length === 0) {
+      // All good — green-light the button
+      bulk.classList.remove('has-conflict');
+      msg.style.display = 'none';
+      btn.disabled = false;
+      btn.innerHTML = `<span class="mi mi-sm">link</span> Combine Selected → Validate`;
+    } else {
+      // Conflicts found — dark-amber bulk bar, disabled button, inline row tags
+      bulk.classList.add('has-conflict');
+
+      // Build conflict summary for the bar
+      const conflictLabels = conflicts.map(c => {
+        const vals = c.unique.join(' vs ');
+        return `${c.rule.label} mismatch (${vals})`;
+      });
+      txt.textContent = conflictLabels[0]; // show primary conflict
+      if (conflicts.length > 1) txt.textContent += ` + ${conflicts.length - 1} more`;
+      msg.style.display = 'flex';
+
+      btn.disabled = true;
+      btn.innerHTML = `<span class="mi mi-sm">block</span> Cannot combine`;
+
+      // Mark conflicting rows + inject inline conflict tag
+      for (const conflict of conflicts) {
+        // Find rows that don't match the majority value
+        const valueCounts = {};
+        conflict.values.forEach(v => { valueCounts[v.val] = (valueCounts[v.val] || 0) + 1; });
+        const majorityVal = Object.entries(valueCounts).sort((a,b) => b[1]-a[1])[0][0];
+
+        conflict.values.forEach(({ row, val }) => {
+          row.classList.add('conflict-row');
+          // Inject conflict tag into the name cell's nc-meta div
+          const metaDiv = row.querySelector('.nc-meta');
+          if (metaDiv) {
+            const existing = metaDiv.querySelector(`.injected-conflict-tag[data-rule="${conflict.rule.key}"]`);
+            if (!existing) {
+              const tag = document.createElement('span');
+              tag.className = 'tip-wrap injected-conflict-tag';
+              tag.setAttribute('data-rule', conflict.rule.key);
+              tag.innerHTML = `
+                <span class="conflict-tag">
+                  <span class="mi" style="font-size:11px">warning</span>
+                  ${conflict.rule.label}: ${val}
+                </span>
+                <span class="tip">${conflict.rule.label} mismatch:<br>This scenario has <strong>${val}</strong> — other selected scenario(s) have <strong>${conflict.unique.filter(u => u !== val).join(', ')}</strong>.<br><br>Uncheck this scenario or select one with matching ${conflict.rule.label} to proceed.</span>
+              `;
+              metaDiv.appendChild(tag);
+            }
+          }
+        });
+      }
+    }
+
+    // Update row sel class
+    document.querySelectorAll('tbody tr').forEach(tr => {
+      const cb = tr.querySelector('input[type=checkbox]');
+      if (!tr.classList.contains('conflict-row')) {
+        tr.classList.toggle('sel', cb?.checked);
+      }
+    });
+  }
+
   function goTo(step) {
-    // Update panels
     document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
     document.getElementById('panel-' + step).classList.add('active');
-
-    // Update stepper indicators
     for (let i = 1; i <= 3; i++) {
       const ind = document.getElementById('step-ind-' + i);
       const circle = document.getElementById('sc' + i);
@@ -927,8 +1118,6 @@
         circle.textContent = i;
       }
     }
-
-    // Update header
     const titles = {
       1: ['Select Scenarios', 'Choose the scenarios you want to combine'],
       2: ['Validate Compatibility', 'All 6 rules must pass before combining'],
@@ -940,18 +1129,8 @@
     window.scrollTo(0, 0);
   }
 
-  function updateBulk() {
-    const checked = document.querySelectorAll('tbody input[type=checkbox]:checked');
-    const count = checked.length;
-    document.getElementById('sel-count').textContent = count + ' selected';
-    document.querySelectorAll('tbody tr').forEach(row => {
-      const cb = row.querySelector('input[type=checkbox]');
-      row.classList.toggle('sel', cb && cb.checked);
-    });
-  }
-
   function toggleAll(cb) {
-    document.querySelectorAll('tbody input[type=checkbox]').forEach(c => { c.checked = cb.checked; });
+    document.querySelectorAll('tbody input[type=checkbox]').forEach(c => c.checked = cb.checked);
     updateBulk();
   }
 
@@ -960,6 +1139,9 @@
     document.getElementById('chk-all').checked = false;
     updateBulk();
   }
+
+  // Run on load to show the initial conflict state (rows 1+2 are pre-checked and conflict)
+  document.addEventListener('DOMContentLoaded', updateBulk);
 </script>
 </body>
 </html>

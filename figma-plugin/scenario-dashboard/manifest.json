@@ -1,8 +1,0 @@
-{
-  "name": "Scenario Dashboard Builder",
-  "id": "scenario-dashboard-builder-001",
-  "api": "1.0.0",
-  "main": "code.js",
-  "editorType": ["figma"],
-  "ui": "ui.html"
-}
