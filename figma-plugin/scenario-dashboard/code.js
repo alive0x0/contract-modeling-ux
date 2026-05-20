@@ -72,7 +72,8 @@ figma.ui.onmessage = async (msg) => {
 
     const solid = (c, o = 1) => [{ type: 'SOLID', color: c, opacity: o }];
     const noFill = [];
-    const S = (c, w = 1) => [{ type: 'SOLID', color: c, strokeWeight: w }];
+    // Stroke paint array — strokeWeight must be set on the frame, NOT inside this array
+    const S = (c) => [{ type: 'SOLID', color: c }];
 
     // ── HELPERS ───────────────────────────────────────────────
     // Map weight names to exact Nunito Sans style strings Figma recognises
@@ -299,6 +300,7 @@ figma.ui.onmessage = async (msg) => {
       hdr.itemSpacing = 48;
       hdr.counterAxisAlignItems = 'CENTER';
       hdr.strokes = S(C.border);
+      hdr.strokeWeight = 1;
       hdr.strokeAlign = 'OUTSIDE';
 
       // Left — title block
@@ -970,8 +972,8 @@ figma.ui.onmessage = async (msg) => {
       noteF.paddingTop = 4; noteF.paddingBottom = 4;
       noteF.fills = solid(C.thBg);
       noteF.cornerRadius = 4;
-      noteF.strokes = S(C.border); noteF.strokeWeight = 1;
-      noteF.strokes = [{ type: 'SOLID', color: C.border }];
+      noteF.strokes = S(C.border);
+      noteF.strokeWeight = 1;
       noteF.strokeAlign = 'INSIDE';
       noteF.appendChild(txt(m.note, 10, 'Regular', C.ink2, { width: memberStatW - 36 }));
       mc.appendChild(noteF);
