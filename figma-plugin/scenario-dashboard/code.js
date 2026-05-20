@@ -235,7 +235,7 @@ figma.ui.onmessage = async (msg) => {
       // Nav links
       const navLinks = hbox(0, 'Nav Links');
       navLinks.paddingLeft = 24; navLinks.paddingRight = 24;
-      navLinks.counterAxisAlignItems = 'STRETCH';
+      navLinks.counterAxisAlignItems = 'MIN';
 
       const links = [
         { label: 'Scenario', active: false },
@@ -274,13 +274,10 @@ figma.ui.onmessage = async (msg) => {
       right.appendChild(txt('Help', 14, 'SemiBold', C.ink));
       right.appendChild(icon('notifications', 18, C.ink2));
       const av = figma.createFrame();
-      av.resize(28, 28); av.cornerRadius = 1000;
-      av.fills = solid(C.blue); av.name = 'Avatar';
       av.layoutMode = 'HORIZONTAL';
-      av.primaryAxisAlignItems = 'CENTER';
-      av.counterAxisAlignItems = 'CENTER';
-      av.primaryAxisSizingMode = 'FIXED';
-      av.counterAxisSizingMode = 'FIXED';
+      av.primaryAxisSizingMode = 'FIXED'; av.counterAxisSizingMode = 'FIXED';
+      av.primaryAxisAlignItems = 'CENTER'; av.counterAxisAlignItems = 'CENTER';
+      av.resize(28, 28); av.cornerRadius = 1000;
       av.appendChild(txt('GX', 11, 'Bold', C.white));
       right.appendChild(av);
       nav.appendChild(right);
@@ -463,14 +460,12 @@ figma.ui.onmessage = async (msg) => {
         const avRow = hbox(4, 'Creator');
         avRow.counterAxisAlignItems = 'CENTER';
         const avDot = figma.createFrame();
+        avDot.layoutMode = 'HORIZONTAL';
+        avDot.primaryAxisSizingMode = 'FIXED'; avDot.counterAxisSizingMode = 'FIXED';
+        avDot.primaryAxisAlignItems = 'CENTER'; avDot.counterAxisAlignItems = 'CENTER';
         avDot.resize(16, 16); avDot.cornerRadius = 100;
         avDot.fills = solid(s.avColor || C.blue);
         avDot.name = 'Avatar Dot';
-        avDot.layoutMode = 'HORIZONTAL';
-        avDot.primaryAxisAlignItems = 'CENTER';
-        avDot.counterAxisAlignItems = 'CENTER';
-        avDot.primaryAxisSizingMode = 'FIXED';
-        avDot.counterAxisSizingMode = 'FIXED';
         avDot.appendChild(txt(s.initials, 8, 'Bold', C.white));
         avRow.appendChild(avDot);
         avRow.appendChild(txt(s.creator, 11, 'SemiBold', C.ink2));
@@ -701,10 +696,11 @@ figma.ui.onmessage = async (msg) => {
             meta.counterAxisAlignItems = 'CENTER';
             meta.appendChild(txt(cell.id, 10, 'SemiBold', C.ink3));
             const av2 = figma.createFrame();
+            av2.layoutMode = 'HORIZONTAL';
+            av2.primaryAxisSizingMode = 'FIXED'; av2.counterAxisSizingMode = 'FIXED';
+            av2.primaryAxisAlignItems = 'CENTER'; av2.counterAxisAlignItems = 'CENTER';
             av2.resize(14, 14); av2.cornerRadius = 100;
             av2.fills = solid(cell.avColor || C.blue);
-            av2.layoutMode = 'HORIZONTAL'; av2.primaryAxisAlignItems = 'CENTER'; av2.counterAxisAlignItems = 'CENTER';
-            av2.primaryAxisSizingMode = 'FIXED'; av2.counterAxisSizingMode = 'FIXED';
             av2.appendChild(txt(cell.initials, 7, 'Bold', C.white));
             meta.appendChild(av2);
             meta.appendChild(txt(cell.creator, 11, 'Regular', C.ink2));
@@ -759,15 +755,17 @@ figma.ui.onmessage = async (msg) => {
             const ab = hbox(4, 'Actions');
             ab.counterAxisAlignItems = 'CENTER';
             const runBtn = figma.createFrame();
-            runBtn.layoutMode = 'HORIZONTAL'; runBtn.primaryAxisAlignItems = 'CENTER'; runBtn.counterAxisAlignItems = 'CENTER';
+            runBtn.layoutMode = 'HORIZONTAL';
             runBtn.primaryAxisSizingMode = 'FIXED'; runBtn.counterAxisSizingMode = 'FIXED';
+            runBtn.primaryAxisAlignItems = 'CENTER'; runBtn.counterAxisAlignItems = 'CENTER';
             runBtn.resize(28, 28); runBtn.cornerRadius = 4; runBtn.fills = solid(C.thBg);
             runBtn.strokes = S(C.border); runBtn.strokeWeight = 1;
             runBtn.appendChild(icon('play_arrow', 16, C.ink2));
             ab.appendChild(runBtn);
             const moreBtn = figma.createFrame();
-            moreBtn.layoutMode = 'HORIZONTAL'; moreBtn.primaryAxisAlignItems = 'CENTER'; moreBtn.counterAxisAlignItems = 'CENTER';
+            moreBtn.layoutMode = 'HORIZONTAL';
             moreBtn.primaryAxisSizingMode = 'FIXED'; moreBtn.counterAxisSizingMode = 'FIXED';
+            moreBtn.primaryAxisAlignItems = 'CENTER'; moreBtn.counterAxisAlignItems = 'CENTER';
             moreBtn.resize(28, 28); moreBtn.cornerRadius = 4; moreBtn.fills = solid(C.thBg);
             moreBtn.strokes = S(C.border); moreBtn.strokeWeight = 1;
             moreBtn.appendChild(icon('more_vert', 16, C.ink2));
@@ -934,11 +932,11 @@ figma.ui.onmessage = async (msg) => {
       const topR = hbox(8, 'Member Top');
       topR.counterAxisAlignItems = 'CENTER';
       const avF = figma.createFrame();
+      avF.layoutMode = 'HORIZONTAL';
+      avF.primaryAxisSizingMode = 'FIXED'; avF.counterAxisSizingMode = 'FIXED';
+      avF.primaryAxisAlignItems = 'CENTER'; avF.counterAxisAlignItems = 'CENTER';
       avF.resize(28, 28); avF.cornerRadius = 100;
       avF.fills = solid(m.avColor);
-      avF.layoutMode = 'HORIZONTAL';
-      avF.primaryAxisAlignItems = 'CENTER'; avF.counterAxisAlignItems = 'CENTER';
-      avF.primaryAxisSizingMode = 'FIXED'; avF.counterAxisSizingMode = 'FIXED';
       avF.appendChild(txt(m.initials, 11, 'Bold', C.white));
       topR.appendChild(avF);
       const nameV = vbox(1, 'Name');
@@ -1169,8 +1167,9 @@ figma.ui.onmessage = async (msg) => {
     pageNav.counterAxisAlignItems = 'CENTER';
     for (const p of ['chevron_left', '1', '2', '3', 'chevron_right']) {
       const pb = figma.createFrame();
-      pb.layoutMode = 'HORIZONTAL'; pb.primaryAxisAlignItems = 'CENTER'; pb.counterAxisAlignItems = 'CENTER';
+      pb.layoutMode = 'HORIZONTAL';
       pb.primaryAxisSizingMode = 'FIXED'; pb.counterAxisSizingMode = 'FIXED';
+      pb.primaryAxisAlignItems = 'CENTER'; pb.counterAxisAlignItems = 'CENTER';
       pb.resize(28, 28); pb.cornerRadius = 4;
       if (p === '1') { pb.fills = solid(C.blue); pb.appendChild(txt('1', 12, 'Bold', C.white)); }
       else if (p === 'chevron_left' || p === 'chevron_right') { pb.fills = solid(C.white); pb.strokes = S(C.border); pb.strokeWeight = 1; pb.appendChild(icon(p, 16, C.ink2)); }
