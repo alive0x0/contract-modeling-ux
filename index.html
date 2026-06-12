@@ -1,0 +1,1307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Combined Scenario — Interactive Wireflow</title>
+<link rel="preconnect" href="https://fonts.bunny.net">
+<link href="https://fonts.bunny.net/css?family=nunito-sans:400,600,700,800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<style>
+/* ── Reset & Tokens ── */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --font:'Nunito Sans',system-ui,sans-serif;
+  --icon:'Material Symbols Rounded';
+  --primary:#0033FF;
+  --primary-dark:#110081;
+  --primary-mid:#B4D1FF;
+  --ink:#353331;
+  --ink-muted:#6B6966;
+  --ink-disabled:#A3A19F;
+  --border:#DBDDE9;
+  --border-strong:#C1C4D4;
+  --bg-screen:#FDFDFF;
+  --bg-low:#F1F3FC;
+  --error:#A90000;
+  --success:#488319;
+  --warn-bg:#FEF3C7;
+  --warn-icon:#D97706;
+  --combined-bg:#E6DEF7;
+  --combined-text:#3F2C6B;
+  --badge-blue-bg:#B4D1FF;
+  --tag-r:1000px;
+}
+body{font-family:var(--font);color:var(--ink);background:#eef0f8;display:flex;flex-direction:column;align-items:center;padding:24px 16px 60px;min-height:100vh}
+
+/* ── Step Progress Bar ── */
+.step-nav{display:flex;align-items:center;gap:0;background:#fff;border:1px solid var(--border);border-radius:12px;padding:10px 20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,51,.06);width:100%;max-width:1280px;flex-wrap:wrap;gap:6px 0}
+.step-item{display:flex;align-items:center;gap:6px;padding:6px 12px;cursor:pointer;border-radius:8px;transition:background .15s;font-size:13px;font-weight:600;color:var(--ink-muted);white-space:nowrap}
+.step-item:hover{background:var(--bg-low)}
+.step-item.active{background:var(--primary);color:#fff}
+.step-item.done{color:var(--success)}
+.step-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;background:var(--bg-low);color:var(--ink-muted)}
+.step-item.active .step-num{background:rgba(255,255,255,.25);color:#fff}
+.step-item.done .step-num{background:var(--success);color:#fff}
+.step-arrow{font-family:var(--icon);font-size:16px;color:var(--ink-disabled);line-height:1}
+
+/* ── Screen Frame ── */
+.screen{display:none;width:1280px;max-width:100%;background:#fff;border-radius:12px;box-shadow:0 4px 24px rgba(0,0,51,.1);overflow:hidden;flex-direction:column}
+.screen.active{display:flex}
+
+/* ── Annotation Banner ── */
+.ann{background:#1a1a3e;color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ann-tag{background:var(--primary);color:#fff;padding:2px 10px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap}
+.ann-text{font-size:13px;font-weight:600;color:#c8d0f0;flex:1}
+.ann-nav{display:flex;gap:8px;flex-shrink:0}
+.ann-btn{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:#fff;padding:5px 14px;border-radius:6px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer}
+.ann-btn:hover{background:rgba(255,255,255,.25)}
+.ann-btn.primary-ann{background:var(--primary);border-color:var(--primary)}
+
+/* ── Navigation Bar ── */
+.cn-nav{height:40px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px 0 12px;gap:0;flex-shrink:0}
+.cn-nav-logo{font-family:var(--icon);font-size:22px;color:var(--primary-dark);line-height:1;margin-right:4px}
+.cn-nav-app{font-size:16px;font-weight:600;color:var(--ink);margin-right:20px}
+.cn-nav-link{padding:12px 14px 4px;font-size:14px;font-weight:600;color:var(--ink-muted);cursor:pointer;border-bottom:2px solid transparent;display:flex;align-items:center;gap:3px;white-space:nowrap}
+.cn-nav-link.active{color:var(--primary);border-bottom-color:var(--primary)}
+.cn-nav-link .ico{font-family:var(--icon);font-size:15px;line-height:1}
+.cn-nav-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.cn-avatar{width:28px;height:28px;border-radius:50%;background:var(--primary);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+
+/* ── Screen Header ── */
+.cn-header{background:var(--bg-screen);padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.cn-page-title{font-size:26px;font-weight:700;color:var(--ink)}
+.cn-page-sub{font-size:13px;font-weight:600;color:var(--ink-muted);display:flex;align-items:center;gap:8px;margin-top:4px;flex-wrap:wrap}
+.cn-header-actions{display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:wrap}
+
+/* ── Breadcrumb ── */
+.cn-breadcrumb{background:var(--bg-screen);padding:0 12px;display:flex;align-items:center;border-bottom:1px solid var(--border);height:32px;flex-shrink:0}
+.cn-breadcrumb a,.cn-breadcrumb span{font-size:13px;font-weight:600;color:var(--primary);padding:2px 4px;text-decoration:none}
+.cn-breadcrumb .sep{font-family:var(--icon);font-size:18px;color:var(--ink-disabled);line-height:1}
+
+/* ── Buttons ── */
+.btn{display:inline-flex;align-items:center;gap:5px;height:32px;padding:0 12px;border-radius:4px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.btn .ico{font-family:var(--icon);font-size:16px;line-height:1}
+.btn-ghost{background:#fff;border:1px solid var(--primary);color:var(--primary)}
+.btn-ghost:hover{background:var(--bg-low)}
+.btn-primary{background:var(--primary);border:1px solid var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-danger{background:#fff;border:1px solid var(--error);color:var(--error)}
+.btn-text{background:none;border:none;color:var(--primary);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;padding:0 4px}
+.btn:disabled,.btn[disabled]{opacity:.45;cursor:not-allowed;pointer-events:none}
+.btn-sm{height:26px;padding:0 8px;font-size:12px}
+
+/* ── Tags / Pills ── */
+.tag{display:inline-flex;align-items:center;gap:4px;border-radius:var(--tag-r);padding:3px 8px;font-size:12px;font-weight:700}
+.tag-blue{background:var(--badge-blue-bg);color:var(--ink)}
+.tag-combined{background:var(--combined-bg);color:var(--combined-text)}
+.tag-combined .ico{font-family:var(--icon);font-size:14px;line-height:1}
+.tag-green{background:#DCFCE7;color:#15803D}
+.tag-warn{background:var(--warn-bg);color:#92400E}
+.tag-gray{background:var(--bg-low);color:var(--ink-muted)}
+.tag-success{background:#DCFCE7;color:#166534}
+.tag-red{background:#FEE2E2;color:var(--error)}
+.tag-fac{background:#DBEAFE;color:#1D4ED8}
+.tag-pro{background:#F0FDF4;color:#15803D}
+.status-run{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:var(--ink-muted)}
+
+/* ── Table ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{background:var(--bg-low);padding:8px 10px;text-align:left;font-weight:700;color:var(--ink);border-bottom:2px solid var(--border-strong);white-space:nowrap;font-size:12px}
+thead th.center{text-align:center}
+tbody tr{border-bottom:1px solid var(--border);transition:background .1s}
+tbody tr:hover{background:#f8f9ff}
+tbody tr.selected{background:#EEF2FF}
+tbody td{padding:8px 10px;color:var(--ink);font-size:13px;vertical-align:middle}
+tbody td.center{text-align:center}
+tbody td .tag{font-size:11px;padding:2px 7px}
+.cb-col{width:36px;min-width:36px;padding:6px 10px;text-align:center}
+input[type=checkbox]{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+
+/* ── Bulk Bar ── */
+.bulk-bar{display:none;align-items:center;gap:12px;padding:8px 16px;background:#EEF2FF;border-bottom:1px solid #C7D2FE;flex-shrink:0}
+.bulk-bar.visible{display:flex}
+.bulk-bar .ico{font-family:var(--icon);font-size:16px;line-height:1}
+.bulk-count{font-size:14px;font-weight:700;color:var(--ink)}
+.bulk-sep{width:1px;height:20px;background:var(--border-strong);margin:0 4px}
+.bulk-action{background:none;border:none;color:var(--primary);font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.bulk-action.warn-action{color:var(--warn-icon)}
+.bulk-action.danger{color:var(--error)}
+
+/* ── Popover ── */
+.overlay-bg{position:fixed;inset:0;background:rgba(30,30,50,.3);z-index:900;display:none}
+.overlay-bg.open{display:block}
+.popover-wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:1000;pointer-events:none}
+.popover{background:#fff;border:1px solid var(--border);border-radius:16px;box-shadow:0 12px 40px rgba(0,0,51,.15);pointer-events:all;width:520px;max-width:calc(100vw - 40px);max-height:90vh;overflow-y:auto;display:none;flex-direction:column}
+.popover.open{display:flex}
+.pop-header{padding:20px 20px 12px;border-bottom:1px solid var(--border)}
+.pop-title{font-size:18px;font-weight:700;color:var(--ink)}
+.pop-body{padding:16px 20px;display:flex;flex-direction:column;gap:14px;flex:1}
+.pop-footer{padding:12px 20px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.pop-warn{background:var(--warn-bg);border:1px solid #FDE68A;border-radius:8px;padding:10px 12px;display:flex;align-items:flex-start;gap:8px}
+.pop-warn .ico{font-family:var(--icon);font-size:18px;color:var(--warn-icon);line-height:1;flex-shrink:0;margin-top:1px}
+.pop-warn-text{font-size:13px;font-weight:600;color:#92400E;line-height:1.5}
+.scenario-list{display:flex;flex-direction:column;gap:6px}
+.scenario-row{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:#fafafa;transition:background .15s}
+.scenario-row.conflict{background:var(--warn-bg);border-color:#FDE68A}
+.scenario-row-info{flex:1;min-width:0}
+.scenario-row-name{font-size:13px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scenario-row-sub{font-size:12px;color:var(--ink-muted);margin-top:2px}
+.scenario-remove{background:none;border:none;font-family:var(--icon);font-size:18px;color:var(--ink-disabled);cursor:pointer;line-height:1;padding:2px;flex-shrink:0}
+.scenario-remove:hover{color:var(--error)}
+.pop-field{display:flex;flex-direction:column;gap:4px}
+.pop-label{font-size:13px;font-weight:700;color:var(--ink)}
+.pop-hint{font-size:12px;color:var(--ink-muted)}
+.pop-input{border:1px solid var(--border-strong);border-radius:4px;padding:8px 10px;font-family:var(--font);font-size:14px;color:var(--ink);width:100%}
+.pop-input:focus{outline:2px solid var(--primary);border-color:var(--primary)}
+.pop-section-label{font-size:11px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.6px}
+
+/* ── Right Drawer ── */
+.page-with-drawer{display:flex;flex:1;overflow:hidden}
+.main-content{flex:1;overflow-y:auto;min-width:0}
+.drawer{width:0;overflow:hidden;transition:width .25s cubic-bezier(.4,0,.2,1);flex-shrink:0;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column}
+.drawer.open{width:380px;min-width:380px}
+.drawer-header{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-title{font-size:16px;font-weight:700;color:var(--ink)}
+.drawer-close{background:none;border:none;font-family:var(--icon);font-size:20px;color:var(--ink-muted);cursor:pointer;line-height:1;padding:2px}
+.drawer-body{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+
+/* ── Source Scenario Card (drawer) ── */
+.source-card{border:1px solid var(--border);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;position:relative}
+.source-card.stale{border-color:#FCA5A5;background:#FFF7F7}
+.source-card-name{font-size:13px;font-weight:700;color:var(--ink)}
+.source-card-meta{font-size:12px;color:var(--ink-muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.source-card-warn{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#B91C1C;margin-top:2px}
+.source-card-actions{display:flex;gap:8px;margin-top:4px}
+
+/* ── Activity Log Drawer ── */
+.activity-entry{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.activity-entry:last-child{border-bottom:none}
+.activity-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--icon);font-size:14px;line-height:1;margin-top:1px}
+.dot-diverged{background:#FEF3C7;color:var(--warn-icon)}
+.dot-created{background:var(--bg-low);color:var(--ink-muted)}
+.dot-rerun{background:#DCFCE7;color:var(--success)}
+.dot-added{background:#EDE9FE;color:#7C3AED}
+.dot-updated{background:#DBEAFE;color:#1D4ED8}
+.dot-modified{background:#FEE2E2;color:var(--error)}
+.activity-content{flex:1;min-width:0}
+.activity-date{font-size:11px;font-weight:700;color:var(--ink-muted);margin-bottom:4px}
+.activity-event{font-size:13px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.activity-who{font-size:12px;color:var(--ink-muted);margin-top:2px;display:flex;align-items:center;gap:4px}
+.activity-avatar{width:20px;height:20px;border-radius:50%;background:var(--primary);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.activity-detail{font-size:12px;color:var(--ink-muted);line-height:1.5;margin-top:4px}
+.activity-detail a{color:var(--primary)}
+
+/* ── Left Rail ── */
+.left-rail{width:210px;min-width:210px;border-right:1px solid var(--border);flex-shrink:0;padding:8px 0;background:var(--bg-low)}
+.rail-item{padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink-muted);cursor:pointer;border-right:3px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rail-item:hover{background:#E8EAF6;color:var(--primary)}
+.rail-item.active{color:var(--primary);border-right-color:var(--primary);background:#EEF2FF;font-weight:700}
+
+/* ── Trend Table (detailed) ── */
+.trend-section{padding:16px}
+.trend-section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.section-title{font-size:15px;font-weight:700;color:var(--ink)}
+.segmented{display:flex;border:1px solid var(--border-strong);border-radius:6px;overflow:hidden}
+.seg-btn{padding:5px 12px;font-size:12px;font-weight:600;color:var(--ink-muted);background:#fff;border:none;cursor:pointer;font-family:var(--font)}
+.seg-btn.active{background:var(--primary);color:#fff}
+.seg-btn:not(.active):hover{background:var(--bg-low)}
+
+/* ── Tabs ── */
+.tabs{display:flex;border-bottom:2px solid var(--border);padding:0 16px;background:var(--bg-screen);flex-shrink:0}
+.tab{padding:10px 16px;font-size:14px;font-weight:600;color:var(--ink-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tab:hover:not(.active){color:var(--ink)}
+
+/* ── Tag Popover (bulk update) ── */
+.tag-pop{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,51,.12);z-index:50;min-width:240px;padding:12px;display:none}
+.tag-pop.open{display:block}
+.tag-pop::before{content:'';position:absolute;top:-7px;left:20px;width:12px;height:12px;background:#fff;border-left:1px solid var(--border);border-top:1px solid var(--border);transform:rotate(45deg)}
+.tag-pop-title{font-size:12px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.tag-option{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:6px;cursor:pointer}
+.tag-option:hover{background:var(--bg-low)}
+.tag-option label{font-size:13px;font-weight:600;color:var(--ink);cursor:pointer}
+.tag-pop-footer{border-top:1px solid var(--border);padding-top:10px;margin-top:8px;display:flex;gap:8px}
+
+/* ── Info Banner ── */
+.info-banner{padding:10px 16px;background:#EFF6FF;border-bottom:1px solid #BFDBFE;display:flex;align-items:flex-start;gap:8px;font-size:13px;font-weight:600;color:#1E40AF;flex-shrink:0}
+.info-banner .ico{font-family:var(--icon);font-size:16px;line-height:1;flex-shrink:0;margin-top:1px}
+
+/* ── Details: Trend breakdown sub-table ── */
+.tbl-group-header{background:#EEF2FF;font-size:12px;font-weight:700;color:var(--primary)}
+.tbl-group-header td{padding:6px 10px}
+.tbl-total{background:var(--bg-low);font-weight:700}
+.percent-pos{color:#166534}
+.percent-neg{color:var(--error)}
+.sub-row td{padding:6px 10px 6px 24px;font-size:12px;border-bottom:1px solid var(--border)}
+
+/* ── Step 5 — Source Mgmt ── */
+.source-mgmt-row{display:flex;align-items:flex-start;gap:8px;padding:10px;border:1px solid var(--border);border-radius:8px;transition:background .15s}
+.source-mgmt-row:hover{background:var(--bg-low)}
+.source-mgmt-row.stale{border-color:#FCA5A5;background:#FFF5F5}
+.source-left{flex:1;min-width:0}
+.source-name{font-size:13px;font-weight:700;color:var(--ink)}
+.source-meta{font-size:12px;color:var(--ink-muted);margin-top:2px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.source-actions{display:flex;gap:6px;flex-shrink:0;align-items:flex-start;flex-wrap:wrap}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1a1a3e;color:#fff;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:600;box-shadow:0 4px 20px rgba(0,0,0,.3);z-index:9999;display:none;align-items:center;gap:8px;white-space:nowrap}
+.toast.show{display:flex}
+.toast .ico{font-family:var(--icon);font-size:16px;line-height:1;color:#86efac}
+
+/* ── Empty state ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;gap:12px;padding:48px 24px;color:var(--ink-muted);text-align:center}
+.empty-state .ico{font-family:var(--icon);font-size:48px;line-height:1;color:var(--ink-disabled)}
+
+/* ── Progress step indicator (detail header) ── */
+.run-strip{display:flex;align-items:center;gap:6px;padding:6px 16px;background:var(--bg-low);border-bottom:1px solid var(--border);font-size:12px;color:var(--ink-muted);flex-shrink:0;flex-wrap:wrap}
+.run-strip .ico{font-family:var(--icon);font-size:14px;line-height:1}
+
+/* responsive helpers */
+@media(max-width:900px){.drawer.open{width:300px;min-width:300px}.left-rail{width:160px;min-width:160px}}
+</style>
+</head>
+<body>
+
+<!-- ── STEP NAV ── -->
+<nav class="step-nav" id="stepNav">
+  <div class="step-item done" onclick="goTo(1)"><div class="step-num">✓</div>Scenario List</div>
+  <span class="step-arrow">chevron_right</span>
+  <div class="step-item done" onclick="goTo(2)"><div class="step-num">✓</div>Select & Validate</div>
+  <span class="step-arrow">chevron_right</span>
+  <div class="step-item done" onclick="goTo(3)"><div class="step-num">✓</div>Confirm & Run</div>
+  <span class="step-arrow">chevron_right</span>
+  <div class="step-item done" onclick="goTo(4)"><div class="step-num">✓</div>Combined Detail</div>
+  <span class="step-arrow">chevron_right</span>
+  <div class="step-item active" onclick="goTo(5)"><div class="step-num">5</div>Bulk Update Tags</div>
+  <span class="step-arrow">chevron_right</span>
+  <div class="step-item" onclick="goTo(6)"><div class="step-num">6</div>Activity Log</div>
+  <span class="step-arrow">chevron_right</span>
+  <div class="step-item" onclick="goTo(7)"><div class="step-num">7</div>Source Management</div>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 1 — Scenario Dashboard (base state)
+═════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen-1">
+  <div class="ann">
+    <span class="ann-tag">Screen 1 of 7</span>
+    <span class="ann-text">Scenario Dashboard — Base state. Users browse scenarios. Click column header to sort. Click rows to select. Use <strong>Bulk Actions</strong> to enter multi-select mode and reveal Combine + Update Tag options.</span>
+    <div class="ann-nav">
+      <button class="ann-btn primary-ann" onclick="goTo(2)">Next: Select Scenarios →</button>
+    </div>
+  </div>
+  <!-- Nav -->
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span>
+    <span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-link">Ratesheet History <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-link">Ratesheet Maintenance <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right">
+      <span class="ico" style="font-family:var(--icon);font-size:18px;color:var(--ink-muted)">search</span>
+      <span class="ico" style="font-family:var(--icon);font-size:18px;color:var(--ink-muted)">notifications</span>
+      <div class="cn-avatar">EN</div>
+    </div>
+  </div>
+  <!-- Header -->
+  <div class="cn-header">
+    <div>
+      <div class="cn-page-title">Scenarios</div>
+      <div class="cn-page-sub">
+        <span>My Market · Central Region</span>
+        <span style="color:var(--border-strong)">|</span>
+        <span>Renewals &lt;90 days</span>
+        <span class="tag tag-gray" style="font-size:11px">600 total</span>
+      </div>
+    </div>
+    <div class="cn-header-actions">
+      <div style="display:flex;border:1px solid var(--border-strong);border-radius:4px;overflow:hidden">
+        <input style="border:none;padding:0 10px;font-family:var(--font);font-size:13px;width:260px;color:var(--ink);outline:none" placeholder="Search by name, ID, system, or tag…">
+        <span style="font-family:var(--icon);font-size:18px;padding:0 8px;display:flex;align-items:center;color:var(--ink-muted);background:var(--bg-low)">search</span>
+      </div>
+      <button class="btn btn-ghost"><span class="ico">filter_alt</span>Combined Only</button>
+      <button class="btn btn-primary" onclick="goTo(2)"><span class="ico">add</span>Create Scenario</button>
+    </div>
+  </div>
+  <!-- Table -->
+  <div style="padding:12px 16px 4px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:13px;font-weight:700;color:var(--ink)">Scenarios — Created By: Your Team</span>
+    <button class="btn-text" onclick="goTo(2)">☑ Bulk Actions</button>
+  </div>
+  <div class="tbl-wrap" style="padding:0 16px 16px">
+    <table id="tbl1">
+      <thead>
+        <tr>
+          <th>Scenario Name</th>
+          <th>ID</th>
+          <th>Type</th>
+          <th>Contract Office</th>
+          <th>System</th>
+          <th>Status</th>
+          <th>Tags</th>
+          <th>Last Run</th>
+          <th style="width:70px">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbl1Body"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 2 — Multi-select state + Combine Popover
+═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-2">
+  <div class="ann">
+    <span class="ann-tag">Screen 2 of 7</span>
+    <span class="ann-text">Multi-select mode — 3 scenarios checked (⚠️ misaligned dates warning on action bar). Click <strong>Combine Scenarios</strong> to open the validation popover. Remove the conflicting scenario to enable <em>Confirm &amp; Run</em>.</span>
+    <div class="ann-nav">
+      <button class="ann-btn" onclick="goTo(1)">← Back</button>
+      <button class="ann-btn primary-ann" onclick="goTo(3)">After combine → Screen 3 →</button>
+    </div>
+  </div>
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span>
+    <span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-link">Ratesheet History <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right">
+      <span style="font-family:var(--icon);font-size:18px;color:var(--ink-muted)">search</span>
+      <span style="font-family:var(--icon);font-size:18px;color:var(--ink-muted)">notifications</span>
+      <div class="cn-avatar">EN</div>
+    </div>
+  </div>
+  <div class="cn-header">
+    <div>
+      <div class="cn-page-title">Scenarios</div>
+      <div class="cn-page-sub"><span>My Market · Central Region</span></div>
+    </div>
+    <div class="cn-header-actions">
+      <div style="display:flex;border:1px solid var(--border-strong);border-radius:4px;overflow:hidden">
+        <input style="border:none;padding:0 10px;font-family:var(--font);font-size:13px;width:260px;color:var(--ink);outline:none" placeholder="Search by name, ID, system, or tag…">
+        <span style="font-family:var(--icon);font-size:18px;padding:0 8px;display:flex;align-items:center;color:var(--ink-muted);background:var(--bg-low)">search</span>
+      </div>
+      <button class="btn btn-ghost"><span class="ico">filter_alt</span>Combined Only</button>
+      <button class="btn btn-primary"><span class="ico">add</span>Create Scenario</button>
+    </div>
+  </div>
+  <!-- Bulk action bar -->
+  <div class="bulk-bar visible" id="bulkBar2">
+    <button class="bulk-action" style="color:var(--ink-muted)" onclick="exitBulk()"><span style="font-family:var(--icon);font-size:18px;line-height:1">close</span></button>
+    <span class="bulk-count">3 Selected</span>
+    <span class="bulk-sep"></span>
+    <button class="bulk-action warn-action" onclick="openCombinePopover()">
+      <span style="font-family:var(--icon);font-size:16px;line-height:1">warning</span>
+      Combine Scenarios
+    </button>
+    <button class="bulk-action" onclick="openTagPop2()">
+      <span style="font-family:var(--icon);font-size:16px;line-height:1">label</span>
+      Update Tag
+    </button>
+    <button class="bulk-action danger">
+      <span style="font-family:var(--icon);font-size:16px;line-height:1">delete</span>
+      Delete
+    </button>
+  </div>
+  <div style="padding:4px 16px 4px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font-size:13px;font-weight:700;color:var(--ink)">Scenarios — Created By: Your Team</span>
+    <button class="btn-text">☑ Bulk Actions</button>
+  </div>
+  <div class="tbl-wrap" style="padding:0 16px 16px">
+    <table><thead><tr>
+      <th class="cb-col"><input type="checkbox" id="selAll2" checked></th>
+      <th>Scenario Name</th><th>ID</th><th>Type</th><th>Contract Office</th><th>System</th><th>Status</th><th>Tags</th><th>Last Run</th>
+    </tr></thead>
+    <tbody id="tbl2Body"></tbody></table>
+  </div>
+
+  <!-- Combine Popover — Warning state -->
+  <div class="overlay-bg" id="combineOverlay" onclick="closeCombinePopover()"></div>
+  <div class="popover-wrap">
+    <div class="popover" id="combinePopover">
+      <div class="pop-header">
+        <div class="pop-title" id="combinePopTitle">Combine Scenarios (3)</div>
+      </div>
+      <div class="pop-body">
+        <div id="combineWarn" class="pop-warn">
+          <span class="ico">warning</span>
+          <div class="pop-warn-text">Effective dates aren't aligned. Remove <strong>HCA Austin ASC actual all LOB RD</strong> to solve it, or <a href="#" onclick="return false" style="color:#92400E;text-decoration:underline">view conflict details</a>.</div>
+        </div>
+        <div>
+          <div class="pop-section-label" style="margin-bottom:8px">Selected Scenarios (3)</div>
+          <div class="scenario-list" id="combineList"></div>
+        </div>
+        <div class="pop-field">
+          <div class="pop-label">Name This Combined Scenario</div>
+          <input class="pop-input" id="combineName" value="[Combined]" placeholder="[Combined]">
+          <div class="pop-hint">The <code>[Combined]</code> prefix is added automatically. Add a descriptive name after it.</div>
+        </div>
+        <div class="pop-field">
+          <div class="pop-label">Tag <span style="color:var(--ink-muted);font-weight:400">(Optional)</span></div>
+          <select class="pop-input" style="cursor:pointer">
+            <option value="">Select…</option>
+            <option>HCA-Neg</option><option>HCA-Pro</option><option>Draft</option><option>Review</option><option>Approved</option>
+          </select>
+        </div>
+      </div>
+      <div class="pop-footer">
+        <button class="btn btn-primary" id="confirmRunBtn" disabled onclick="doConfirmRun()">Confirm &amp; Run</button>
+        <button class="btn-text" onclick="clearAllScenarios()">Clear All</button>
+        <button class="btn-text" style="margin-left:auto" onclick="closeCombinePopover()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Popover for s2 -->
+  <div style="position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:800;display:none" id="tagPop2Wrap">
+    <div style="background:#fff;border:1px solid var(--border);border-radius:12px;box-shadow:0 8px 28px rgba(0,0,51,.12);padding:14px;width:240px">
+      <div class="tag-pop-title">Apply Tags to 3 Scenarios</div>
+      <div class="tag-option"><input type="checkbox" id="tc1"><label for="tc1"><span class="tag tag-blue" style="font-size:11px">HCA-Neg</span></label></div>
+      <div class="tag-option"><input type="checkbox" id="tc2"><label for="tc2"><span class="tag tag-blue" style="font-size:11px">HCA-Pro</span></label></div>
+      <div class="tag-option"><input type="checkbox" id="tc3"><label for="tc3"><span class="tag tag-gray" style="font-size:11px">Draft</span></label></div>
+      <div class="tag-option"><input type="checkbox" id="tc4"><label for="tc4"><span class="tag tag-green" style="font-size:11px">Review</span></label></div>
+      <div class="tag-option"><input type="checkbox" id="tc5"><label for="tc5"><span class="tag tag-success" style="font-size:11px">Approved</span></label></div>
+      <div class="tag-pop-footer">
+        <button class="btn btn-primary btn-sm" onclick="applyTags2()">Apply</button>
+        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('tagPop2Wrap').style.display='none'">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 3 — Combine resolved → navigating to detail
+═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-3">
+  <div class="ann">
+    <span class="ann-tag">Screen 3 of 7</span>
+    <span class="ann-text"><strong>"HCA Austin ASC"</strong> removed. Conflict resolved. Combine Scenarios (2) — <em>Confirm &amp; Run</em> button is now enabled (blue). Click it to navigate to the Combined Scenario detail view.</span>
+    <div class="ann-nav">
+      <button class="ann-btn" onclick="goTo(2)">← Back</button>
+      <button class="ann-btn primary-ann" onclick="goTo(4)">Confirm &amp; Run → Screen 4 →</button>
+    </div>
+  </div>
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span><span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right"><div class="cn-avatar">EN</div></div>
+  </div>
+  <div class="cn-header">
+    <div><div class="cn-page-title">Scenarios</div></div>
+  </div>
+  <div class="bulk-bar visible"><span class="bulk-count" style="color:var(--ink-muted)">✓ Conflict resolved</span></div>
+  <div style="padding:16px;display:flex;justify-content:center">
+    <div class="popover open" style="position:relative;box-shadow:0 4px 20px rgba(0,0,51,.1)">
+      <div class="pop-header">
+        <div class="pop-title">Combine Scenarios (2)</div>
+        <div style="font-size:12px;color:var(--success);font-weight:600;margin-top:4px;display:flex;align-items:center;gap:4px">
+          <span style="font-family:var(--icon);font-size:15px;line-height:1;color:var(--success)">check_circle</span>
+          All scenarios have aligned effective dates
+        </div>
+      </div>
+      <div class="pop-body">
+        <div class="scenario-list">
+          <div class="scenario-row">
+            <div style="font-family:var(--icon);font-size:18px;line-height:1;color:var(--success)">check_circle</div>
+            <div class="scenario-row-info">
+              <div class="scenario-row-name">HCA Houston ASC baseline - Plan trends</div>
+              <div class="scenario-row-sub">S-85622 · Texas – Houston, Texas – All Other</div>
+            </div>
+          </div>
+          <div class="scenario-row">
+            <div style="font-family:var(--icon);font-size:18px;line-height:1;color:var(--success)">check_circle</div>
+            <div class="scenario-row-info">
+              <div class="scenario-row-name">HCA San Antonio ASC</div>
+              <div class="scenario-row-sub">S-85580 · Texas – San Antonio</div>
+            </div>
+          </div>
+        </div>
+        <div class="pop-field">
+          <div class="pop-label">Name This Combined Scenario</div>
+          <input class="pop-input" value="[Combined] HCA TX ASC Plan trends">
+          <div class="pop-hint">Run typically completes in 2–4 minutes. You'll get a notification when ready.</div>
+        </div>
+        <div class="pop-field">
+          <div class="pop-label">Tag <span style="color:var(--ink-muted);font-weight:400">(Optional)</span></div>
+          <select class="pop-input"><option>HCA-Neg</option><option>Draft</option></select>
+        </div>
+      </div>
+      <div class="pop-footer">
+        <button class="btn btn-primary" onclick="goTo(4)">Confirm &amp; Run</button>
+        <button class="btn-text">Clear All</button>
+        <button class="btn-text" style="margin-left:auto">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 4 — Combined Scenario Detail (Modeling Summary)
+═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-4">
+  <div class="ann">
+    <span class="ann-tag">Screen 4 of 7</span>
+    <span class="ann-text">Combined Scenario detail — <strong>[Combined] HCA Plan trends</strong>. Shows Modeling Summary with Trend Breakdown table (By Contract Office / By Scenario toggle). Click <strong>Source Scenarios (3)</strong> to open right drawer. Click <strong>Activity Log</strong> to jump to Screen 6.</span>
+    <div class="ann-nav">
+      <button class="ann-btn" onclick="goTo(3)">← Back</button>
+      <button class="ann-btn primary-ann" onclick="goTo(5)">Bulk Tags → Screen 5 →</button>
+    </div>
+  </div>
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span><span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-link">Ratesheet History <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right"><div class="cn-avatar">EN</div></div>
+  </div>
+  <div class="cn-breadcrumb">
+    <a href="#">Scenarios</a><span class="sep">chevron_right</span>
+    <a href="#">HCA Health System</a><span class="sep">chevron_right</span>
+    <span style="color:var(--ink)">Combined Detail</span>
+  </div>
+  <div class="cn-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="cn-page-title">[Combined] HCA Plan trends</div>
+        <span class="tag tag-combined"><span class="ico">add_link</span>Combined (Fac)</span>
+        <span class="tag tag-blue">HCA-Neg</span>
+      </div>
+      <div class="cn-page-sub">
+        <span class="status-run"><span style="font-family:var(--icon);font-size:14px;line-height:1">check_circle</span>S-78676</span>
+        <span>Run: 04-21-2026 at 14:32</span>
+        <button class="btn btn-ghost btn-sm"><span class="ico">play_arrow</span>Re-run</button>
+      </div>
+    </div>
+    <div class="cn-header-actions">
+      <button class="btn btn-ghost" onclick="goTo(6)"><span class="ico">update</span>Activity Log</button>
+      <button class="btn btn-ghost" id="srcBtn4" onclick="toggleDrawer4()"><span class="ico">hub</span>Source Scenarios (3)</button>
+      <button class="btn btn-ghost"><span class="ico">file_copy</span></button>
+    </div>
+  </div>
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" id="tab4-modeling" onclick="setTab4('modeling')">Modeling Summary</div>
+    <div class="tab" id="tab4-trends" onclick="setTab4('trends')">Trend Details</div>
+    <div class="tab" id="tab4-allin" onclick="setTab4('allin')">All In Summary</div>
+  </div>
+  <!-- Content with drawer -->
+  <div class="page-with-drawer" style="flex:1;overflow:hidden">
+    <!-- Left Rail -->
+    <div class="left-rail">
+      <div class="rail-item active">Modeling Summary</div>
+      <div class="rail-item" onclick="goTo(5)">Trend Details</div>
+      <div class="rail-item">All In Summary</div>
+      <div class="rail-item">Structure Metrics</div>
+      <div class="rail-item">Individual Stop Loss</div>
+      <div class="rail-item">Provider Stop Loss</div>
+      <div class="rail-item">Benchmark</div>
+    </div>
+    <!-- Main content -->
+    <div class="main-content" id="s4Main">
+      <div class="trend-section">
+        <div class="trend-section-header">
+          <div>
+            <div class="section-title">Trend Breakdown</div>
+            <div style="font-size:12px;color:var(--ink-muted);margin-top:2px">CAY · 2026–2028 projections · 3 source scenarios</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <select class="pop-input" style="width:80px;padding:4px 8px;font-size:13px">
+              <option>CAY</option><option>COY</option><option>Point-in-Time</option>
+            </select>
+            <div class="segmented" id="seg4">
+              <button class="seg-btn active" onclick="setSeg4('office',this)">By Contract Office</button>
+              <button class="seg-btn" onclick="setSeg4('scenario',this)">By Scenario</button>
+              <button class="seg-btn" onclick="setSeg4('product',this)">By Product</button>
+            </div>
+            <button class="btn btn-ghost btn-sm"><span class="ico">download</span>Export</button>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table id="trendTbl4"><thead></thead><tbody></tbody></table>
+        </div>
+        <!-- Product pills -->
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <button class="seg-btn active" style="border:1px solid var(--border-strong);border-radius:var(--tag-r);padding:4px 12px;font-size:12px">CMB</button>
+          <button class="seg-btn" style="border:1px solid var(--border-strong);border-radius:var(--tag-r);padding:4px 12px;font-size:12px">OAP</button>
+          <button class="seg-btn" style="border:1px solid var(--border-strong);border-radius:var(--tag-r);padding:4px 12px;font-size:12px">PPO</button>
+          <button class="seg-btn" style="border:1px solid var(--border-strong);border-radius:var(--tag-r);padding:4px 12px;font-size:12px">HMO</button>
+        </div>
+      </div>
+    </div>
+    <!-- Right Drawer: Source Scenarios -->
+    <div class="drawer" id="drawer4">
+      <div class="drawer-header">
+        <div class="drawer-title">Source Scenarios (3)</div>
+        <button class="drawer-close" onclick="toggleDrawer4()">close</button>
+      </div>
+      <div class="info-banner" style="margin:0">
+        <span class="ico">info</span>
+        <span>Syncing, adding, or removing sources only affects this combined scenario. Source scenarios are never modified. <a href="#" style="color:var(--primary)">Re-run</a> to apply changes.</span>
+      </div>
+      <div class="drawer-body" id="drawer4Body"></div>
+      <div style="padding:12px 16px;border-top:1px solid var(--border)">
+        <button class="btn btn-ghost" style="width:100%"><span class="ico">add</span>Add Source Scenario</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 5 — Bulk Update Tags (Trend Details tab, By Scenario)
+═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-5">
+  <div class="ann">
+    <span class="ann-tag">Screen 5 of 7</span>
+    <span class="ann-text">Bulk Update Tags on Trend Breakdown table (By Scenario view). Select rows via checkboxes → bulk bar appears → click <strong>Update Tags</strong> → popover opens. Tags show mixed state for partial matches. <strong>UX Improvement:</strong> This enables updating source scenario tags <em>without</em> leaving the combined view.</span>
+    <div class="ann-nav">
+      <button class="ann-btn" onclick="goTo(4)">← Back</button>
+      <button class="ann-btn primary-ann" onclick="goTo(6)">Activity Log → Screen 6 →</button>
+    </div>
+  </div>
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span><span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right"><div class="cn-avatar">EN</div></div>
+  </div>
+  <div class="cn-breadcrumb">
+    <a href="#">Scenarios</a><span class="sep">chevron_right</span>
+    <span style="color:var(--ink)">Combined Detail</span>
+  </div>
+  <div class="cn-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="cn-page-title">[Combined] HCA Plan trends</div>
+        <span class="tag tag-combined"><span class="ico">add_link</span>Combined (Fac)</span>
+        <span class="tag tag-blue">HCA-Neg</span>
+      </div>
+      <div class="cn-page-sub"><span>S-78676 · Run: 04-21-2026 at 14:32</span></div>
+    </div>
+    <div class="cn-header-actions">
+      <button class="btn btn-ghost" onclick="goTo(6)"><span class="ico">update</span>Activity Log</button>
+      <button class="btn btn-ghost"><span class="ico">hub</span>Source Scenarios (3)</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab">Modeling Summary</div>
+    <div class="tab active">Trend Details</div>
+    <div class="tab">All In Summary</div>
+  </div>
+  <!-- Bulk bar for s5 -->
+  <div class="bulk-bar" id="bulkBar5">
+    <button class="bulk-action" style="color:var(--ink-muted)" onclick="clearS5Selection()"><span style="font-family:var(--icon);font-size:18px;line-height:1">close</span></button>
+    <span class="bulk-count" id="bulkCount5">0 Selected</span>
+    <span class="bulk-sep"></span>
+    <div style="position:relative">
+      <button class="bulk-action" onclick="toggleTagPop5()">
+        <span style="font-family:var(--icon);font-size:16px;line-height:1">label</span>Update Tags
+      </button>
+      <!-- Tag popover inline -->
+      <div class="tag-pop" id="tagPop5">
+        <div class="tag-pop-title">Update Tags for Selected Scenarios</div>
+        <div class="tag-option"><input type="checkbox" id="t5a" checked><label for="t5a"><span class="tag tag-blue" style="font-size:11px">HCA-Neg</span> <span style="font-size:11px;color:var(--ink-muted)">(on all selected)</span></label></div>
+        <div class="tag-option"><input type="checkbox" id="t5b"><label for="t5b"><span class="tag tag-blue" style="font-size:11px">HCA-Pro</span></label></div>
+        <div class="tag-option" title="Applied to some selected rows"><input type="checkbox" id="t5c" ref="mixed"><label for="t5c"><span class="tag tag-warn" style="font-size:11px">Draft</span> <span style="font-size:11px;color:var(--ink-muted)">(mixed)</span></label></div>
+        <div class="tag-option"><input type="checkbox" id="t5d"><label for="t5d"><span class="tag tag-green" style="font-size:11px">Review</span></label></div>
+        <div class="tag-option"><input type="checkbox" id="t5e"><label for="t5e"><span class="tag tag-success" style="font-size:11px">Approved</span></label></div>
+        <div class="tag-pop-footer">
+          <button class="btn btn-primary btn-sm" onclick="applyTags5()">Apply Tags</button>
+          <button class="btn btn-ghost btn-sm" onclick="document.getElementById('tagPop5').classList.remove('open')">Cancel</button>
+        </div>
+      </div>
+    </div>
+    <button class="bulk-action danger"><span style="font-family:var(--icon);font-size:16px;line-height:1">hub_remove</span>Remove from Combined</button>
+  </div>
+  <div class="page-with-drawer" style="flex:1">
+    <div class="left-rail">
+      <div class="rail-item">Modeling Summary</div>
+      <div class="rail-item active">Trend Details</div>
+      <div class="rail-item">All In Summary</div>
+    </div>
+    <div class="main-content">
+      <div class="trend-section">
+        <div class="trend-section-header">
+          <div>
+            <div class="section-title">Trend Breakdown — By Scenario</div>
+            <div style="font-size:12px;color:var(--ink-muted);margin-top:2px">Select rows to bulk-update tags or remove from combined</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <div class="segmented">
+              <button class="seg-btn">By Contract Office</button>
+              <button class="seg-btn active">By Scenario</button>
+              <button class="seg-btn">By Product</button>
+            </div>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th class="cb-col"><input type="checkbox" id="selAll5" onchange="toggleAllS5(this)"></th>
+                <th>Scenario</th><th>Type</th><th>Provider #</th><th>Base $</th>
+                <th>2026 Trend</th><th>2027 Trend</th><th>Tags</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="tbl5Body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 6 — Activity Log drawer
+═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-6">
+  <div class="ann">
+    <span class="ann-tag">Screen 6 of 7</span>
+    <span class="ann-text">Activity Log — right-side drawer showing full event history. <strong>Diverged</strong> badge tracks when combined parameters drift from sources. Events include parameter updates, source additions/removals, external modifications, and re-runs. Each entry shows user avatar + timestamp + description.</span>
+    <div class="ann-nav">
+      <button class="ann-btn" onclick="goTo(5)">← Back</button>
+      <button class="ann-btn primary-ann" onclick="goTo(7)">Source Management → Screen 7 →</button>
+    </div>
+  </div>
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span><span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right"><div class="cn-avatar">EN</div></div>
+  </div>
+  <div class="cn-breadcrumb">
+    <a href="#">Scenarios</a><span class="sep">chevron_right</span>
+    <span style="color:var(--ink)">Combined Detail</span>
+  </div>
+  <div class="cn-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="cn-page-title">[Combined] HCA Plan trends</div>
+        <span class="tag tag-combined"><span class="ico">add_link</span>Combined (Fac)</span>
+        <span class="tag tag-blue">HCA-Neg</span>
+        <span class="tag tag-warn" style="font-size:11px"><span style="font-family:var(--icon);font-size:13px;line-height:1">fork_right</span>Diverged from sources</span>
+      </div>
+      <div class="cn-page-sub"><span>S-78676 · Run: 04-21-2026 at 14:32</span></div>
+    </div>
+    <div class="cn-header-actions">
+      <button class="btn btn-primary"><span class="ico">update</span>Activity Log</button>
+      <button class="btn btn-ghost" onclick="goTo(7)"><span class="ico">hub</span>Source Scenarios (3)</button>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab active">Modeling Summary</div>
+    <div class="tab">Trend Details</div>
+    <div class="tab">All In Summary</div>
+  </div>
+  <div class="page-with-drawer" style="flex:1;overflow:hidden">
+    <div class="left-rail">
+      <div class="rail-item active">Modeling Summary</div>
+      <div class="rail-item">Trend Details</div>
+      <div class="rail-item">All In Summary</div>
+    </div>
+    <div class="main-content" style="padding:16px">
+      <div style="color:var(--ink-muted);font-size:14px;padding:24px 0 0">← Activity Log panel is open on the right →</div>
+    </div>
+    <!-- Activity Log drawer -->
+    <div class="drawer open" style="width:420px;min-width:420px">
+      <div class="drawer-header">
+        <div class="drawer-title" style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--icon);font-size:18px;line-height:1">update</span>
+          Activity Log
+        </div>
+        <button class="drawer-close">close</button>
+      </div>
+      <div class="drawer-body" id="activityLog"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+  SCREEN 7 — Source Scenarios Management
+═════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen-7">
+  <div class="ann">
+    <span class="ann-tag">Screen 7 of 7</span>
+    <span class="ann-text">Source Scenarios Management — full panel. Shows sync status per source (stale = modified externally). Users can Sync (pull latest data), Remove, or Add sources. UX insight: stale badge with amber highlight surfaces action before re-run. <em>Modifications to sources never affect combined — only Sync + Re-run pulls them in.</em></span>
+    <div class="ann-nav">
+      <button class="ann-btn" onclick="goTo(6)">← Back</button>
+      <button class="ann-btn primary-ann" onclick="goTo(1)">↺ Start Over</button>
+    </div>
+  </div>
+  <div class="cn-nav">
+    <span class="cn-nav-logo">eco</span><span class="cn-nav-app">Contract Modeling</span>
+    <div class="cn-nav-link active">Scenarios <span class="ico">arrow_drop_down</span></div>
+    <div class="cn-nav-right"><div class="cn-avatar">EN</div></div>
+  </div>
+  <div class="cn-breadcrumb">
+    <a href="#">Scenarios</a><span class="sep">chevron_right</span>
+    <span style="color:var(--ink)">Combined Detail</span>
+  </div>
+  <div class="cn-header">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <div class="cn-page-title">[Combined] HCA Plan trends</div>
+        <span class="tag tag-combined"><span class="ico">add_link</span>Combined (Fac)</span>
+        <span class="tag tag-blue">HCA-Neg</span>
+        <span class="tag tag-warn" style="font-size:11px"><span style="font-family:var(--icon);font-size:13px;line-height:1">fork_right</span>Diverged</span>
+      </div>
+    </div>
+    <div class="cn-header-actions">
+      <button class="btn btn-ghost" onclick="goTo(6)"><span class="ico">update</span>Activity Log</button>
+      <button class="btn btn-primary"><span class="ico">hub</span>Source Scenarios (3)</button>
+    </div>
+  </div>
+  <div class="page-with-drawer" style="flex:1;overflow:hidden">
+    <div class="left-rail">
+      <div class="rail-item active">Modeling Summary</div>
+      <div class="rail-item">Trend Details</div>
+      <div class="rail-item">All In Summary</div>
+    </div>
+    <div class="main-content" style="padding:16px">
+      <div class="section-title" style="margin-bottom:12px">Source Scenarios (3)</div>
+      <div class="info-banner" style="border-radius:8px;margin-bottom:16px">
+        <span class="ico">info</span>
+        <span>Syncing, adding, or removing sources only affects this combined scenario. Source scenarios are never modified. Re-run after changes to see updated results.</span>
+      </div>
+      <div id="sourceMgmtList" style="display:flex;flex-direction:column;gap:10px"></div>
+      <div style="margin-top:16px">
+        <button class="btn btn-ghost"><span class="ico">add</span>Add Source Scenario</button>
+      </div>
+      <div style="margin-top:24px;padding:16px;background:var(--bg-low);border-radius:8px;border:1px solid var(--border)">
+        <div class="section-title" style="margin-bottom:8px">Snapshot Model</div>
+        <div style="font-size:13px;color:var(--ink-muted);line-height:1.6">
+          <span style="color:var(--ink);font-weight:700">At creation:</span> data from each source scenario was copied (snapshotted) into this combined scenario.<br>
+          <span style="color:var(--ink);font-weight:700">After creation:</span> this combined scenario runs independently. Changes to sources do NOT automatically update it.<br>
+          <span style="color:var(--ink);font-weight:700">To update:</span> use <strong>Sync</strong> on a source → then <strong>Re-run</strong> this combined scenario.
+        </div>
+      </div>
+    </div>
+    <!-- Right: summary panel -->
+    <div style="width:300px;min-width:300px;border-left:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg-screen)">
+      <div class="section-title">Re-run Summary</div>
+      <div style="font-size:13px;color:var(--ink-muted)">Last run: <strong style="color:var(--ink)">04/21/2026 at 14:32</strong></div>
+      <div style="font-size:13px;color:var(--ink-muted)">1 source has pending sync</div>
+      <button class="btn btn-primary"><span class="ico">play_arrow</span>Sync All &amp; Re-run</button>
+      <button class="btn btn-ghost"><span class="ico">refresh</span>Re-run (current data)</button>
+      <div style="border-top:1px solid var(--border);padding-top:12px">
+        <div style="font-size:12px;font-weight:700;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Divergence Status</div>
+        <div style="font-size:13px;color:var(--ink);line-height:1.6">
+          Parameters updated <strong>07/22/2026</strong> — effective date range extended to Jan 1–Dec 31 2026.<br>
+          <span class="tag tag-warn" style="font-size:11px;margin-top:4px;display:inline-flex"><span style="font-family:var(--icon);font-size:13px;line-height:1">fork_right</span>Diverged from sources</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Toast ── -->
+<div class="toast" id="toast">
+  <span class="ico">check_circle</span>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════
+const SCENARIOS = [
+  {id:'S-85622', name:'HCA Houston ASC baseline - Plan trends', type:'Facility', office:'Texas – Houston, All Other', system:'HCA', status:'Test', tags:['HCA-Neg','HCA-Houst'], run:'06/19/2026 00:34', combined:false, owner:'LE'},
+  {id:'S-85624', name:'HCA CO Broad NWK 1.1.27 Cigna Prop SL Build (PSL)', type:'Facility', office:'Colorado', system:'HCA', status:'Cigna Prop', tags:[], run:'06/12/2026 12:29', combined:false, owner:'TP'},
+  {id:'S-85581', name:'HCA SFL Rebalance Counter-proposal', type:'Facility', office:'Florida – South Florida', system:'HCA', status:'Provider Prop', tags:['HCA-Neg'], run:'06/11/2026 11:20', combined:false, owner:'LT'},
+  {id:'S-85579', name:'HCA Houston Hospitals baseline - Plan trends', type:'Facility', office:'Texas – Houston', system:'HCA', status:'Test', tags:['HCA-Neg','HCA-Houst'], run:'06/10/2026 23:29', combined:false, owner:'MB'},
+  {id:'S-85577', name:'HCA Hospitals 5.1.26 Renewal Prorated 7.1.26', type:'Professional', office:'Missouri – Kansas City', system:'HCA', status:'Test', tags:['HCA-Neg'], run:'06/09/2026 04:49', combined:false, owner:'DW'},
+  {id:'S-85578', name:'HCA SFL Plan', type:'Facility, Professional', office:'Florida – South Florida', system:'HCA', status:'Test', tags:['HCA-Neg'], run:'06/06/2026 01:31', combined:false, owner:'DM'},
+  {id:'S-85580', name:"HCA KC ASC's 7/1 Renewal Prorated to 5/1", type:'Professional', office:'Missouri – Kansas City', system:'HCA', status:'Provider Prop', tags:['HCA-Pro'], run:'06/05/2026 19:33', combined:false, owner:'CG'},
+  {id:'S-85582', name:'[Combined] Temporary Bob Variance Scenario for S-84974', type:'ASC, Facility', office:'Florida – Orlando', system:'HCA', status:'Test', tags:['ASC-Neg','Bob Diff'], run:'05/28/2026 09:20', combined:true, owner:'JH'},
+  {id:'S-85424', name:'Temporary Utilization Variance Scenario for S-84974', type:'ASC, Facility', office:'Florida – Orlando', system:'HCA', status:'Test', tags:['ASC-Neg'], run:'05/24/2026 21:07', combined:false, owner:'MD'},
+  {id:'S-84023', name:'HCA CO Broad NWK 1.1.27 Cigna Prop - SL Build (Minus PSL)', type:'ASC, Facility', office:'Colorado', system:'HCA', status:'Provider Prop', tags:[], run:'05/20/2026 21:13', combined:false, owner:'CK'},
+];
+
+const CHECKED3 = [0,3,6]; // S-85622, S-85579, S-85580
+
+// Combined scenarios selected for combine
+let combineScenarios = [
+  {id:'S-85622', name:'HCA Houston ASC baseline - Plan trends', office:'Texas – Houston, Texas – All Other', conflict:false},
+  {id:'S-87344', name:'HCA Austin ASC actual all LOB RD', office:'Texas – Austin', conflict:true},
+  {id:'S-85580', name:'HCA San Antonio ASC', office:'Texas – San Antonio', conflict:false},
+];
+
+// Source scenario data for drawers
+const SOURCES = [
+  {id:'S-29082', name:'TX-Austin ASC+Fac Combined 2026 v3', type:'SB', office:'Texas – Houston, Texas – All Other', stale:false},
+  {id:'S-40291', name:'TX-Austin ASC+Fac Combined 2026 v3', type:'SB', office:'Texas – Austin', stale:true, staleSince:'04/23/2026'},
+  {id:'S-83923', name:'HCA San Antonio ASC', type:'Fac', office:'Texas – San Antonio', stale:false},
+];
+
+// Trend breakdown data
+const TREND_OFFICE = [
+  {label:'Total', providers:240, base:'$36,018', t26:'3.20%',t27:'2.95%', group:true},
+  {label:'Texas – Houston (S-29082, S-83923)', providers:140, base:'$18,660', t26:'3.40%',t27:'3.00%'},
+  {label:'Texas – All Other (S-11082, S-22023)', providers:80, base:'$8,949', t26:'2.96%',t27:'2.85%'},
+  {label:'Texas – San Antonio (S-10000)', providers:20, base:'$4,486', t26:'3.35%',t27:'3.10%'},
+];
+const TREND_SCENARIO = [
+  {label:'Total', providers:240, base:'$36,018', t26:'3.20%',t27:'2.95%', group:true},
+  {id:'S-29082', label:'HCA CO Broad NWK 1.1.27 C', providers:100, base:'$18,660', t26:'3.40%',t27:'3.00%', tags:['HCA-Neg']},
+  {id:'S-11082', label:"HCA KC ASC's 7/1 Renewal P", providers:80, base:'$8,949', t26:'2.96%',t27:'2.85%', tags:['HCA-Neg','Draft']},
+  {id:'S-83923', label:'HCA San Antonio ASC Test', providers:20, base:'$4,486', t26:'3.35%',t27:'3.10%', tags:['HCA-Pro']},
+  {id:'S-10000', label:'[8% CM] HCA Valley Event Pl', providers:20, base:'$4,486', t26:'3.48%',t27:'3.20%', tags:['HCA-Neg']},
+  {id:'S-22023', label:'HCA SA All Facilities All LOB', providers:10, base:'$2,486', t26:'2.80%',t27:'2.60%', tags:[]},
+  {id:'S-29999', label:'HCA Health Nevada – Remov', providers:10, base:'$1,486', t26:'3.60%',t27:'3.40%', tags:['Draft']},
+];
+
+// Activity log entries
+const ACTIVITY = [
+  {date:'07/22/2026', type:'fork_right', cls:'dot-diverged', badge:'Diverged', event:'Parameters updated', who:'J. Davis', initials:'JD', time:'13:05', detail:'Effective date range extended to Jan 1–Dec 31 2026. Combined scenario parameters now diverge from sources. Source scenarios were not modified.'},
+  {date:'05/30/2026', type:'sync_problem', cls:'dot-modified', badge:'Stale', event:'S-73008 modified externally', who:'J. Davis', initials:'JD', time:'09:05', detail:'Source scenario was re-run with updated parameters. This combined scenario still uses the Apr 21 snapshot. Use <strong>Refresh from source</strong> below to pull in the latest data, then re-run.'},
+  {date:'05/30/2026', type:'done_all', cls:'dot-rerun', badge:'', event:'Re-run completed', who:'J. Davis', initials:'JD', time:'09:15', detail:'Combined trend 3.2% ↑ vs 2.9% prior year. 240 providers included across 3 contract offices.'},
+  {date:'04/30/2026', type:'add', cls:'dot-added', badge:'', event:'Source S-38333 added', who:'J. Davis', initials:'JD', time:'09:05', detail:'HCA Austin Hosp actual all LOB RD — S-38333 added as source.'},
+  {date:'04/30/2026', type:'bookmark_manager', cls:'dot-updated', badge:'', event:'Source scenarios updated', who:'J. Davis', initials:'JD', time:'13:05', detail:'Added: HCA CO Broad NWK 1.1.27 Cigna Prop - SL Build (Minus PSL) S-11111<br>Removed: HCA CO Broad NWK 1.1.27 Cigna Prop - SL Build S-11110'},
+  {date:'04/23/2026', type:'sync_problem', cls:'dot-modified', badge:'Stale', event:'Source S-73008 modified externally', who:'S. Othman', initials:'SO', time:'13:05', detail:'Source scenario re-run with updated parameters. This combined scenario still uses the Apr 21 snapshot. Use <a href="#" style="color:var(--primary)">Refresh from source</a> to pull the latest data, then re-run.'},
+  {date:'04/22/2026', type:'not_started', cls:'dot-created', badge:'', event:'Combined scenario created', who:'J. Davis', initials:'JD', time:'13:05', detail:'Created from 3 source scenarios: HCA Houston ASC (S-85622), HCA Austin ASC (S-87344), HCA San Antonio ASC (S-85580).'},
+];
+
+// Source management data (s7)
+const SOURCES_MGMT = [
+  {id:'S-29082', name:'TX-Austin ASC+Fac Combined 2026 v3', type:'SB', typeCls:'tag-fac', office:'Texas – Houston, Texas – All Other', stale:false, lastSync:'04/21/2026'},
+  {id:'S-40291', name:'HCA Austin ASC actual all LOB RD', type:'SB', typeCls:'tag-fac', office:'Texas – Austin', stale:true, staleSince:'04/23/2026', staleDetail:'Source was re-run on 04/23/2026. This combined still uses the Apr 21 snapshot.'},
+  {id:'S-83923', name:'HCA San Antonio ASC', type:'Fac', typeCls:'tag-fac', office:'Texas – San Antonio', stale:false, lastSync:'04/21/2026'},
+];
+
+// ═══════════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════════
+let currentScreen = 1;
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + n).classList.add('active');
+  currentScreen = n;
+  // Update step nav
+  const items = document.querySelectorAll('.step-item');
+  items.forEach((item, i) => {
+    item.classList.remove('active','done');
+    if (i + 1 < n) item.classList.add('done');
+    else if (i + 1 === n) item.classList.add('active');
+  });
+  window.scrollTo(0,0);
+}
+
+// ═══════════════════════════════════════════════════
+// SCREEN 1 — Render table
+// ═══════════════════════════════════════════════════
+function renderS1() {
+  const tbody = document.getElementById('tbl1Body');
+  tbody.innerHTML = SCENARIOS.map(s => `
+    <tr>
+      <td>${s.combined ? '<span class="tag tag-combined" style="font-size:11px"><span style="font-family:var(--icon);font-size:12px;line-height:1">add_link</span>Combined</span> ' : ''}${s.name}</td>
+      <td style="color:var(--ink-muted);font-size:12px">${s.id}</td>
+      <td style="font-size:12px">${s.type}</td>
+      <td style="font-size:12px">${s.office}</td>
+      <td><span class="tag tag-gray" style="font-size:11px">${s.system}</span></td>
+      <td><span class="tag ${s.status==='Test'?'tag-success':s.status.includes('Prop')?'tag-warn':'tag-gray'}" style="font-size:11px">${s.status}</span></td>
+      <td>${s.tags.map(t=>`<span class="tag tag-blue" style="font-size:11px">${t}</span>`).join(' ')}</td>
+      <td style="font-size:12px;color:var(--ink-muted)">${s.run}</td>
+      <td class="center">
+        <button class="btn-text" style="font-size:12px" title="Copy"><span style="font-family:var(--icon);font-size:15px;line-height:1">file_copy</span></button>
+        <button class="btn-text" style="font-size:12px" title="More"><span style="font-family:var(--icon);font-size:15px;line-height:1">more_vert</span></button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// SCREEN 2 — Render table + combine logic
+// ═══════════════════════════════════════════════════
+function renderS2() {
+  const tbody = document.getElementById('tbl2Body');
+  tbody.innerHTML = SCENARIOS.map((s, i) => {
+    const checked = CHECKED3.includes(i);
+    return `<tr class="${checked?'selected':''}">
+      <td class="cb-col"><input type="checkbox" ${checked?'checked':''} onchange="onS2Check()"></td>
+      <td>${s.combined ? '<span class="tag tag-combined" style="font-size:11px"><span style="font-family:var(--icon);font-size:12px;line-height:1">add_link</span>Combined</span> ' : ''}${s.name}</td>
+      <td style="color:var(--ink-muted);font-size:12px">${s.id}</td>
+      <td style="font-size:12px">${s.type}</td>
+      <td style="font-size:12px">${s.office}</td>
+      <td><span class="tag tag-gray" style="font-size:11px">${s.system}</span></td>
+      <td><span class="tag ${s.status==='Test'?'tag-success':s.status.includes('Prop')?'tag-warn':'tag-gray'}" style="font-size:11px">${s.status}</span></td>
+      <td>${s.tags.map(t=>`<span class="tag tag-blue" style="font-size:11px">${t}</span>`).join(' ')}</td>
+      <td style="font-size:12px;color:var(--ink-muted)">${s.run}</td>
+    </tr>`;
+  }).join('');
+}
+
+function onS2Check() {
+  const checked = document.querySelectorAll('#screen-2 input[type=checkbox]:checked').length;
+  document.getElementById('bulkBar2').classList.toggle('visible', checked > 0);
+}
+
+function exitBulk() {
+  document.querySelectorAll('#screen-2 input[type=checkbox]').forEach(c => c.checked = false);
+  document.getElementById('bulkBar2').classList.remove('visible');
+}
+
+// Combine popover
+function openCombinePopover() {
+  document.getElementById('combineOverlay').classList.add('open');
+  document.getElementById('combinePopover').classList.add('open');
+  renderCombineList();
+}
+function closeCombinePopover() {
+  document.getElementById('combineOverlay').classList.remove('open');
+  document.getElementById('combinePopover').classList.remove('open');
+}
+function renderCombineList() {
+  const hasConflict = combineScenarios.some(s => s.conflict);
+  document.getElementById('combinePopTitle').textContent = `Combine Scenarios (${combineScenarios.length})`;
+  document.getElementById('combineWarn').style.display = hasConflict ? 'flex' : 'none';
+  document.getElementById('confirmRunBtn').disabled = hasConflict;
+  document.getElementById('combineList').innerHTML = combineScenarios.map((s,i) => `
+    <div class="scenario-row ${s.conflict?'conflict':''}">
+      <span style="font-family:var(--icon);font-size:18px;line-height:1;color:${s.conflict?'var(--warn-icon)':'var(--success)'}">${s.conflict?'warning':'check_circle'}</span>
+      <div class="scenario-row-info">
+        <div class="scenario-row-name">${s.name}</div>
+        <div class="scenario-row-sub">${s.id} · ${s.office}</div>
+      </div>
+      <button class="scenario-remove" onclick="removeFromCombine(${i})" title="Remove">cancel</button>
+    </div>
+  `).join('');
+}
+function removeFromCombine(idx) {
+  combineScenarios.splice(idx, 1);
+  renderCombineList();
+  showToast('Scenario removed. Conflict resolved ✓');
+}
+function clearAllScenarios() {
+  combineScenarios = [];
+  renderCombineList();
+}
+function doConfirmRun() {
+  closeCombinePopover();
+  goTo(3);
+}
+
+// Tag pop s2
+function openTagPop2() {
+  document.getElementById('tagPop2Wrap').style.display = 'flex';
+}
+function applyTags2() {
+  document.getElementById('tagPop2Wrap').style.display = 'none';
+  showToast('Tags updated on 3 scenarios');
+}
+
+// ═══════════════════════════════════════════════════
+// SCREEN 4 — Trend table
+// ═══════════════════════════════════════════════════
+let seg4Mode = 'office';
+
+function renderTrendTbl(mode) {
+  const data = mode === 'scenario' ? TREND_SCENARIO : TREND_OFFICE;
+  const tbl = document.getElementById('trendTbl4');
+  tbl.querySelector('thead').innerHTML = `<tr>
+    ${mode === 'scenario' ? '<th class="cb-col"></th>' : ''}
+    <th>${mode === 'scenario' ? 'Scenario' : 'Contract Office'}</th>
+    <th class="center">Provider #</th><th>Base $</th>
+    <th class="center">2026 Trend</th><th class="center">2027 Trend</th>
+    ${mode === 'scenario' ? '<th>Tags</th>' : ''}
+  </tr>`;
+  tbl.querySelector('tbody').innerHTML = data.map(r => {
+    const trendCls = (t) => parseFloat(t)>3.2?'percent-pos':'';
+    return `<tr class="${r.group?'tbl-total':''}">
+      ${mode === 'scenario' && !r.group ? '<td class="cb-col"><input type="checkbox"></td>' : mode === 'scenario' ? '<td class="cb-col"></td>' : ''}
+      <td>${r.label}${r.id&&!r.group?`<div style="font-size:11px;color:var(--ink-muted)">${r.id}</div>`:''}</td>
+      <td class="center">${r.providers}</td>
+      <td>${r.base}</td>
+      <td class="center"><span class="${trendCls(r.t26)}" style="font-size:13px;font-weight:700">${r.t26}</span></td>
+      <td class="center"><span class="${trendCls(r.t27)}" style="font-size:13px;font-weight:700">${r.t27}</span></td>
+      ${mode === 'scenario' ? `<td>${(r.tags||[]).map(t=>`<span class="tag tag-blue" style="font-size:10px">${t}</span>`).join(' ')}</td>` : ''}
+    </tr>`;
+  }).join('');
+}
+
+function setSeg4(mode, btn) {
+  seg4Mode = mode;
+  document.querySelectorAll('#seg4 .seg-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTrendTbl(mode);
+}
+
+function setTab4(tab) {
+  document.querySelectorAll('#screen-4 .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab4-'+tab).classList.add('active');
+}
+
+// Drawer s4
+let drawer4Open = false;
+function toggleDrawer4() {
+  drawer4Open = !drawer4Open;
+  document.getElementById('drawer4').classList.toggle('open', drawer4Open);
+  if (drawer4Open) renderDrawer4();
+}
+function renderDrawer4() {
+  document.getElementById('drawer4Body').innerHTML = SOURCES.map(s => `
+    <div class="source-card ${s.stale?'stale':''}">
+      <div class="source-card-name">${s.name}</div>
+      <div class="source-card-meta">
+        <span class="tag tag-fac" style="font-size:11px">${s.type}</span>
+        <span>${s.id}</span>
+        <span>${s.office}</span>
+      </div>
+      ${s.stale ? `<div class="source-card-warn"><span style="font-family:var(--icon);font-size:14px;line-height:1">warning</span>Modified ${s.staleSince} — not yet synced</div>` : ''}
+      <div class="source-card-actions">
+        ${s.stale ? `<button class="btn btn-ghost btn-sm" onclick="syncSource('${s.id}')"><span class="ico">refresh</span>Sync</button>` : ''}
+        <button class="btn btn-ghost btn-sm"><span style="font-family:var(--icon);font-size:14px;line-height:1">open_in_new</span>Open</button>
+        <button class="btn btn-ghost btn-sm" style="color:var(--error)"><span style="font-family:var(--icon);font-size:14px;line-height:1">delete</span></button>
+      </div>
+    </div>
+  `).join('');
+}
+function syncSource(id) {
+  showToast(`Synced ${id} — re-run to apply`);
+}
+
+// ═══════════════════════════════════════════════════
+// SCREEN 5 — Bulk tags table
+// ═══════════════════════════════════════════════════
+let s5Selected = new Set();
+
+function renderS5() {
+  const tbody = document.getElementById('tbl5Body');
+  tbody.innerHTML = TREND_SCENARIO.filter(r=>!r.group).map((r,i) => {
+    const sel = s5Selected.has(i);
+    return `<tr class="${sel?'selected':''}" id="s5row${i}">
+      <td class="cb-col"><input type="checkbox" ${sel?'checked':''} onchange="toggleS5(${i},this)"></td>
+      <td>
+        <div style="font-size:13px;font-weight:600">${r.label}</div>
+        <div style="font-size:11px;color:var(--ink-muted)">${r.id}</div>
+      </td>
+      <td><span class="tag tag-fac" style="font-size:11px">Fac</span></td>
+      <td class="center">${r.providers}</td>
+      <td>${r.base}</td>
+      <td class="center" style="font-weight:700;color:var(--success)">${r.t26}</td>
+      <td class="center" style="font-weight:700">${r.t27}</td>
+      <td id="s5tags${i}">${(r.tags||[]).map(t=>`<span class="tag tag-blue" style="font-size:11px">${t}</span>`).join(' ')}</td>
+      <td class="center">
+        <button class="btn-text" title="Remove from combined"><span style="font-family:var(--icon);font-size:15px;line-height:1">hub_remove</span></button>
+        <button class="btn-text" title="Open"><span style="font-family:var(--icon);font-size:15px;line-height:1">open_in_new</span></button>
+      </td>
+    </tr>`;
+  }).join('');
+  updateS5BulkBar();
+}
+
+function toggleS5(i, cb) {
+  if (cb.checked) s5Selected.add(i);
+  else s5Selected.delete(i);
+  const row = document.getElementById('s5row'+i);
+  if (row) row.classList.toggle('selected', cb.checked);
+  updateS5BulkBar();
+}
+
+function toggleAllS5(masterCb) {
+  const rows = document.querySelectorAll('#tbl5Body tr');
+  rows.forEach((row, i) => {
+    const cb = row.querySelector('input[type=checkbox]');
+    if (cb) { cb.checked = masterCb.checked; if (masterCb.checked) s5Selected.add(i); else s5Selected.delete(i); row.classList.toggle('selected', masterCb.checked); }
+  });
+  updateS5BulkBar();
+}
+
+function updateS5BulkBar() {
+  const n = s5Selected.size;
+  const bar = document.getElementById('bulkBar5');
+  bar.classList.toggle('visible', n > 0);
+  document.getElementById('bulkCount5').textContent = `${n} Selected`;
+}
+
+function clearS5Selection() {
+  s5Selected.clear();
+  renderS5();
+  document.getElementById('selAll5').checked = false;
+}
+
+function toggleTagPop5() {
+  document.getElementById('tagPop5').classList.toggle('open');
+}
+
+function applyTags5() {
+  document.getElementById('tagPop5').classList.remove('open');
+  showToast(`Tags updated on ${s5Selected.size} source scenarios`);
+  clearS5Selection();
+}
+
+// ═══════════════════════════════════════════════════
+// SCREEN 6 — Activity Log
+// ═══════════════════════════════════════════════════
+function renderActivityLog() {
+  const el = document.getElementById('activityLog');
+  el.innerHTML = ACTIVITY.map(e => `
+    <div class="activity-entry">
+      <div class="activity-dot ${e.cls}"><span style="font-family:var(--icon);font-size:14px;line-height:1">${e.type}</span></div>
+      <div class="activity-content">
+        <div class="activity-date">${e.date}</div>
+        <div class="activity-event">
+          ${e.event}
+          ${e.badge ? `<span class="tag ${e.badge==='Diverged'?'tag-warn':e.badge==='Stale'?'tag-red':'tag-gray'}" style="font-size:10px;padding:2px 6px">${e.badge}</span>` : ''}
+        </div>
+        <div class="activity-who">
+          <div class="activity-avatar">${e.initials}</div>
+          <span>${e.who} · ${e.time}</span>
+        </div>
+        <div class="activity-detail">${e.detail}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// SCREEN 7 — Source Management
+// ═══════════════════════════════════════════════════
+function renderSourceMgmt() {
+  document.getElementById('sourceMgmtList').innerHTML = SOURCES_MGMT.map(s => `
+    <div class="source-mgmt-row ${s.stale?'stale':''}">
+      <div class="source-left">
+        <div class="source-name">${s.name}</div>
+        <div class="source-meta">
+          <span class="tag ${s.typeCls}" style="font-size:11px">${s.type}</span>
+          <span>${s.id}</span>
+          <span>${s.office}</span>
+          ${s.stale ? '' : `<span style="font-size:11px;color:var(--success)">✓ Synced ${s.lastSync}</span>`}
+        </div>
+        ${s.stale ? `<div style="display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;font-weight:600;color:#B91C1C">
+          <span style="font-family:var(--icon);font-size:14px;line-height:1">sync_problem</span>
+          Modified externally ${s.staleSince} — ${s.staleDetail}
+        </div>` : ''}
+      </div>
+      <div class="source-actions">
+        ${s.stale ? `<button class="btn btn-primary btn-sm" onclick="showToast('Synced ${s.id} — re-run to apply')"><span class="ico">refresh</span>Sync</button>` : ''}
+        <button class="btn btn-ghost btn-sm"><span style="font-family:var(--icon);font-size:14px;line-height:1">open_in_new</span>Open</button>
+        <button class="btn btn-danger btn-sm" onclick="showToast('${s.name} removed from combined')"><span style="font-family:var(--icon);font-size:14px;line-height:1">delete</span></button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════
+// TOAST
+// ═══════════════════════════════════════════════════
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ═══════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════
+renderS1();
+renderS2();
+renderTrendTbl('office');
+renderActivityLog();
+renderS5();
+renderSourceMgmt();
+goTo(1);
+</script>
+</body>
+</html>
